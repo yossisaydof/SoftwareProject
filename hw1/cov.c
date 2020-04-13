@@ -22,44 +22,39 @@ int main(int argc, char** argv) {
 //    char* input_filename = c1;
 //    char* output_filename = c2;
 
-    int num_of_rows = 2, num_of_columns = 3;
+    FILE *file = fopen(input_filename, "r");
+    assert(file != NULL);
+    int num_of_rows = 0, num_of_columns = 0;
+    fscanf(file, "%d", &num_of_columns);
+    fscanf(file, "%d", &num_of_rows);
+    
+    double **matrix = generate2DArray(num_of_rows, num_of_columns);
 
-    double **input_matrix = read_matrix_to_memory(input_filename);
+    read_matrix_to_memory(file, matrix, num_of_rows, num_of_columns);
+
+    fclose(file);
+
     printf("Input Matrix:\n");
-    print_matrix(input_matrix, num_of_rows, num_of_columns);
+    print_matrix(matrix, num_of_rows, num_of_columns);
 
-    standardize_matrix(input_matrix, num_of_rows, num_of_columns);
+    standardize_matrix(matrix, num_of_rows, num_of_columns);
     printf("Covariance Matrix:\n");
-    print_matrix(input_matrix, num_of_rows, num_of_columns);
+    print_matrix(matrix, num_of_rows, num_of_columns);
 
     printf("Output Matrix:\n");
-    create_the_covariance_matrix(input_matrix, output_filename, num_of_rows, num_of_columns);
+    create_the_covariance_matrix(matrix, output_filename, num_of_rows, num_of_columns);
 
     printf("\nDone");
 }
 
 
-double **read_matrix_to_memory(char* filename) {
-    FILE *file = fopen(filename, "r");
-    if (file == NULL) {
-        printf("Failed");
-    }
-    int num_of_rows = 0, num_of_column = 0;
-    fscanf(file, "%d", &num_of_column);
-    fscanf(file, "%d", &num_of_rows);
-
-
-    double **matrix = generate2DArray(num_of_rows, num_of_column);
-
+double **read_matrix_to_memory(FILE *file, double **matrix, int num_of_rows, int num_of_column) {
     for (int i = 0; i < num_of_rows; i++) {
         for (int j = 0; j < num_of_column; j++) {
             int n = fscanf(file, "%lf", &matrix[i][j]);
             assert(n == 1);
         }
     }
-    fclose(file);
-
-    return matrix;
 }
 
 
