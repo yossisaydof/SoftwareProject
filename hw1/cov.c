@@ -3,8 +3,8 @@
 #include <assert.h>
 
 double find_mean_of_row();
-double **read_matrix_to_memory();
-void standardize_matrix();
+double **read_matrix_to_memory(FILE *file, double **matrix, int num_of_rows, int num_of_column);
+void standardize_matrix(double **matrix_input, int num_of_rows, int num_of_columns);
 void subtract_mean_from_row();
 void print_matrix();
 double **generate2DArray();
@@ -27,7 +27,7 @@ int main(int argc, char** argv) {
     int num_of_rows = 0, num_of_columns = 0;
     fscanf(file, "%d", &num_of_columns);
     fscanf(file, "%d", &num_of_rows);
-    
+
     double **matrix = generate2DArray(num_of_rows, num_of_columns);
 
     read_matrix_to_memory(file, matrix, num_of_rows, num_of_columns);
@@ -44,6 +44,8 @@ int main(int argc, char** argv) {
     printf("Output Matrix:\n");
     create_the_covariance_matrix(matrix, output_filename, num_of_rows, num_of_columns);
 
+    //TODO: make sure to free matrix memory
+    free(matrix);
     printf("\nDone");
 }
 
@@ -96,6 +98,7 @@ void create_the_covariance_matrix(double **input_matrix, char *output_filename, 
         }
         printf("\n");
         int n = fwrite(row_to_write, sizeof(double), num_of_rows, file);
+        free(row_to_write);
         assert(n == num_of_rows);
     }
     fclose(file);

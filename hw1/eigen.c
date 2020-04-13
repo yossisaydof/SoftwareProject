@@ -1,39 +1,61 @@
 #include <stdio.h>
 #include <assert.h>
+#include <stdlib.h>
 #include <time.h>
 #include <math.h>
-#include "SPBufferset.h"
 
-double **read_matrix_to_memory(char* filename, int num_of_rows, int num_of_column);
+void generate2DArray(double **matrix, int n);
+void write_vector_to_file(char *output_filename, double *eigen_vector, int n);
+void read_matrix_to_memory(FILE *file, double **matrix, char* filename, int n);
 void create_random_vector(double *vector, int n);
 void update_next_vector(double *next_vector, double **matrix, double *curr_vector, int n);
 void matrix_vector_multiplication(double *new_vector, double **matrix, double *vector, int n);
 double calc_vector_magnitude(double *vector, int n);
+void create_random_vector(double *vector, int n);
+void power_iteration(double *eigen_vector, double *rand_vector, double **matrix, int n);
 
 
-double epsilon = 0.00001;
+double EPSILON = 0.00001;
 
 
 int main(int argc, char** argv) {
 
-	SP_BUFF_SET();
 	srand(time(NULL));
 
 	char* input_filename = argv[1];
 	char* output_filename = argv[2];
-	int n; //TODO n should be the number of columns/rows in the matrix (rows == columns)
+
+    FILE *file = fopen(input_filename, "r");
+    assert(file != NULL);
+    int num_of_rows = 0, num_of_columns = 0;
+    fscanf(file, "%d", &num_of_columns);
+    fscanf(file, "%d", &num_of_rows);
+    assert(num_of_rows == num_of_columns);
+
+    int n = num_of_rows;
 
     double **input_matrix;
     input_matrix = malloc(n * sizeof(double));
-	read_matrix_to_memory(input_matrix, input_filename, n, n);
+	read_matrix_to_memory(file, input_matrix, input_filename, n);
 
 	double *first_vector;
 	first_vector = malloc(n * sizeof(double));
+	create_random_vector(first_vector, n);
+
+    for (int i = 0; i < n; i++) {
+        printf("%lf\n", first_vector[i]);
+    }
 
 	double *eigen_vector;
 	eigen_vector = malloc(n * sizeof(double));
 
-	power_iteration(eigen_vector, input_matrix, first_vector, n);
+	power_iteration(eigen_vector, first_vector, input_matrix, n);
+
+	write_vector_to_file(output_filename, eigen_vector, n);
+
+    for (int i = 0; i < n; i++) {
+        printf("%lf\n", eigen_vector[i]);
+    }
 
 	free(first_vector);
 	free(eigen_vector);
@@ -42,12 +64,8 @@ int main(int argc, char** argv) {
 
 
 
-void read_matrix_to_memory(double **matrix, char* filename, int n) {
+void read_matrix_to_memory(FILE *file, double **matrix, char* filename, int n) {
 	// Read the entire input matrix into memory
-
-	FILE *file = fopen(filename, "r");
-    assert(file != NULL);
-
     generate2DArray(matrix, n);
 
     for (int i = 0; i < n; i++) {
@@ -85,11 +103,11 @@ void update_next_vector(double *next_vector, double **matrix, double *curr_vecto
 	numerator_vector = malloc(n * sizeof(double));
 
 
-	double *numerator = matrix_vector_multiplication(numerator_vector, matrix, curr_vector, n);
-	double denominator = calc_vector_magnitude(numerator, n);
+	matrix_vector_multiplication(numerator_vector, matrix, curr_vector, n);
+	double denominator = calc_vector_magnitude(numerator_vector, n);
 
 	for (int i = 0; i < n; i++){
-		next_vector[i] = numerator[i]/denominator;
+		next_vector[i] = numerator_vector[i]/denominator;
 	}
 
 	free(numerator_vector);
@@ -135,18 +153,30 @@ void power_iteration(double *eigen_vector, double *rand_vector, double **matrix,
 			max_diff = fabs(eigen_vector[i] - rand_vector[i]);
 		}
 	}
-
-	while (max_diff > epsilon){
+    double *prev_vector = malloc(n * sizeof(double));
+	while (max_diff > EPSILON){
 		// We are done iterating when the change in the new vector is small enough
-		update_next_vector(eigen_vector, matrix, rand_vector, n);
+        for (int j = 0; j < n; j++) {
+            prev_vector[j] = eigen_vector[j];
+        }
+		update_next_vector(eigen_vector, matrix, prev_vector, n);
 
-		max_diff = fabs(eigen_vector[0] - rand_vector[0]);
+		max_diff = fabs(eigen_vector[0] - prev_vector[0]);
 		for (int i = 1; i < n; i++){
-			if (max_diff < fabs(eigen_vector[i] - rand_vector[i])){
-				max_diff = fabs(eigen_vector[i] - rand_vector[i]);
+		    if (max_diff > EPSILON)
+                break;
+			if (max_diff < fabs(eigen_vector[i] - prev_vector[i])){
+				max_diff = fabs(eigen_vector[i] - prev_vector[i]);
 			}
 		}
 	}
+    free(prev_vector);
+}
 
+void write_vector_to_file(char *output_filename, double *eigen_vector, int n) {
+    FILE *file = fopen(output_filename, "w");
+
+    int m = fwrite(eigen_vector, sizeof(double), n, file);
+    assert(m == n);
 
 }
