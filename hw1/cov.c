@@ -1,127 +1,107 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
+#include <time.h>
 
-double find_mean_of_row();
-void read_matrix_to_memory(FILE *file, double **matrix, int num_of_rows, int num_of_column);
-void standardize_matrix(double **matrix_input, int num_of_rows, int num_of_columns);
-void subtract_mean_from_row();
-void print_matrix();
-double **generate2DArray();
-void create_the_covariance_matrix();
-double cal_dot_product_of_rows();
+void create_and_write_covariance_matrix(char *input_filename, char *output_filename);
+void find_mean_and_subtract_it_from_each_row(double *row, int row_length);
+double calculate_dot_product_of_two_rows(double *row1, double *row2, int row_length);
 
-int main(int argc, char** argv) {
-    FILE *file;
+int main(int argc, char* argv[]) {
     char *input_filename, *output_filename;
-    int num_of_rows, num_of_columns;
-    double **matrix;
     (void)argc;
 
     input_filename = argv[1];
     output_filename = argv[2];
 
-    file = fopen(input_filename, "r");
-    assert(file != NULL);
-    num_of_rows = 0, num_of_columns = 0;
-    fscanf(file, "%d", &num_of_columns);
-    fscanf(file, "%d", &num_of_rows);
+    create_and_write_covariance_matrix(input_filename, output_filename);
 
-    matrix = generate2DArray(num_of_rows, num_of_columns);
-
-    read_matrix_to_memory(file, matrix, num_of_rows, num_of_columns);
-
-    fclose(file);
-
-    standardize_matrix(matrix, num_of_rows, num_of_columns);
-
-    create_the_covariance_matrix(matrix, output_filename, num_of_rows, num_of_columns);
-
-    free(matrix);
     return 0;
 }
 
 
-void read_matrix_to_memory(FILE *file, double **matrix, int num_of_rows, int num_of_column) {
-    int i, j, n;
-    for (i = 0; i < num_of_rows; i++) {
-        for (j = 0; j < num_of_column; j++) {
-            n = fscanf(file, "%lf", &matrix[i][j]);
-            assert(n == 1);
-        }
-    }
-}
-
-
-void standardize_matrix(double **matrix_input, int num_of_rows, int num_of_columns) {
-    double mean;
-    int i;
-    for (i = 0; i < num_of_rows; i++) {
-        mean = find_mean_of_row(matrix_input[i], num_of_columns);
-        subtract_mean_from_row(matrix_input[i], mean, num_of_columns);
-    }
-}
-
-
-double find_mean_of_row(double *row, int n) {
-    double sum = 0;
-    int i;
-    for (i = 0; i < n; i++) {
-        sum = sum + row[i];
-    }
-    return sum / n;
-}
-
-
-void subtract_mean_from_row(double *row, double mean, int n) {
-    int i;
-    for (i = 0; i < n; i++) {
-        row[i] = row[i] - mean;
-    }
-}
-
-
-void create_the_covariance_matrix(double **input_matrix, char *output_filename, int num_of_rows, int num_of_columns) {
-    FILE *file;
+void create_and_write_covariance_matrix(char *input_filename, char *output_filename) {
+    FILE *input_file, *output_file;
+    clock_t start, end;
+    int matrix_dimension[2], output_matrix_dimension[2];
+    int num_of_rows, num_of_columns, i, j, n;
     double *row_to_write;
-    double dot_product_of_rows;
-    int i, j, n;
+    double **matrix;
 
-    file = fopen(output_filename, "w");
+    start = clock();
+
+    input_file = fopen(input_filename, "r");
+    assert(input_file != NULL);
+    rewind(input_file);
+
+    fread(matrix_dimension, sizeof(int), 2, input_file);
+    num_of_columns = matrix_dimension[0];
+    num_of_rows = matrix_dimension[1];
+
+    matrix = malloc(num_of_rows * sizeof(double));
+    for (i = 0; i < num_of_rows; i++) {
+        matrix[i] = malloc(num_of_columns * sizeof(double));
+        n = fread(matrix[i], sizeof(double), num_of_columns, input_file);
+        assert(n == num_of_columns);
+    }
 
     for (i = 0; i < num_of_rows; i++) {
-        row_to_write = malloc(num_of_rows * sizeof(double));
+        find_mean_and_subtract_it_from_each_row(matrix[i], num_of_columns);
+    }
+
+    fclose(input_file);
+
+    output_file = fopen(output_filename, "w");
+    assert(output_file != NULL);
+
+    output_matrix_dimension[0] = num_of_rows;
+    output_matrix_dimension[1] = num_of_rows;
+
+    row_to_write = malloc(num_of_rows * sizeof(double));
+    fwrite(output_matrix_dimension, sizeof(int), 2, output_file);
+
+    for (i = 0; i < num_of_rows; i++) {
+
         for (j = 0; j < num_of_rows; j++) {
-            dot_product_of_rows = cal_dot_product_of_rows(input_matrix[i], input_matrix[j], num_of_columns);
-            row_to_write[j] = dot_product_of_rows;
+            row_to_write[j] = calculate_dot_product_of_two_rows(matrix[i], matrix[j], num_of_columns);
         }
-        n = fwrite(row_to_write, sizeof(double), num_of_rows, file);
-        free(row_to_write);
+        n = fwrite(row_to_write ,sizeof(double), num_of_rows ,output_file);
         assert(n == num_of_rows);
     }
-    fclose(file);
+
+    end = clock();
+    printf("Execution took %f seconds\n", ((double)(end-start) / CLOCKS_PER_SEC));
+
+    fclose(output_file);
+    free(matrix);
+    free(row_to_write);
+
+
 }
 
-
-double cal_dot_product_of_rows(double *row1, double *row2, int n) {
-    double result = 0;
+void find_mean_and_subtract_it_from_each_row(double *row, int row_length) {
+    double sum, mean;
     int i;
-    for (i = 0; i < n; i++) {
+
+    sum  = 0;
+    for (i = 0; i < row_length; i++) {
+        sum += row[i];
+    }
+
+    mean = (double) sum / row_length;
+    for (i = 0; i < row_length; i++) {
+        row[i] -= mean;
+    }
+
+}
+
+double calculate_dot_product_of_two_rows(double *row1, double *row2, int row_length) {
+    double result;
+    int i;
+
+    result = 0;
+    for (i = 0; i < row_length; i++) {
         result += row1[i] * row2[i];
     }
     return result;
 }
-
-
-double **generate2DArray(int num_of_rows, int num_of_columns) {
-    double **matrix;
-    int i;
-    matrix = malloc(num_of_rows * sizeof(double));
-    for (i = 0; i < num_of_columns; i++) {
-        matrix[i] = malloc(num_of_columns * sizeof(double));
-    }
-    return matrix;
-}
-
-
-
