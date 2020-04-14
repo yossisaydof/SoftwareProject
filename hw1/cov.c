@@ -9,12 +9,18 @@ double calculate_dot_product_of_two_rows(double *row1, double *row2, int row_len
 
 int main(int argc, char* argv[]) {
     char *input_filename, *output_filename;
+    clock_t start, end;
     (void)argc;
+
+    start = clock();
 
     input_filename = argv[1];
     output_filename = argv[2];
 
     create_and_write_covariance_matrix(input_filename, output_filename);
+
+    end = clock();
+    printf("Execution took %f seconds\n", ((double)(end-start) / CLOCKS_PER_SEC));
 
     return 0;
 }
@@ -22,13 +28,10 @@ int main(int argc, char* argv[]) {
 
 void create_and_write_covariance_matrix(char *input_filename, char *output_filename) {
     FILE *input_file, *output_file;
-    clock_t start, end;
     int matrix_dimension[2], output_matrix_dimension[2];
     int num_of_rows, num_of_columns, i, j, n;
     double *row_to_write;
     double **matrix;
-
-    start = clock();
 
     input_file = fopen(input_filename, "r");
     assert(input_file != NULL);
@@ -69,13 +72,9 @@ void create_and_write_covariance_matrix(char *input_filename, char *output_filen
         assert(n == num_of_rows);
     }
 
-    end = clock();
-    printf("Execution took %f seconds\n", ((double)(end-start) / CLOCKS_PER_SEC));
-
     fclose(output_file);
     free(matrix);
     free(row_to_write);
-
 
 }
 
