@@ -44,7 +44,7 @@ void create_and_write_covariance_matrix(char *input_filename, char *output_filen
     matrix = malloc(num_of_rows * sizeof(double));
     for (i = 0; i < num_of_rows; i++) {
         matrix[i] = malloc(num_of_columns * sizeof(double));
-        n = fread(matrix[i], sizeof(double), num_of_columns, input_file);
+        n = (int)fread(matrix[i], sizeof(double), num_of_columns, input_file);
         assert(n == num_of_columns);
     }
 
@@ -68,7 +68,7 @@ void create_and_write_covariance_matrix(char *input_filename, char *output_filen
         for (j = 0; j < num_of_rows; j++) {
             row_to_write[j] = calculate_dot_product_of_two_rows(matrix[i], matrix[j], num_of_columns);
         }
-        n = fwrite(row_to_write ,sizeof(double), num_of_rows ,output_file);
+        n = (int)fwrite(row_to_write ,sizeof(double), num_of_rows ,output_file);
         assert(n == num_of_rows);
     }
 

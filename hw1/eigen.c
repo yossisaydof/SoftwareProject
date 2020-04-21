@@ -7,7 +7,7 @@
 void write_vector_to_file(char *output_filename, double *eigen_vector, int n);
 void read_matrix_to_memory(FILE *file, double **matrix, int n);
 void create_random_vector(double *vector, int n);
-void update_next_vector(double *next_vector, double **matrix, double *curr_vector, int n);
+void update_next_vector(double *next_vector, double **matrix, double *curr_vector, double *numerator_vector, int n);
 void matrix_vector_multiplication(double *new_vector, double **matrix, double *vector, int n);
 double calc_vector_magnitude(double *vector, int n);
 void create_random_vector(double *vector, int n);
@@ -96,12 +96,9 @@ void create_random_vector(double *vector, int n){
 
 }
 
-void update_next_vector(double *next_vector, double **matrix, double *curr_vector, int n){
-	double *numerator_vector;
+void update_next_vector(double *next_vector, double **matrix, double *curr_vector, double *numerator_vector, int n){
     double denominator;
     int i;
-
-    numerator_vector = malloc(n * sizeof(double));
 
 	matrix_vector_multiplication(numerator_vector, matrix, curr_vector, n);
 	denominator = calc_vector_magnitude(numerator_vector, n);
@@ -109,8 +106,6 @@ void update_next_vector(double *next_vector, double **matrix, double *curr_vecto
 	for (i = 0; i < n; i++){
 		next_vector[i] = (double) numerator_vector[i] / denominator;
 	}
-
-	free(numerator_vector);
 }
 
 
@@ -142,10 +137,13 @@ double calc_vector_magnitude(double *vector, int n){
 
 void power_iteration(double *eigen_vector, double *rand_vector, double **matrix, int n){
     double max_diff, diff;
-    double *prev_vector;
+    double *prev_vector, *numerator_vector;
     int i, j;
 
-	update_next_vector(eigen_vector, matrix, rand_vector, n);
+    prev_vector = malloc(n * sizeof(double));
+    numerator_vector = malloc(n * sizeof(double));
+
+	update_next_vector(eigen_vector, matrix, rand_vector, numerator_vector, n);
 
     max_diff = fabs(eigen_vector[0] - rand_vector[0]);
 
@@ -154,16 +152,16 @@ void power_iteration(double *eigen_vector, double *rand_vector, double **matrix,
 			max_diff = fabs(eigen_vector[i] - rand_vector[i]);
 		}
 	}
-    prev_vector = malloc(n * sizeof(double));
-	while (max_diff > EPSILON){
+
+    while (max_diff >= EPSILON){
         for (j = 0; j < n; j++) {
             prev_vector[j] = eigen_vector[j];
         }
-		update_next_vector(eigen_vector, matrix, prev_vector, n);
+		update_next_vector(eigen_vector, matrix, prev_vector, numerator_vector, n);
 
 		max_diff = fabs(eigen_vector[0] - prev_vector[0]);
 		for (i = 1; i < n; i++){
-		    if (max_diff > EPSILON)
+		    if (max_diff >= EPSILON)
                 break;
 		    diff = fabs(eigen_vector[i] - prev_vector[i]);
 			if (max_diff < diff){
@@ -172,6 +170,7 @@ void power_iteration(double *eigen_vector, double *rand_vector, double **matrix,
 		}
 	}
     free(prev_vector);
+    free(numerator_vector);
 }
 
 void write_vector_to_file(char *output_filename, double *eigen_vector, int n) {
