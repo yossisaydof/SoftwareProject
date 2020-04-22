@@ -104,7 +104,7 @@ void create_random_vector(double *vector, int n){
 
 void update_next_vector(double *next_vector, double **matrix, double *curr_vector, double *numerator_vector, int n){
 	/*
-	 * calculates the next normalized vector according to the following equation:
+	 * Calculates the next normalized vector according to the following equation:
 	 *  (matrix * vector)/||(matrix * vector)||
 	 */
     double denominator;
@@ -121,16 +121,16 @@ void update_next_vector(double *next_vector, double **matrix, double *curr_vecto
 
 void matrix_vector_multiplication(double *new_vector, double **matrix, double *vector, int n){
 	/*
-	 * updates new_vector as the multiplication of matrix*vector
+	 * Updates new_vector as the multiplication of matrix*vector
 	 */
 	double sum;
     int i, j;
     sum = 0;
 
 	for (i = 0; i < n; i++){
-		/* iterating over the matrix's rows and new_vector's rows */
+		/* Iterate over the matrix's rows and new_vector's rows */
 		for (j = 0; j < n; j++){
-			/* iterating over the matrix's columns and vector's rows */
+			/* Iterate over the matrix's columns and vector's rows */
 			sum += matrix[i][j] * vector[j];
 		}
 		new_vector[i] = sum;
@@ -140,7 +140,7 @@ void matrix_vector_multiplication(double *new_vector, double **matrix, double *v
 }
 
 double calc_vector_magnitude(double *vector, int n){
-	/* calculates the vector's magnitude (i.e. square root of the vector's dot product with itself) */
+	/* Calculates the vector's magnitude (i.e. square root of the vector's dot product with itself) */
 	double sum_squares = 0;
 	int i;
 
@@ -152,7 +152,7 @@ double calc_vector_magnitude(double *vector, int n){
 }
 
 void power_iteration(double *eigen_vector, double *rand_vector, double **matrix, int n){
-	/* updates the eigenvalue in eigen_vector */
+	/* Updates the eigenvalue in eigen_vector */
     double max_diff, diff;
     double *prev_vector, *numerator_vector;
     int i, j;
