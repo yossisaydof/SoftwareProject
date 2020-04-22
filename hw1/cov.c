@@ -38,14 +38,14 @@ void create_and_write_covariance_matrix(char *input_filename, char *output_filen
     rewind(input_file);
 
     /*
-     * Read matrix dimension from input file
+     * Read matrix dimensions from input file
      */
     fread(matrix_dimension, sizeof(int), 2, input_file);
     num_of_columns = matrix_dimension[0];
     num_of_rows = matrix_dimension[1];
 
 	 /*
-	  * Read the entire input matrix into memory
+	  * Read entire input matrix into memory
 	  */
     matrix = malloc(num_of_rows * sizeof(double));
     for (i = 0; i < num_of_rows; i++) {
@@ -55,7 +55,7 @@ void create_and_write_covariance_matrix(char *input_filename, char *output_filen
     }
 
     /*
-	 * Standardize the input matrix
+	 * Standardize input matrix
 	 */
     for (i = 0; i < num_of_rows; i++) {
         find_mean_and_subtract_it_from_each_row(matrix[i], num_of_columns);
