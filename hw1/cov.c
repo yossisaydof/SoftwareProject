@@ -19,8 +19,10 @@ int main(int argc, char* argv[]) {
 
     create_and_write_covariance_matrix(input_filename, output_filename);
 
+
     end = clock();
     printf("Execution took %f seconds\n", ((double)(end-start) / CLOCKS_PER_SEC));
+
 
     return 0;
 }
@@ -80,6 +82,10 @@ void create_and_write_covariance_matrix(char *input_filename, char *output_filen
         /* Write each row of the covariance matrix into the file, each row at the time */
         n = (int)fwrite(row_to_write ,sizeof(double), num_of_rows ,output_file);
         assert(n == num_of_rows);
+    }
+
+    for (i = 0; i < num_of_rows; i++) {
+            free(matrix[i]);
     }
 
     fclose(output_file);

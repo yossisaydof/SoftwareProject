@@ -4,28 +4,29 @@
 #include <time.h>
 #include <math.h>
 
-void write_vector_to_file(char *output_filename, double *eigen_vector, int n);
-void read_matrix_to_memory(FILE *file, double **matrix, int n);
 void create_random_vector(double *vector, int n);
-void update_next_vector(double *next_vector, double **matrix, double *curr_vector, double *numerator_vector, int n);
-void matrix_vector_multiplication(double *new_vector, double **matrix, double *vector, int n);
+void update_next_vector(FILE *file, double *input_vector, double *next_vector, double *curr_vector, double *numerator_vector, int n);
+void matrix_vector_multiplication(double *input_vector, FILE *file, double *new_vector, double *vector, int n);
 double calc_vector_magnitude(double *vector, int n);
-void create_random_vector(double *vector, int n);
-void power_iteration(double *eigen_vector, double *rand_vector, double **matrix, int n);
+void power_iteration(double *input_vector,FILE *file, double *eigen_vector, double *rand_vector, int n,
+                     double *prev_vector, double *numerator_vector);
+void write_vector_to_file(char *output_filename, double *eigen_vector, int n);
 
 
 double EPSILON = 0.00001;
-
+int cnt = 0;
 
 int main(int argc, char* argv[]) {
     FILE *file;
-    clock_t start, end;
     char *input_filename,  *output_filename;
-    int num_of_rows, num_of_columns, n;
+    int num_of_rows, num_of_columns;
     int matrix_dimension[2];
-    double **input_matrix;
+    double *input_rows;
     double *first_vector;
     double *eigen_vector;
+    double *prev_vector;
+    double *numerator_vector;
+    clock_t start, end;
     (void)argc;
 
     start = clock();
@@ -38,62 +39,46 @@ int main(int argc, char* argv[]) {
     file = fopen(input_filename, "r");
     assert(file != NULL);
 
+    /* Getting matrix's dimensions */
     num_of_rows = 0;
     num_of_columns = 0;
-
     fread(matrix_dimension, sizeof(int), 2, file);
     num_of_columns = matrix_dimension[0];
     num_of_rows = matrix_dimension[1];
     assert(num_of_rows == num_of_columns);
 
-    n = num_of_rows;
+    /* Creating a vector to read the matrix's rows */
+    input_rows = malloc(num_of_rows * sizeof(double));
 
-    input_matrix = malloc(n * sizeof(double));
+    /* Creating b1 from random numbers */
+	first_vector = malloc(num_of_rows * sizeof(double));
+	create_random_vector(first_vector, num_of_rows);
 
-	read_matrix_to_memory(file, input_matrix, n);
+	eigen_vector = malloc(num_of_rows * sizeof(double));
+	rewind(file);
 
-	first_vector = malloc(n * sizeof(double));
-	create_random_vector(first_vector, n);
+    prev_vector = malloc(num_of_rows * sizeof(double));
+    numerator_vector = malloc(num_of_rows * sizeof(double));
+	power_iteration(input_rows, file, eigen_vector, first_vector, num_of_rows, prev_vector, numerator_vector);
 
-	eigen_vector = malloc(n * sizeof(double));
+	write_vector_to_file(output_filename, eigen_vector, num_of_rows);
 
-	power_iteration(eigen_vector, first_vector, input_matrix, n);
-
-	write_vector_to_file(output_filename, eigen_vector, n);
-
-	free(first_vector);
+    fclose(file);
+    free(prev_vector);
+    free(numerator_vector);
+    free(first_vector);
 	free(eigen_vector);
-	free(input_matrix);
+	free(input_rows);
 
     end = clock();
-
     printf("Execution took %f seconds\n", ((double)(end-start) / CLOCKS_PER_SEC));
 
     return 0;
 }
 
-
-
-void read_matrix_to_memory(FILE *file, double **matrix, int n) {
-	/*
-	 * Read the entire input matrix into memory
-	 */
-    int i, m;
-
-    for (i = 0; i < n; i++) {
-        matrix[i] = malloc(n * sizeof(double));
-        m = fread(matrix[i], sizeof(double), n, file);
-        assert(n == m);
-    }
-
-    fclose(file);
-
-}
-
-
 void create_random_vector(double *vector, int n){
 	/*
-	 * update vector to random numbers
+	 * Update vector to random numbers
 	 */
     int i;
 	for (i = 0; i < n; i++){
@@ -102,45 +87,11 @@ void create_random_vector(double *vector, int n){
 
 }
 
-void update_next_vector(double *next_vector, double **matrix, double *curr_vector, double *numerator_vector, int n){
-	/*
-	 * Calculates the next normalized vector according to the following equation:
-	 *  (matrix * vector)/||(matrix * vector)||
-	 */
-    double denominator;
-    int i;
-
-	matrix_vector_multiplication(numerator_vector, matrix, curr_vector, n);
-	denominator = calc_vector_magnitude(numerator_vector, n);
-
-	for (i = 0; i < n; i++){
-		next_vector[i] = (double) numerator_vector[i] / denominator;
-	}
-}
-
-
-void matrix_vector_multiplication(double *new_vector, double **matrix, double *vector, int n){
-	/*
-	 * Updates new_vector as the multiplication of matrix*vector
-	 */
-	double sum;
-    int i, j;
-    sum = 0;
-
-	for (i = 0; i < n; i++){
-		/* Iterate over the matrix's rows and new_vector's rows */
-		for (j = 0; j < n; j++){
-			/* Iterate over the matrix's columns and vector's rows */
-			sum += matrix[i][j] * vector[j];
-		}
-		new_vector[i] = sum;
-		sum = 0;
-	}
-
-}
 
 double calc_vector_magnitude(double *vector, int n){
-	/* Calculates the vector's magnitude (i.e. square root of the vector's dot product with itself) */
+	/*
+	 * Calculates the vector's magnitude (i.e. square root of the vector's dot product with itself)
+	*/
 	double sum_squares = 0;
 	int i;
 
@@ -151,31 +102,34 @@ double calc_vector_magnitude(double *vector, int n){
 	return sqrt(sum_squares);
 }
 
-void power_iteration(double *eigen_vector, double *rand_vector, double **matrix, int n){
-	/* Updates the eigenvalue in eigen_vector */
+void power_iteration(double *input_vector,FILE *file, double *eigen_vector, double *rand_vector, int n,
+                     double *prev_vector, double *numerator_vector){
+	/*
+	 * Updates the eigenvalue in eigen_vector
+	*/
     double max_diff, diff;
-    double *prev_vector, *numerator_vector;
     int i, j;
 
-    prev_vector = malloc(n * sizeof(double));
-    numerator_vector = malloc(n * sizeof(double));
 
-	update_next_vector(eigen_vector, matrix, rand_vector, numerator_vector, n);
-
+    /* Updating eigen_vector to be b1 */
+	update_next_vector(file, input_vector, eigen_vector, rand_vector, numerator_vector, n);
     max_diff = fabs(eigen_vector[0] - rand_vector[0]);
-
-	for (i = 1; i < n; i++){
-		if (max_diff < fabs(eigen_vector[i] - rand_vector[i])){
-			max_diff = fabs(eigen_vector[i] - rand_vector[i]);
-		}
-	}
+    if (max_diff >= EPSILON){
+    	for (i = 1; i < n; i++){
+    		if (max_diff < fabs(eigen_vector[i] - rand_vector[i])){
+    				max_diff = fabs(eigen_vector[i] - rand_vector[i]);
+    		}
+    	}
+    }
 
     while (max_diff >= EPSILON){
-    	/* We are done iterating when the change in the new vector is small enough */
+    	/*
+    	 * We are done iterating when the change in the new vector is small enough
+    	*/
         for (j = 0; j < n; j++) {
             prev_vector[j] = eigen_vector[j];
         }
-		update_next_vector(eigen_vector, matrix, prev_vector, numerator_vector, n);
+		update_next_vector(file, input_vector, eigen_vector, prev_vector, numerator_vector, n);
 
 		max_diff = fabs(eigen_vector[0] - prev_vector[0]);
 		for (i = 1; i < n; i++){
@@ -187,8 +141,50 @@ void power_iteration(double *eigen_vector, double *rand_vector, double **matrix,
 			}
 		}
 	}
-    free(prev_vector);
-    free(numerator_vector);
+}
+
+void update_next_vector(FILE *file, double *input_vector, double *next_vector, double *curr_vector, double *numerator_vector, int n){
+	/*
+	 * Calculates the next normalized vector according to the following equation:
+	 *  (matrix * vector)/||(matrix * vector)||
+	 */
+    double denominator;
+    int i;
+
+	matrix_vector_multiplication(input_vector, file, numerator_vector, curr_vector, n);
+    rewind(file);
+	denominator = calc_vector_magnitude(numerator_vector, n);
+
+	for (i = 0; i < n; i++){
+		next_vector[i] = (double) numerator_vector[i] / denominator;
+	}
+}
+
+void matrix_vector_multiplication(double *input_vector, FILE *file, double *new_vector, double *vector, int n){
+	/*
+	 * Updates new_vector as the multiplication of matrix*vector
+	 */
+	double sum;
+    int i, j, num;
+	int matrix_dim[2];
+    sum = 0;
+
+    /* Read first 2 numbers from file */
+    num = fread(matrix_dim, sizeof(int), 2, file);
+    assert(num == 2);
+    for (i = 0; i < n; ++i) {
+    	/* Iterating over the martix's rows */
+    	num = fread(input_vector, sizeof(double), n, file); /* Read row i to input_vector (row i is of length n) */
+		assert(num == n);
+		cnt++;
+		for (j = 0; j < n; ++j) {
+			sum += input_vector[j] * vector[j];
+		}
+
+		new_vector[i] = sum;
+		sum = 0;
+	}
+
 }
 
 void write_vector_to_file(char *output_filename, double *eigen_vector, int n) {
@@ -206,5 +202,7 @@ void write_vector_to_file(char *output_filename, double *eigen_vector, int n) {
 
     assert(k == 2);
     assert(m == n);
+
+    fclose(file);
 
 }
