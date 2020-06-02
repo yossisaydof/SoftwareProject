@@ -5,13 +5,14 @@
 #include "spmat.h"
 
 void create_random_vector(double *vector, int n);
+int calc_nnz_values(FILE *input_matrix_file, int n);
 
 
 int main(int argc, char* argv[]){
     FILE *input_matrix_file, *initial_vector_file;
     char *input_matrix_filename, *initial_vector_filename ,*output_filename, *implementation = NULL;
     double *initial_vector, *matrix_row;
-    int n, i, matrix_dimension[2];
+    int n, i, nnz, num, matrix_dimension[2];
     spmat* sparse_matrix;
 
     /* TESTING */
@@ -29,9 +30,11 @@ int main(int argc, char* argv[]){
     input_matrix_file = fopen(input_matrix_filename, "r");
     assert(input_matrix_file != NULL);
 
-    fread(matrix_dimension, sizeof(int), 2, input_matrix_file);
+    num = (int) fread(matrix_dimension, sizeof(int), 2, input_matrix_file);
+    assert(num == 2);
     assert(matrix_dimension[0] == matrix_dimension[1]);
     n = matrix_dimension[0];
+    rewind(input_matrix_file);
 
     initial_vector = malloc(n * sizeof(double));
 
@@ -50,7 +53,8 @@ int main(int argc, char* argv[]){
 
         initial_vector_file = fopen(initial_vector_filename, "r");
         assert(initial_vector_file != NULL);
-        fread(initial_vector, sizeof(int), n, initial_vector_file);
+        num = (int) fread(initial_vector, sizeof(int), n, initial_vector_file);
+        assert(num == n);
     }
     else return -1;
 
@@ -60,15 +64,22 @@ int main(int argc, char* argv[]){
         sparse_matrix = spmat_allocate_list(n);
     }
     else if (strcmp(implementation, "-array") == 0){
-        sparse_matrix = spmat_allocate_array(n,1);
+        num = (int) fread(matrix_dimension, sizeof(int), 2, input_matrix_file);
+        assert(num == 2);
+        assert(matrix_dimension[0] == matrix_dimension[1]);
+
+        n = matrix_dimension[0];
+        nnz = calc_nnz_values(input_matrix_file, n);
+        sparse_matrix = spmat_allocate_array(n, nnz);
     }
     else
         return -1;
 
     /* Read sparse matrix from input file */
+    matrix_row = malloc(sizeof(double) * n);
     for (i = 0; i < n; i++) {
-        matrix_row = malloc(sizeof(double) * n);
-        fread(matrix_row, sizeof(double), n, input_matrix_file);
+        num = (int) fread(matrix_row, sizeof(double), n, input_matrix_file);
+        assert(num == n);
         sparse_matrix->add_row(sparse_matrix, matrix_row, i);
     }
 
@@ -89,5 +100,34 @@ void create_random_vector(double *vector, int n){
         vector[i] = (double)rand();
     }
 
+}
+
+
+int calc_nnz_values(FILE *input_matrix_file, int n){
+    /*
+     * Calculate non-zero values for sparse matrix
+     */
+    double *row;
+    int i, j, nnz, num;
+    int matrix_dim[2];
+    nnz = 0;
+    row = malloc(n * sizeof(double));
+
+    /* Read first 2 numbers from file */
+    num = (int) fread(matrix_dim, sizeof(int), 2, input_matrix_file);
+    assert(num == 2);
+    for (i = 0; i < n; ++i) {
+        /* Iterating over the martix's rows */
+        num = (int) fread(row, sizeof(double), n, input_matrix_file);
+        assert(num == n);
+        for (j = 0; j < n; ++j) {
+            if (row[j] == (double) 0)
+                nnz += 1;
+        }
+    }
+
+    rewind(input_matrix_file);
+    free(row);
+    return nnz;
 }
 

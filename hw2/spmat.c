@@ -10,7 +10,7 @@ void add_row_array(struct _spmat *A, const double *row, int i);
 void free_array(struct _spmat *A);
 void mult_array(const struct _spmat *A, const double *v, double *result);
 
-typedef struct {
+typedef struct Array {
     double *values;
     int *colind;
     int *rowptr;
@@ -48,19 +48,17 @@ spmat* spmat_allocate_array(int n, int nnz) {
 
 spmat* spmat_allocate_list(int n) {
     spmat* sparse_matrix;
-    LinkedList *list_of_rows;
+    LinkedList *row_lists;
     int i;
-    list_of_rows = (LinkedList*) malloc(n * sizeof(LinkedList));
-//    for (i = 0; i < n; i++) {
-//        list_of_rows[i] = NULL;
-//    }
+
+    row_lists = (LinkedList*) malloc(n * sizeof(LinkedList));
 
     sparse_matrix = malloc(sizeof(spmat));
     sparse_matrix -> n = n;
     sparse_matrix -> add_row = add_row_linked_list;
     sparse_matrix -> free = free_linked_list;
     sparse_matrix -> mult = mult_linked_list;
-    sparse_matrix -> private = (LinkedList *)list_of_rows;
+    sparse_matrix -> private = (LinkedList *)row_lists;
 
     return sparse_matrix;
 }
@@ -68,12 +66,11 @@ spmat* spmat_allocate_list(int n) {
 
 void add_row_linked_list(struct _spmat *A, const double *row, int i) {
     int j, k, is_empty;
-    LinkedList *linked_list = (LinkedList*)(A->private);
-    LinkedList *list_node;
+    LinkedList *linked_list = (LinkedList*) (A->private);
+    LinkedList *row_node;
     LinkedList *new_node, *prev_node = NULL ;
 
-    list_node = &linked_list[i];
-
+    row_node = &linked_list[i];
     is_empty = 0;
     for (j = 0; j < A->n; j++) {
         if (row[j] == 0) continue;
@@ -85,64 +82,28 @@ void add_row_linked_list(struct _spmat *A, const double *row, int i) {
 
         if (is_empty == 0){
             is_empty = 1;
-            list_node->head =new_node;
-            list_node = (LinkedList *) new_node;
-        } else {
-            prev_node = list_node;
-            list_node->next = new_node;
-            prev_node = list_node;
-
-            list_node += sizeof(LinkedList);
-//            linked_list = linked_list->next;
+            row_node->head = new_node;
+            row_node = (LinkedList *) new_node;
+            prev_node = new_node;
+        }
+        else {
+            prev_node->next = new_node;
+            prev_node = new_node;
         }
     }
     if (is_empty == 0){
-        list_node = (LinkedList*)NULL;
+        row_node = (LinkedList*)NULL;
     }
 }
-
-void print(struct _spmat *A, int n) {
-    LinkedList *linked_list = (LinkedList*)(A->private);
-    LinkedList *head;
-    int i, j;
-    for (i = 0; i < n; i++) {
-        head = &linked_list[i];
-        while(head->next != NULL) {
-            printf("%lf", head->value);
-            head += sizeof(LinkedList);
-        }
-
-    }
-}
-
-
-void free_linked_list(struct _spmat *A) {
-    int i;
-    LinkedList* node, tmp;
-    LinkedList* ls;
-    ls = (LinkedList*) A->private;
-
-//    for (i = 0; i < A->n; i++) {
-//        node = &ls->row_list[i];
-//        while (node != NULL) {
-//            tmp = node->next;
-//        }
-//        free(node);
-//    }
-}
-
-
-void mult_linked_list(const struct _spmat *A, const double *v, double *result) {}
 
 
 void add_row_array(struct _spmat *A, const double *row, int i) {
     Array *array_struct = A -> private;
-    int index;
-    int j;
+    int index, j;
 
-    index = 0;
+    index = array_struct -> index;
     for (j = 0; j < A -> n ; j++) {
-        if (row[j] == 0) continue ;
+        if (row[j] == 0) continue;
 
         array_struct -> index ++;
         index = array_struct -> index;
@@ -150,9 +111,7 @@ void add_row_array(struct _spmat *A, const double *row, int i) {
         array_struct -> colind[index] = j;
         array_struct -> rowptr[index] = i;
     }
-    if (index == 0) {
 
-    }
     if (i == A -> n) {
         if (index == 0) {
             array_struct -> rowptr[array_struct -> index] = array_struct -> index + 1;
@@ -163,7 +122,29 @@ void add_row_array(struct _spmat *A, const double *row, int i) {
 }
 
 
-void free_array(struct _spmat *A) {}
+void free_array(struct _spmat *A) {
+    Array *array_struct = A -> private;
 
+}
+
+void free_linked_list(struct _spmat *A) {
+    int i;
+    LinkedList* node, tmp;
+    LinkedList* linked_list;
+    linked_list = (LinkedList*)(A->private);
+
+    for (i = 0; i < A->n; i++) {
+        node = &linked_list[i];
+        while (node != NULL) {
+            tmp = node->next;
+        }
+        free(node);
+    }
+}
 
 void mult_array(const struct _spmat *A, const double *v, double *result) {}
+
+
+void mult_linked_list(const struct _spmat *A, const double *v, double *result) {}
+
+
