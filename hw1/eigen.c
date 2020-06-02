@@ -14,7 +14,6 @@ void write_vector_to_file(char *output_filename, double *eigen_vector, int n);
 
 
 double EPSILON = 0.00001;
-int cnt = 0;
 
 int main(int argc, char* argv[]) {
     FILE *file;
@@ -26,10 +25,7 @@ int main(int argc, char* argv[]) {
     double *eigen_vector;
     double *prev_vector;
     double *numerator_vector;
-    clock_t start, end;
     (void)argc;
-
-    start = clock();
 
     srand(time(NULL));
 
@@ -69,9 +65,6 @@ int main(int argc, char* argv[]) {
     free(first_vector);
 	free(eigen_vector);
 	free(input_rows);
-
-    end = clock();
-    printf("Execution took %f seconds\n", ((double)(end-start) / CLOCKS_PER_SEC));
 
     return 0;
 }
@@ -176,7 +169,6 @@ void matrix_vector_multiplication(double *input_vector, FILE *file, double *new_
     	/* Iterating over the martix's rows */
     	num = fread(input_vector, sizeof(double), n, file); /* Read row i to input_vector (row i is of length n) */
 		assert(num == n);
-		cnt++;
 		for (j = 0; j < n; ++j) {
 			sum += input_vector[j] * vector[j];
 		}

@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
-#include <time.h>
 
 void create_and_write_covariance_matrix(char *input_filename, char *output_filename);
 void find_mean_and_subtract_it_from_each_row(double *row, int row_length);
@@ -9,20 +8,12 @@ double calculate_dot_product_of_two_rows(double *row1, double *row2, int row_len
 
 int main(int argc, char* argv[]) {
     char *input_filename, *output_filename;
-    clock_t start, end;
     (void)argc;
-
-    start = clock();
 
     input_filename = argv[1];
     output_filename = argv[2];
 
     create_and_write_covariance_matrix(input_filename, output_filename);
-
-
-    end = clock();
-    printf("Execution took %f seconds\n", ((double)(end-start) / CLOCKS_PER_SEC));
-
 
     return 0;
 }

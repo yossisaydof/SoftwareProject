@@ -9,10 +9,10 @@ int calc_nnz_values(FILE *input_matrix_file, int n);
 
 
 int main(int argc, char* argv[]){
-    FILE *input_matrix_file, *initial_vector_file;
+    FILE *input_matrix_file, *initial_vector_file, *output_file;
     char *input_matrix_filename, *initial_vector_filename ,*output_filename, *implementation = NULL;
-    double *initial_vector, *matrix_row;
-    int n, i, nnz, num, matrix_dimension[2];
+    double *initial_vector, *matrix_row, *result_vector;
+    int n, i, nnz, num, matrix_dimension[2], vector_dimension[2];
     spmat* sparse_matrix;
 
     /* TESTING */
@@ -36,7 +36,7 @@ int main(int argc, char* argv[]){
     n = matrix_dimension[0];
     rewind(input_matrix_file);
 
-    initial_vector = malloc(n * sizeof(double));
+    initial_vector = (double*) malloc(n * sizeof(double));
 
     if (argc == 4) {
         /* In case that there is no initial vector input, so we create it */
@@ -53,7 +53,10 @@ int main(int argc, char* argv[]){
 
         initial_vector_file = fopen(initial_vector_filename, "r");
         assert(initial_vector_file != NULL);
-        num = (int) fread(initial_vector, sizeof(int), n, initial_vector_file);
+        num = (int) fread(vector_dimension, sizeof(int), 2, initial_vector_file);
+        assert(num == 2);
+
+        num = (int) fread(initial_vector, sizeof(double), n, initial_vector_file);
         assert(num == n);
     }
     else return -1;
@@ -76,15 +79,31 @@ int main(int argc, char* argv[]){
         return -1;
 
     /* Read sparse matrix from input file */
-    matrix_row = malloc(sizeof(double) * n);
+    matrix_row = (double*) malloc(sizeof(double) * n);
     for (i = 0; i < n; i++) {
         num = (int) fread(matrix_row, sizeof(double), n, input_matrix_file);
         assert(num == n);
         sparse_matrix->add_row(sparse_matrix, matrix_row, i);
     }
 
+    /* Multiplies sparse matrix by initial vector */
+    result_vector = (double*) malloc(n * sizeof(double));
+    /* Add power iteration here */
+    sparse_matrix->mult(sparse_matrix, initial_vector, result_vector);
+
+    /* Write the produced result vector to the output file */
+    output_file = fopen(output_filename, "w");
+    assert(output_file != NULL);
+
+    num = (int)fwrite(vector_dimension ,sizeof(int), 2 ,output_file);
+    assert(num == 2);
+
+    num = (int) fwrite(result_vector, sizeof(double), n, output_file);
+    assert(num == n);
+
     /* Free all memory in the code */
     sparse_matrix->free(sparse_matrix);
+
     free(initial_vector);
 
     return argc;
