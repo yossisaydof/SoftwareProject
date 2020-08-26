@@ -24,7 +24,6 @@ typedef struct LinkedListNode{
 } LinkedListNode;
 
 typedef struct LinkedListNode** spmatLinkedList;
-//typedef struct Array** spmatArray;
 
 
 spmat* spmat_allocate_array(int n, int nnz) {
@@ -34,8 +33,11 @@ spmat* spmat_allocate_array(int n, int nnz) {
     spmat_array = (Array*) malloc(sizeof(Array));
     spmat_array -> values = malloc(nnz * sizeof(double));
     spmat_array -> colind = malloc(nnz * sizeof(int));
-    spmat_array -> rowptr = malloc((nnz + 1) * sizeof(int));
+    spmat_array -> rowptr = malloc((n + 1) * sizeof(int));
     spmat_array -> index = -1;
+
+    spmat_array -> rowptr[0] = 0;
+    spmat_array -> rowptr[n] = nnz;
 
     sparse_matrix = malloc(sizeof(spmat));
     sparse_matrix -> n = n;
@@ -93,40 +95,38 @@ void add_row_linked_list(struct _spmat *A, const double *row, int i) {
 
 
 void add_row_array(struct _spmat *A, const double *row, int i) {
-    int index, index_row, j;
-//    spmatArray spmat_array;
+    int index, j;
     Array *array_struct;
+    double *values;
+    int *colind, *rowptr;
 
     array_struct = (Array*) (A -> private);
+    values = array_struct -> values;
+    colind = array_struct -> colind;
+    rowptr = array_struct -> rowptr;
     index = array_struct -> index;
-    index_row = index + 1;
 
     for (j = 0; j < A -> n ; j++) {
-        if (row[j] == 0) continue;
+        if (row[j] == 0)
+            continue;
 
-        array_struct -> index ++;
+        array_struct -> index++;
         index = array_struct -> index;
-        array_struct -> values[index] = row[j];
-        array_struct -> colind[index] = j;
-        array_struct -> rowptr[index] = index_row;
+        values[index] = row[j];
+        colind[index] = j;
     }
-
-    if (i + 1 == A -> n) {
-        if (index == 0) {
-            array_struct -> rowptr[array_struct -> index] = array_struct -> index + 1;
-        }
-        array_struct -> rowptr[(array_struct -> index) + 1] = (array_struct -> index) + 1;
-    }
+    rowptr[i + 1] = index;
 }
 
 
 void free_array(struct _spmat *A) {
-    Array *array_struct = A -> private;
+    Array *array_struct;
+    array_struct = A -> private;
 
     free(array_struct -> rowptr);
     free(array_struct -> colind);
     free(array_struct -> values);
-    free(array_struct);
+    free(A);
 
 }
 
@@ -149,32 +149,26 @@ void free_linked_list(struct _spmat *A) {
     free(A);
 }
 
-void mult_array(const struct _spmat *A, const double *row, double *result) {
-    int index, j;
-//    spmatArray spmat_array;
+void mult_array(const struct _spmat *A, const double *v, double *result) {
+    int i, j;
+    double sum;
+
     Array *array_struct;
+    double *values;
+    int *colind, *rowptr;
 
     array_struct = (Array*) (A -> private);
-    index = array_struct -> index;
+    rowptr = array_struct->rowptr;
+    values = array_struct->values;
+    colind = array_struct->colind;
 
-    for (j = 0; j < A -> n ; j++) {
-        if (row[j] == 0) continue;
-
-        array_struct -> index ++;
-        index = array_struct -> index;
-        array_struct -> values[index] = row[j];
-        array_struct -> colind[index] = j;
-        array_struct -> rowptr[index] = j;
-    }
-
-    if (j == A -> n) {
-        if (index == 0) {
-            array_struct -> rowptr[array_struct -> index] = array_struct -> index + 1;
+    for (i = 0; i < A -> n; i++) {
+        sum = 0;
+        for (j = rowptr[i]; j < rowptr[i + 1]; j++) {
+            sum += (double) (values[j] * v[colind[j]]);
         }
-        array_struct -> rowptr[(array_struct -> index) + 1] = (array_struct -> index) + 1;
+        result[i] = sum;
     }
-    result[0] = 0;
-
 }
 
 
