@@ -77,7 +77,6 @@ void create_random_vector(double *vector, int n){
 	for (i = 0; i < n; i++){
 		vector[i] = (double)rand();
 	}
-
 }
 
 
