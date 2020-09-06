@@ -1,9 +1,6 @@
 #include "stdlib.h"
-
 #include "modularityGroups.h"
 #include "divideIntoTwo.h"
-
-
 
 void insert(modularityGroups *modularity_groups ,int* nodes, int n) {
     group *new_group, *current;
@@ -25,18 +22,26 @@ void insert(modularityGroups *modularity_groups ,int* nodes, int n) {
 }
 
 group* remove(modularityGroups *modularity_groups) {
+    group *tmp;
 
+    tmp = modularity_groups->head;
+    modularity_groups->head = head->next;
+    modularity_groups->number_of_groups--;
+
+    return tmp;
 }
 
 modularityGroups* allocate_modularity_group(){
     modularityGroups *modularity_groups;
 
     modularity_groups = (modularityGroups*) malloc(sizeof(modularityGroups*));
-    modularity_groups->insert = insert;
+
     modularity_groups->number_of_groups = 0;
     modularity_groups->current = NULL;
     modularity_groups->head = NULL;
-//    modularity_groups->remove
+
+    modularity_groups->insert = insert;
+    modularity_groups->remove = remove;
 
     return modularity_groups;
 }

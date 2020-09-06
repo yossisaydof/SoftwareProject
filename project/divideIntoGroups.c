@@ -5,7 +5,7 @@
 
 
 /**
- * Algorithm 3
+ * Algorithm 3 - Divide a network into modularity groups
  */
 
 
@@ -33,12 +33,25 @@ modularityGroups* divideIntoGroups(matrixStructure *matrix_structure) {
     O = allocate_modularity_group();
 
     while (P->number_of_groups > 0) {
-        g = (group *) P -> remove(P); //Remove a group g from P
+        /* Remove a group g from P */
+        g = (group *) P -> remove(P);
 
-        //Divide g into g1, g2 with Algorithm 2
-        divideIntoTwo(g, g1, g2);
+        /* Divide g into g1, g2 with Algorithm 2 */
+        divideIntoTwo(matrix_structure, g, g1, g2);
+
+        /* if either g1 or g2 is of size 0: Add g to O */
+        if (g1->size == 0 || g2->size == 0) {
+            O->insert(O, g->nodes, g->size);
+        }
+        else {
+            if (g1->size == 1) { O->insert(O, g1->nodes, g1->size); }
+            else { P->insert(P, g1->nodes, g1->size); }
+
+            if (g2->size == 1) { O->insert(O, g2->nodes, g2->size); }
+            else { P->insert(P, g2->nodes, g2->size); }
+        }
     }
 
-
+    return O;
 }
 
