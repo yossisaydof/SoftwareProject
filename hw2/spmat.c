@@ -12,7 +12,6 @@ void mult_array(const struct _spmat *A, const double *v, double *result);
 typedef struct Array {
     double *values;
     int *colind, *rowptr;
-    int index;
 } Array;
 
 
