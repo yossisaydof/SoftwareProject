@@ -17,7 +17,7 @@ typedef struct _spmat {
     /* Multiplies matrix A by vector v, into result (result is pre-allocated) */
     void	(*mult)(const struct _spmat *A, const double *v, double *result);
 
-    void (*print)(struct _spmat *A, int n);
+    void (*print)(struct _spmat *A, int n); //TODO: Delete
 
 } spmat;
 

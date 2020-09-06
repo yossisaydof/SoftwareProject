@@ -1,13 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
+#include "matrixStructure.c"
 
 
 int main(int argc, char* argv[]) {
     FILE *input_matrix_file, *output_file;
     char *input_matrix_filename, *output_filename;
-    MatrixStructure *matrix_structure;
-    SpmatMatrix *spmat_matrix;
+    matrixStructure *matrix_structure;
     (void) argc;
 
 
@@ -25,8 +25,12 @@ int main(int argc, char* argv[]) {
     return 0;
 }
 
-void generate_adjacency_matrix(FILE *matrix_file, SpmatMatrix *spmat_matrix) {
+void generate_adjacency_matrix(FILE *matrix_file, matrixStructure *matrix_structure) {
     int n, nnz, i;
+    spmat_matrix
+
+    spmat_matrix = matrix_structure->A;
+
 
     // n = number of nodes in the graph, |V|
     nnz = M * 2; // sum of the edges degree, sum of the k array (for undirected graph 'cause each edge give 1 in the matrix
