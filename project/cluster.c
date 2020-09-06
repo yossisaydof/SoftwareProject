@@ -26,13 +26,14 @@ int main(int argc, char* argv[]) {
 }
 
 void generate_adjacency_matrix(FILE *matrix_file, matrixStructure *matrix_structure) {
-    int n, nnz, i;
-    spmat_matrix
+    int n, nnz, i, M;
+    spmat *spmat_matrix;
 
-    spmat_matrix = matrix_structure->A;
+    M = (int) matrix_structure -> M;
 
+    spmat_matrix = (spmat*) matrix_structure -> A;
+    n = (int) spmat_matrix -> n; // n = number of nodes in the graph, |V|
 
-    // n = number of nodes in the graph, |V|
     nnz = M * 2; // sum of the edges degree, sum of the k array (for undirected graph 'cause each edge give 1 in the matrix
     spmat_matrix = spmat_allocate_array(n , nnz);
 
