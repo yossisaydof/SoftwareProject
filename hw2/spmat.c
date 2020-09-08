@@ -32,7 +32,6 @@ spmat* spmat_allocate_array(int n, int nnz) {
     spmat_array -> values = malloc(nnz * sizeof(double));
     spmat_array -> colind = malloc(nnz * sizeof(int));
     spmat_array -> rowptr = malloc((n + 1) * sizeof(int));
-    /*spmat_array -> index = -1;*/
 
     spmat_array -> rowptr[0] = 0;
     spmat_array -> rowptr[n] = nnz;
@@ -102,13 +101,10 @@ void add_row_array(struct _spmat *A, const double *row, int i) {
     values = array_struct -> values;
     colind = array_struct -> colind;
     rowptr = array_struct -> rowptr;
-    /*index = array_struct -> index;*/
 
     for (j = 0; j < A -> n ; j++) {
         if (row[j] == 0)
             continue;
-        /*array_struct -> index++;*/
-        /*index = array_struct -> index;*/
         values[index] = row[j];
         colind[index] = j;
         index++;

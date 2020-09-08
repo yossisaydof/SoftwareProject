@@ -19,6 +19,8 @@ typedef struct _spmat {
 
     void (*print)(struct _spmat *A, int n); //TODO: Delete
 
+    double (*sum_of_row)(struct _spmat *A);
+
 } spmat;
 
 /* Allocates a new arrays sparse matrix of size n with nnz non-zero elements */

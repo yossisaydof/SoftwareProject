@@ -34,13 +34,13 @@ int main(int argc, char* argv[]){
     initial_vector = (double*) malloc(n * sizeof(double));
 
     /* In case that there is no initial vector input, so we create it */
-    if (argc == 4) {
+    if (argv == 4) {
         output_filename = argv[2];
         implementation = argv[3];
         create_random_vector(initial_vector, n);
     }
     /* In case that there is initial vector input, so we read it from file */
-    else if (argc == 5) {
+    else if (argv == 5) {
         initial_vector_filename  = argv[2];
         output_filename = argv[3];
         implementation = argv[4];

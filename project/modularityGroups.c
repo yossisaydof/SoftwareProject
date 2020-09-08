@@ -25,7 +25,7 @@ group* remove(modularityGroups *modularity_groups) {
     group *tmp;
 
     tmp = modularity_groups -> head;
-    modularity_groups -> head = head->next;
+    modularity_groups -> head = tmp->next;
     modularity_groups -> number_of_groups--;
 
     return tmp;

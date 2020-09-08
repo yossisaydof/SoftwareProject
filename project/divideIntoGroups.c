@@ -32,6 +32,9 @@ modularityGroups* divideIntoGroups(matrixStructure *matrix_structure) {
 
     O = allocate_modularity_group();
 
+    g1 = malloc(sizeof(group*)); // TODO: Free memory
+    g2 = malloc(sizeof(group*));
+
     while (P->number_of_groups > 0) {
         /* Remove a group g from P */
         g = (group *) P -> remove(P);
@@ -44,14 +47,22 @@ modularityGroups* divideIntoGroups(matrixStructure *matrix_structure) {
             O->insert(O, g->nodes, g->size);
         }
         else {
-            if (g1->size == 1) { O->insert(O, g1->nodes, g1->size); }
-            else { P->insert(P, g1->nodes, g1->size); }
+            if (g1->size == 1) {
+                O->insert(O, g1->nodes, g1->size);
+            } else {
+                P->insert(P, g1->nodes, g1->size);
+            }
 
-            if (g2->size == 1) { O->insert(O, g2->nodes, g2->size); }
-            else { P->insert(P, g2->nodes, g2->size); }
+            if (g2->size == 1) {
+                O->insert(O, g2->nodes, g2->size);
+            } else {
+                P->insert(P, g2->nodes, g2->size);
+            }
         }
     }
 
+    free(g1);
+    free(g2);
     return O;
 }
 
