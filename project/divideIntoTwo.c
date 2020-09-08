@@ -1,6 +1,6 @@
 #include "group.h"
-#include "powerIteration.c"
-#include "matrixStructure.c"
+#include "powerIteration.h"
+#include "matrixStructure.h"
 
 /**
  /Algorithm 2 - Divide a group into two
@@ -45,6 +45,7 @@ void compute_f_g(matrixStructure *matrix_structure, group *g, double *f) {
 }
 
 double compute_delta_Q(matrixStructure *matrix_structure, double *f, group *g, int *s) {
+    // TODO
     double delta_Q, sum;
     int i, j, index_i;
 

@@ -2,9 +2,8 @@
 #include <time.h>
 #include <math.h>
 #include "powerIteration.h"
-#include "spmat.h"
 #include "spmatArray.h"
-#include "spmatList.h"
+#include "matrixStructure.h"
 
 double EPSILON = 0.00001;
 
@@ -29,13 +28,14 @@ double calc_vector_magnitude(double *vector, int n) {
     return sqrt(sum_squares);
 }
 
-double* calc_next_vector(spmatArray *matrix, double* currVector, int n, double *nextVector) {
-    // TODO - change spmatArray to spmat after we decide which implementation we want to use
+double* calc_next_vector(matrixStructure matrix, double* currVector, int n, double *nextVector) {
     double denominator;
     int i;
 
     /* calculates numerator (i.e matrix * currVector) */
-    nextVector = mult(matrix, currVector);
+    nextVector = mult(matrix, currVector); /* TODO : check if the matrix should be A or B or B_hat */
+
+
 
     /* calculates denominator (i.e ||(matrix * currVector)||) */
     denominator = calc_vector_magnitude(nextVector, n);
@@ -58,20 +58,27 @@ int check_diff(double *currVector, double *nextVector, int n) {
     return 1;
 }
 
-double clac_eigenvalue(double *eigenVector, double *multVector, int n) {
+double clac_eigenvalue(double *eigenVector, double *Abk, int n) {
     /* Calculates an approximation of the corresponding dominant eigenvalue */
-    // TODO
+    // TODO - change Abk naming
+    int i;
+    double denominator, numerator;
+    for (i = 0; i < n ; i++) {
+        denominator += eigenVector[i] * eigenVector[i];
+        numerator += eigenVector[i] * Abk[i];
+    }
+
+    return numerator / denominator;
 }
 
-void power_iteration(spmat *matrix, int n, double *eigenVector, double eigenValue) {
+double power_iteration(spmat *matrix, int n, double *eigenVector, double eigenValue) {
     /*
      * Approximates the dominant eigenpair
-     * Stores the largest eigenvalue in eigenValue
      * Stores the corresponding eigenvector in *eigenVector
+     * Returns the largest eigenvalue in eigenValue
      */
 
     double *currVector;
-    int continueIter = 1;
 
     currVector = malloc(sizeof(double) * n);
     create_random_vector(n, currVector);
@@ -87,4 +94,6 @@ void power_iteration(spmat *matrix, int n, double *eigenVector, double eigenValu
     eigenValue = clac_eigenvalue(nextVector, Abk, n); // TODO - change Abk naming
 
     free(currVector);
+
+    return eigenValue;
 }

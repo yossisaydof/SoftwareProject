@@ -1,9 +1,8 @@
-
-
-#include <mach/machine.h>
+#include "stdlib.h"
+#include "modularityGroups.h"
+#include "divideIntoTwo.h"
+#include <mach/machine.h> // TODO: what is this?
 #include "group.h"
-
-
 
 // P and O for algorithm 3
 typedef struct _modularityGroups { // linked list
@@ -11,9 +10,9 @@ typedef struct _modularityGroups { // linked list
     group *current;
     int number_of_groups;
 
-    void    (*insert)(struct _modularityGroups *modularity_groups,int* nodes, int n); // insert group to the end of the list, |g| = n
-    group*    (*remove)(); // remove the first group
-    void    (*free)(); // free memory
+    void       (*insert)(struct _modularityGroups *modularity_groups,int* nodes, int n); // insert group to the end of the list, |g| = n
+    group*     (*remove)(); // remove the first group
+    void       (*free)(); // free memory
 } modularityGroups;
 
 

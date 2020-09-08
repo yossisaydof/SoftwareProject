@@ -1,5 +1,4 @@
 
-
 #include "spmatArray.h"
 
 // holds B matrix B_ij = A_ij - k_i*k_j/M

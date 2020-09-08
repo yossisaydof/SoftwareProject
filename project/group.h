@@ -1,7 +1,4 @@
 
-
-
-
 typedef struct _group {
     struct _group *next;
     int *nodes;
