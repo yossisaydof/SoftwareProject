@@ -4,7 +4,7 @@
 #include "matrixStructure.h"
 
 
-int main(int argc, char* argv[]) {
+int cluster(int argc, char* argv[]) {
     FILE *input_matrix_file, *output_file;
     char *input_matrix_filename, *output_filename;
     matrixStructure *matrix_structure;

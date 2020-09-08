@@ -1,7 +1,9 @@
+#include "group.h"
 #include "stdlib.h"
 #include "divideIntoGroups.h"
 #include "modularityGroups.h"
 #include "divideIntoTwo.h"
+#include "matrixStructure.h"
 
 
 /**
@@ -40,6 +42,7 @@ modularityGroups* divideIntoGroups(matrixStructure *matrix_structure) {
         g = (group *) P -> remove(P);
 
         /* Divide g into g1, g2 with Algorithm 2 */
+
         divideIntoTwo(matrix_structure, g, g1, g2);
 
         /* if either g1 or g2 is of size 0: Add g to O */
