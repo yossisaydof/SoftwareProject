@@ -1,73 +1,52 @@
-#include "group.h"
 #include "spmatArray.h"
 #include "matrixStructure.h"
 #include <math.h>
 #include <stdlib.h>
 
-double sum_of_row(spmat *A, int i) {
-    // TODO
-    /* calculates sum of row i in A */
-    int i, sum;
+double sum_of_row(matrixStructure *matrix_structure, int i) {
+    /* calculates sum of row i in B_hat */
+    int j, k_i, k_j, nnz_i, cnt_nnz = 0, A_ij = 0, row_start, row_end, *K;
+    double M;
+    spmat *A, sum1 = 0, sum2 = 0;
 
-    sum = 0;
-    for (i = 0; i < A -> n; i++) {
-        for (j = rowptr[i]; j < rowptr[i + 1]; j++) {
-            sum += (double) (values[j]);
+    A = matrix_structure -> A;
+    K = matrix_structure -> degreeList;
+    k_i = K[i];
+    row_start = A -> rowptr[i];
+    row_end = A -> rowptr[i + 1];
+    nnz_i = row_end - row_start; // number of non-zero elements in row i
+
+    for (j = 0; j < A -> n; j++) {
+        if (i == j) continue;
+
+        if (cnt_nnz < nnz_i) {
+            // TODO: check if it should be <=
+            if (j == A -> colind[row_start + cnt_nnz]) {
+                cnt_nnz++;
+                A_ij = A -> values[row_start + cnt_nnz];
+            }
         }
+        sum1 += A_ij - (k_i * k_j) / M;
+        sum2 += abs(A_ij - (k_i * k_j) / M);
     }
 
-    sum = 0;
+    sum1 = abs(sum1);
 
-    return sum;
+    return sum1 + sum2;
 }
 
 
-void calc_sum_of_col(matrixStructure *matrix_structure, group *g, double *f , int col_index) {
-    int i, j, k, l;
-    spmat *A;
-    double *values;
-    int *colind, *rowptr, k_i, k_j;
-
-    A = matrix_structure -> A;
-    rowptr = A -> rowptr;
-    values = A -> values;
-    colind = A -> colind;
-
-
-
-
-}
-
-double norm_l1(matrixStructure *matrix_structure) { // A = B_hat[g]
+double norm_l1(matrixStructure *matrix_structure) {
     /* ||C||_1 = max_j (sum_i (|C_ij)) */
     int i, n;
-    double max = 0, tmp_sum, *sum_vector;
-    spmat *A;
+    double max = 0, tmp_sum;
 
-    A = matrix_structure -> A;
-    n = A -> n;
-
-    sum_vector = (double*) malloc((A->n) * sizeof(double));
-    calc_sum_of_col(matrix_structure, sum_vector);
-
-    for (i = 0; i < n; i++) {
-        // TODO: if A is a symmetric matrix - can we go over half the columns?
-        tmp_sum = sum_of_row(A, i); // TODO: check what max_col should get as parameter
+    for (i = 0; i < A -> n; i++) {
+        tmp_sum = sum_of_row(matrix_structure, i);
         tmp_sum > max ? max = tmp_sum : max;
     }
 
-    free(sum_vector);
     return max;
-}
-void shift_matrix(spmat *A) {
-    /* perform matrix shifting on a matrix A */
-    double norm;
-
-    norm = norm_l1(A);
-
-
-
-
 }
 
 
