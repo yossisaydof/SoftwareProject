@@ -5,7 +5,7 @@
 
 double sum_of_row(matrixStructure *matrix_structure, int i) {
     /* calculates sum of row i in B_hat */
-    int j, k_i, k_j, nnz_i, cnt_nnz = 0, A_ij = 0, row_start, row_end, *K;
+    int j, k_i, k_j, nnz_i, cnt_nnz = 0, A_ij, row_start, row_end, *K;
     double M;
     spmat *A, sum1 = 0, sum2 = 0;
 
@@ -18,16 +18,15 @@ double sum_of_row(matrixStructure *matrix_structure, int i) {
 
     for (j = 0; j < A -> n; j++) {
         if (i == j) continue;
-
+        A_ij = 0;
         if (cnt_nnz < nnz_i) {
-            // TODO: check if it should be <=
             if (j == A -> colind[row_start + cnt_nnz]) {
                 cnt_nnz++;
                 A_ij = A -> values[row_start + cnt_nnz];
             }
         }
-        sum1 += A_ij - (k_i * k_j) / M;
-        sum2 += abs(A_ij - (k_i * k_j) / M);
+        sum1 += A_ij - ((k_i * k_j) / M);
+        sum2 += abs(A_ij - ((k_i * k_j) / M));
     }
 
     sum1 = abs(sum1);
@@ -48,8 +47,4 @@ double norm_l1(matrixStructure *matrix_structure) {
 
     return max;
 }
-
-
-
-
 

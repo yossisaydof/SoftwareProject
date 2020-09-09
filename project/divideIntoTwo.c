@@ -8,31 +8,7 @@
 */
 
 double sum_of_row(matrixStructure *matrix_structure, group *g) {
-    int i, j, index_i;
-    double sum, calc;
-    double *values;
-    int *colind, *rowptr;
-    spmat *A;
-    int *K, k_i, k_j, M;
 
-    K = matrix_structure -> degreeList;
-    A = matrix_structure -> A;
-    M = matrix_structure -> M;
-    rowptr = A -> rowptr;
-    values = A -> values;
-    colind = A -> colind;
-
-    sum = 0;
-    for (i = 0; i < g -> size; i++) {
-        index_i = g->nodes[i];
-        k_i = K[index_i];
-        for (j = rowptr[index_i]; j < rowptr[index_i + 1]; j++) {
-            k_j = K[colind[j]]; //TODO: Check this again
-            calc = (double) (k_i * k_j) / M;
-            sum += (double) (values[j] - calc);
-        }
-    }
-    return sum;
 }
 
 void compute_f_g(matrixStructure *matrix_structure, group *g, double *f) {
