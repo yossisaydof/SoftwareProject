@@ -71,7 +71,8 @@ double clac_eigenvalue(double *eigenVector, double *Abk, int n) {
     return numerator / denominator;
 }
 
-double power_iteration(spmat *matrix, int n, double *eigenVector, double eigenValue) {
+# TODO
+double power_iteration(matrixStructure *matrix_structure, group *g, double *eigenVector) {
     /*
      * Approximates the dominant eigenpair
      * Stores the corresponding eigenvector in *eigenVector
