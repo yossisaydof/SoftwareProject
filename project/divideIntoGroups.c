@@ -2,8 +2,8 @@
 #include "stdlib.h"
 #include "divideIntoGroups.h"
 #include "modularityGroups.h"
-#include "divideIntoTwo.h"
 #include "matrixStructure.h"
+#include "divideIntoTwo.h"
 
 
 /**

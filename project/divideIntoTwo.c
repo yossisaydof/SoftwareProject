@@ -1,7 +1,5 @@
-
+#include "divideIntoTwo.h"
 #include "powerIteration.h"
-#include "group.h"
-#include "matrixStructure.h"
 
 /**
  /Algorithm 2 - Divide a group into two
@@ -9,8 +7,8 @@
 
 double sum_row_i(matrixStructure *matrix_structure, group *g, int i) {
     /* sum row i in B = SUM over j of (A_ij - (k_i * k_j / M) */
-    int j, k_i, k_j, M, nnz_i, cnt_nnz = 0, A_ij, *nodes, *K;
-    double sum_row;
+    int j, k_i, k_j, M, nnz_i, cnt_nnz = 0, row_start, row_end, A_ij, *nodes, *K;
+    double sum_row = 0;
     spmat *A;
 
     K = matrix_structure -> degreeList;
@@ -34,7 +32,7 @@ double sum_row_i(matrixStructure *matrix_structure, group *g, int i) {
                 A_ij = (int) A -> values[row_start + cnt_nnz];
             }
         }
-        sum_row += (A_ij - (double)((k_i * k_j) / M));
+        sum_row += (A_ij - (double)((double)(k_i * k_j) / M));
     }
 
     return sum_row;
@@ -47,7 +45,7 @@ double compute_delta_Q(matrixStructure *matrix_structure, group *g, int *s) {
      * SUM1 = -SUM over i != j of (A_ij - (k_i * k_j / M))
      * SUM2 = 2 * SUM over i != j of (A_ij - (k_i * k_j / M))
      */
-    double delta_Q, B_i, sum1, sum2;
+    double delta_Q, B_i, sum1 = 0, sum2 = 0;
     int i;
 
     for (i = 0; i < g -> size; i++) {

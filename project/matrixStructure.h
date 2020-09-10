@@ -5,10 +5,10 @@
 typedef struct _matrixStructure {
     int *degreeList; // k-Array
     spmat *A; // adjacency matrix of G
-    int const M; // sum of degreeList
-    int const n; // number of nodes, |V|
+    int M; // sum of degreeList
+    int n; // number of nodes, |V|
     double const norm_1;
 } matrixStructure;
 
-matrixStructure* allocateMatrixStructure();
+matrixStructure* allocate_matrix_structure();
 double calc_norm_1(matrixStructure *matrix_structure);
