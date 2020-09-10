@@ -1,7 +1,6 @@
 #include "spmatArray.h"
 #include <stdlib.h>
 
-
 void add_row_array(struct _spmat *A, const int *row, int i) {
     int j, *colind, *rowptr, *values;
     static int index = 0;

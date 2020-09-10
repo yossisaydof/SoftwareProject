@@ -1,59 +1,65 @@
-#include "powerIteration.h"
 
+#include "powerIteration.h"
+#include "group.h"
+#include "matrixStructure.h"
 
 /**
  /Algorithm 2 - Divide a group into two
 */
 
-double compute_f(matrixStructure *matrix_structure, group *g, int i) {
-    int j;
-
-    for (j = 0; j < g -> size; j++) {
-
-    }
-    return 6.6;
-}
-
-double mult_row_i_with_s(matrixStructure *matrix_structure, group *g, int *s, int i) {
-    /* calculates sum of row i in B_hat */
-    int j, k_i, k_j, nnz_i, cnt_nnz = 0, A_ij, row_start, row_end, *K;
-    double M, result
+double sum_row_i(matrixStructure *matrix_structure, group *g, int i) {
+    /* sum row i in B = SUM over j of (A_ij - (k_i * k_j / M) */
+    int j, k_i, k_j, M, nnz_i, cnt_nnz = 0, A_ij, *nodes, *K;
+    double sum_row;
     spmat *A;
 
-    A = matrix_structure -> A;
     K = matrix_structure -> degreeList;
-    k_i = K[i];
     M = matrix_structure -> M;
+    A = matrix_structure -> A;
+    nodes = g -> nodes;
+
     row_start = A -> rowptr[i];
     row_end = A -> rowptr[i + 1];
     nnz_i = row_end - row_start; // number of non-zero elements in row i
-    // TODO
+
+    k_i = K[i];
     for (j = 0; j < g -> size; j++) {
-        if (i == g -> nodes[j]) continue;
+        if (i == nodes[j]) continue;
         A_ij = 0;
-        k_j = K[g -> nodes[j]];
+        k_j =  K[nodes[j]];
         if (cnt_nnz < nnz_i) {
-            if (g -> nodes[j] == A -> colind[row_start + cnt_nnz]) {
+            if (nodes[j] == A -> colind[row_start + cnt_nnz]) {
+                /* A_ij != 0 */
                 cnt_nnz++;
                 A_ij = (int) A -> values[row_start + cnt_nnz];
-
             }
         }
-        result = A_ij - (k_i * k_j / M);
+        sum_row += (A_ij - (double)((k_i * k_j) / M));
     }
 
-    return result;
+    return sum_row;
 }
 
 double compute_delta_Q(matrixStructure *matrix_structure, group *g, int *s) {
-    double delta_Q = 0, tmp;
+    /*
+     * deltaQ = 0.5 * (s^T * B_hat[g] * s)
+     * notice that: s^T * B_hat[g] * s = SUM1 + SUM2
+     * SUM1 = -SUM over i != j of (A_ij - (k_i * k_j / M))
+     * SUM2 = 2 * SUM over i != j of (A_ij - (k_i * k_j / M))
+     */
+    double delta_Q, B_i, sum1, sum2;
     int i;
 
     for (i = 0; i < g -> size; i++) {
-        tmp = mult_row_i_with_s(matrix_structure, g, s, g -> nodes[i]);
-        delta_Q += (double) (tmp * s[i]);
+        B_i = sum_row_i(matrix_structure, g, g -> nodes[i]);
+        sum1 -= B_i;
+        sum2 += B_i;
     }
-    return delta_Q;
+
+    sum2 *= 2;
+    delta_Q = sum1 + sum2;
+
+    return (delta_Q * 0.5);
 }
 
 void divide_g(group *g, group *g1,group *g2, int *s) {
@@ -73,12 +79,10 @@ void divide_g(group *g, group *g1,group *g2, int *s) {
 void divideIntoTwo(matrixStructure *matrix_structure, group *g, group *g1, group *g2) {
     // TODO - check the note written after the algorithm in page 5
     int n, *s, i, cnt_positive = 0, cnt_negative = 0;
-    double eigen_value, calc, *f, deltaQ, *eigen_vector;
+    double eigen_value, calc, deltaQ, *eigen_vector;
 
     n = g -> size;
     // compute f_g
-    f = (double*)malloc(sizeof(double) * n);
-    compute_f_g(matrix_structure, g, f);
 
     // compute leading eigenpair of the modularity matrix B_hat_g
     eigen_vector = (double*) malloc(sizeof(double) * n);

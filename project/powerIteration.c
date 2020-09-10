@@ -12,7 +12,7 @@ void create_random_vector(int n, double* randVector){
     int i;
 
     for (i = 0; i < n; i++) {
-        randVector[i] = (double) rand();
+        randVector[i] = (double) rand(); // TODO - check how to start rand()
     }
 }
 
@@ -28,14 +28,16 @@ double calc_vector_magnitude(double *vector, int n) {
     return sqrt(sum_squares);
 }
 
-double* calc_next_vector(matrixStructure matrix, double* currVector, int n, double *nextVector) {
+void mult_matrix_vector(matrixStructure *matrix, group *g, double* currVector, double* nextVector) {
+    int i;
+}
+
+double* calc_next_vector(matrixStructure *matrix, group *g, double* currVector, int n, double *nextVector) {
     double denominator;
     int i;
 
     /* calculates numerator (i.e matrix * currVector) */
-    nextVector = mult(matrix, currVector); /* TODO : check if the matrix should be A or B or B_hat */
-
-
+    mult(matrix, g, currVector, nextVector); // TODO
 
     /* calculates denominator (i.e ||(matrix * currVector)||) */
     denominator = calc_vector_magnitude(nextVector, n);
@@ -71,7 +73,6 @@ double clac_eigenvalue(double *eigenVector, double *Abk, int n) {
     return numerator / denominator;
 }
 
-# TODO
 double power_iteration(matrixStructure *matrix_structure, group *g, double *eigenVector) {
     /*
      * Approximates the dominant eigenpair
@@ -80,21 +81,24 @@ double power_iteration(matrixStructure *matrix_structure, group *g, double *eige
      */
 
     double *currVector;
+    int n;
 
+    n = g -> size;
     currVector = malloc(sizeof(double) * n);
     create_random_vector(n, currVector);
 
-    while (1) {
-        calc_next_vector(matrix, currVector, n, eigenVector);
+    while (1) { // TODO: make sure this is not an infinite loop!
+        calc_next_vector(matrix, g, currVector, n, eigenVector);
 
         if (check_diff(currVector, eigenVector) == 1) {
+            /* the vector produced in the final iteration is the desired eigenvector */
             break;
         }
     }
 
     eigenValue = clac_eigenvalue(nextVector, Abk, n); // TODO - change Abk naming
 
-    free(currVector);
+    free(currVector); // TODO - do we need to free each element in the vector?
 
     return eigenValue;
 }

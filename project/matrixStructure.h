@@ -10,6 +10,5 @@ typedef struct _matrixStructure {
     double const norm_1;
 } matrixStructure;
 
-
 matrixStructure* allocateMatrixStructure();
 double calc_norm_1(matrixStructure *matrix_structure);

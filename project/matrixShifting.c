@@ -15,7 +15,7 @@ double sum_of_row(matrixStructure *matrix_structure, int i) {
     M = matrix_structure -> M;
     row_start = A -> rowptr[i];
     row_end = A -> rowptr[i + 1];
-    nnz_i = row_end - row_start; // number of non-zero elements in row i
+    nnz_i = row_end - row_start; /* number of non-zero elements in row i */
 
     for (j = 0; j < A -> n; j++) {
         if (i == j) continue;
@@ -38,17 +38,20 @@ double sum_of_row(matrixStructure *matrix_structure, int i) {
 
 
 double norm_l1(matrixStructure *matrix_structure) {
-    /* ||C||_1 = max_j (sum_i (|C_ij)) */
+    /*
+     * Calculates norm l1 of the matrix
+     * ||C||_1 = max_j (sum_i (|C_ij))
+     * Notice that our matrix represents undirected graph, therefore sum of row i = sum of column i
+     * */
     int i, n;
     double max = 0, tmp_sum;
     spmat *A;
 
     A = matrix_structure -> A;
     for (i = 0; i < A -> n; i++) {
-        tmp_sum = sum_of_row(matrix_structure, i);
-        tmp_sum > max ? max = tmp_sum : max;
+        tmp_sum = sum_of_row(matrix_structure, i); /* instead of calculating sum of column, we calculate sum of row */
+        max = tmp_sum > max ? tmp_sum : max;
     }
 
     return max;
 }
-
