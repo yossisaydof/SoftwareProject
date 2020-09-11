@@ -5,6 +5,7 @@
 
 double sum_of_row(matrixStructure *matrix_structure, int i) {
     /* calculates sum of row i in B_hat */
+    // TODO: change naming from matrix_structure to matrix
     int j, k_i, k_j, nnz_i, cnt_nnz = 0, A_ij, row_start, row_end, *K;
     double M, sum1 = 0, sum2 = 0;
     spmat *A;
