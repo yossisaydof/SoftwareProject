@@ -6,15 +6,6 @@
 #include "modularityGroups.h"
 
 
-int calc_M(const int *K, int n) {
-    int M = 0, i;
-    for (i = 0; i < n; i++) {
-        M += K[i];
-    }
-    return M;
-
-}
-
 void initialize_array_of_zeros(int *row, int n) {
     int i;
     for (i = 0; i < n; i++) {
@@ -28,7 +19,7 @@ void initialize_array_of_zeros(int *row, int n) {
  *      1 1 0
  */
 matrixStructure* generate_matrix_structure(FILE *matrix_file) {
-    int n, i, j, M, node_degree, node_id, *K, *matrix_row = NULL;
+    int n, i, j, M = 0, node_degree, node_id, *K, *matrix_row = NULL;
     matrixStructure *matrix_structure;
     spmat *spmat_matrix;
 
@@ -37,10 +28,10 @@ matrixStructure* generate_matrix_structure(FILE *matrix_file) {
     for (i = 0; i < n; ++i) {
         assert(fread(&node_degree, sizeof(int), 1, matrix_file) == 1);
         K[i] = node_degree;
+        M += node_degree;
         assert(fseek(matrix_file, (long)(node_degree * sizeof(int)), SEEK_CUR) == 0);
     }
 
-    M = calc_M(K, n); // M = nnz
     spmat_matrix = spmat_allocate_array(n, M);
     matrix_row = (int*) malloc(n * sizeof(int));
 
