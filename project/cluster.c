@@ -15,13 +15,11 @@ int calc_M(const int *K, int n) {
 
 }
 
-int* initialize_array_of_zeros(int n) {
-    int i, *row;
-    row = (int*) malloc(n * sizeof(int));
+void initialize_array_of_zeros(int *row, int n) {
+    int i;
     for (i = 0; i < n; i++) {
         row[i] = 0;
     }
-    return row;
 }
 
 //  3 - 2:  1 2     1: 0 2      2: 0 1
@@ -42,12 +40,13 @@ matrixStructure* generate_matrix_structure(FILE *matrix_file) {
         assert(fseek(matrix_file, (long)(node_degree * sizeof(int)), SEEK_CUR) == 0);
     }
 
-    M = calc_M(K, n);
-    spmat_matrix = (spmat *) spmat_allocate_array(n, M * 2);
-    matrix_row = initialize_array_of_zeros(n);
+    M = calc_M(K, n); // M = nnz
+    spmat_matrix = spmat_allocate_array(n, M);
+    matrix_row = (int*) malloc(n * sizeof(int));
 
     assert(fseek(matrix_file, (long)(1 * sizeof(int)), SEEK_SET) == 0);
     for (i = 0; i < n; i++) {
+        initialize_array_of_zeros(matrix_row, n);
         node_degree = K[i];
         for (j = 0; j < node_degree; j++) {
             assert(fread(&node_id, sizeof(int), 1, matrix_file) == 1);
@@ -57,6 +56,7 @@ matrixStructure* generate_matrix_structure(FILE *matrix_file) {
         assert(fseek(matrix_file, (long)(1 * sizeof(int)), SEEK_CUR) == 0);
     }
     matrix_structure = allocate_matrix_structure(K, spmat_matrix, M, n);
+    free(matrix_row);
 
     return matrix_structure;
 }
