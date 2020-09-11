@@ -1,4 +1,3 @@
-#include "group.h"
 #include "stdlib.h"
 #include "modularityGroups.h"
 #include "divideIntoTwo.h"
@@ -6,11 +5,12 @@
 void insert(modularityGroups *modularity_groups ,int* nodes, int n) {
     group *new_group, *current;
 
-    new_group = (group*) malloc(sizeof(group*));
+    new_group = (group*) malloc(sizeof(group));
     current = (group*) modularity_groups->current;
 
     new_group -> nodes = nodes;
     new_group -> size = n;
+//    new_group -> next = NULL; TODO: ?
 
     if (modularity_groups -> number_of_groups == 0) {
         modularity_groups -> head = (group*) new_group;
@@ -19,7 +19,7 @@ void insert(modularityGroups *modularity_groups ,int* nodes, int n) {
         current -> next = new_group;
     }
     modularity_groups -> number_of_groups++;
-    modularity_groups -> current = (group *) (group *) new_group;
+    modularity_groups -> current = (group *) new_group;
 }
 
 group* remove(modularityGroups *modularity_groups) {

@@ -3,7 +3,6 @@
 #include <math.h>
 #include "powerIteration.h"
 #include "spmatArray.h"
-#include "matrixStructure.h"
 
 double EPSILON = 0.00001;
 
@@ -16,7 +15,7 @@ void create_random_vector(int n, double* randVector){
     }
 }
 
-double calc_vector_magnitude(double *vector, int n) {
+double calc_vector_magnitude(const double *vector, int n) {
     /* Calculates the vector's magnitude (i.e. square root of the vector's dot product with itself) */
     double sum_squares = 0;
     int i;
@@ -28,15 +27,15 @@ double calc_vector_magnitude(double *vector, int n) {
     return sqrt(sum_squares);
 }
 
-double calc_next_vector_i(matrixStructure *matrix, group *g, double *currVector, int i) {
+double calc_next_vector_i(matrixStructure *matrix, group *g, const double *curr_vector, int i) {
     /*
      * Calculates next_vector[i]
      * v = curr_vector so:
      * next_vector[i] = SUM over all j in g, j != i [(A_ij - k_i*k_j/M)*(v_j - v_i)]
      */
 
-    int j = 0, A_ij, k_i, k_j, nnz_i, cnt_nnz = 0, row_start, row_end;
-    double sum, M;
+    int j = 0, A_ij, k_i, k_j, nnz_i, cnt_nnz = 0, row_start, row_end, *K;
+    double sum = 0, M;
 
     spmat *A;
 
@@ -49,7 +48,9 @@ double calc_next_vector_i(matrixStructure *matrix, group *g, double *currVector,
     nnz_i = row_end - row_start; /* number of non-zero elements in row i */
 
     for (j = 0; j < g -> size; j++) {
-        if (i == j) continue;
+        if (i == j)
+            continue;
+
         A_ij = 0;
         k_j = K[j];
         if (cnt_nnz < nnz_i) {
@@ -58,89 +59,89 @@ double calc_next_vector_i(matrixStructure *matrix, group *g, double *currVector,
                 A_ij = (int) A -> values[row_start + cnt_nnz];
             }
         }
-        sum += ((A_ij - ((k_i * k_j) / M)) * (currVector[j] - currVector[i]));
+        sum += ((A_ij - (double)((k_i * k_j) / M)) * (curr_vector[j] - curr_vector[i]));
     }
     return sum;
 }
 
-void mult_matrix_vector(matrixStructure *matrix, group *g, double* currVector, double* nextVector) {
+void mult_matrix_vector(matrixStructure *matrix, group *g, double* curr_vector, double* next_vector) {
     /*
      * Calculates B_hat[h] * curr_vector
      */
     int i;
 
     for (i = 0; i < g -> size; i++) {
-        nextVector[i] = calc_next_vector_i(matrix, g, currVector, i);
+        next_vector[i] = calc_next_vector_i(matrix, g, curr_vector, i);
     }
 }
 
-double* calc_next_vector(matrixStructure *matrix, group *g, double* currVector, int n, double *nextVector) {
+void calc_next_vector(matrixStructure *matrix, group *g, double* curr_vector, int n, double *next_vector) {
     double denominator;
     int i;
-    // TODO - change naming of all elements from camelCase to the other one
-    /* calculates numerator (i.e matrix * currVector) */
-    mult_matrix_vector(matrix, g, currVector, nextVector); // TODO
+    /* calculates numerator (i.e matrix * curr_vector) */
+    mult_matrix_vector(matrix, g, curr_vector, next_vector); // TODO
 
-    /* calculates denominator (i.e ||(matrix * currVector)||) */
-    denominator = calc_vector_magnitude(nextVector, n);
+    /* calculates denominator (i.e ||(matrix * curr_vector)||) */
+    denominator = calc_vector_magnitude(next_vector, n);
+    if (denominator == 0)
+        exit(EXIT_FAILURE);
 
-    /* update nextVector */
+    /* update next_vector */
     for (i = 0; i < n; i++) {
-        nextVector[i] = (double) nextVector[i] / denominator;
+        next_vector[i] = (double) (next_vector[i] / denominator);
     }
-
 }
 
-int check_diff(double *currVector, double *nextVector, int n) {
+int check_diff(double *curr_vector, double *next_vector, int n) {
     /* Returns 1 if all differences are smaller than EPSILON */
     int i;
     for (i = 0; i < n; i++) {
-        if (fabs(currVector[i] - nextVector[i]) >= EPSILON) {
-            return 0;
+        if (fabs(curr_vector[i] - next_vector[i]) >= EPSILON) {
+            return 1;
         }
     }
-    return 1;
+    return 0;
 }
 
-double clac_eigenvalue(double *eigenVector, double *Abk, int n) {
+double clac_eigenvalue(const double *eigenVector, const double *Abk, int n) {
     /* Calculates an approximation of the corresponding dominant eigenvalue */
     // TODO - change Abk naming
     int i;
-    double denominator, numerator;
+    double denominator = 0 , numerator = 0;
     for (i = 0; i < n ; i++) {
-        denominator += eigenVector[i] * eigenVector[i];
-        numerator += eigenVector[i] * Abk[i];
+        denominator += (eigenVector[i] * eigenVector[i]);
+        numerator += (eigenVector[i] * Abk[i]);
     }
 
     return numerator / denominator;
 }
 
-double power_iteration(matrixStructure *matrix_structure, group *g, double *eigenVector) {
+double power_iteration(matrixStructure *matrix_structure, group *g, double *eigen_vector) {
     /*
      * Approximates the dominant eigenpair
-     * Stores the corresponding eigenvector in *eigenVector
-     * Returns the largest eigenvalue in eigenValue
+     * Stores the corresponding eigenvector in *eigen_vector
+     * Returns the largest eigenvalue in eigen_value
      */
 
-    double *currVector;
+    double *curr_vector, eigen_value;
     int n;
 
     n = g -> size;
-    currVector = malloc(sizeof(double) * n);
-    create_random_vector(n, currVector);
+    curr_vector = malloc(sizeof(double) * n);
+    create_random_vector(n, curr_vector);
 
     while (1) { // TODO: make sure this is not an infinite loop!
-        calc_next_vector(matrix, g, currVector, n, eigenVector);
+        calc_next_vector(matrix_structure, g, curr_vector, n, eigen_vector);
 
-        if (check_diff(currVector, eigenVector) == 1) {
+        if (check_diff(curr_vector, eigen_vector, n) == 0) {
             /* the vector produced in the final iteration is the desired eigenvector */
             break;
         }
     }
 
-    eigenValue = clac_eigenvalue(nextVector, Abk, n); // TODO - change Abk naming
+    eigen_value = clac_eigenvalue(next_vector, Abk, n); // TODO - change Abk naming
 
-    free(currVector); // TODO - do we need to free each element in the vector?
+    free(curr_vector); // TODO - do we need to free each element in the vector?
 
-    return eigenValue;
+    return eigen_value;
 }

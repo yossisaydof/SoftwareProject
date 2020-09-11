@@ -11,7 +11,7 @@ void initialize_array_of_zeros(int *array, int n) {
 }
 // input = [3 2 1 2 1 0 2 2 0 1]
 //  n - #: e1 e2    #: e3 e4     #: e5 e6
-//  3 - 2:  1 2     1:  0 2      2:  0 1
+//  3 - 2:  1 2     2:  0 2      2:  0 1
 /*      0 1 1
  *      1 0 1
  *      1 1 0
@@ -53,6 +53,7 @@ matrixStructure* generate_matrix_structure(FILE *matrix_file) {
             matrix_row[node_id] = 1;
         }
         spmat_matrix -> add_row(spmat_matrix, matrix_row, i);
+        // skip node degree
         if (fseek(matrix_file, (long)(1 * sizeof(int)), SEEK_CUR) == 0)
             exit(EXIT_FAILURE);
     }
@@ -62,10 +63,29 @@ matrixStructure* generate_matrix_structure(FILE *matrix_file) {
     return matrix_structure;
 }
 
-void write_output_file(FILE *output_file) {
-    
-}
+void write_output_file(FILE *output_file, modularityGroups *modularity_groups) {
+    int i, n, group_size;
+    group *head;
 
+    n = modularity_groups -> number_of_groups;
+    head = modularity_groups -> head;
+
+    // The first value represents the number of groups in the division
+    if (fwrite(&n, sizeof(int), 1, output_file) != 1)
+        exit(EXIT_FAILURE);
+
+    for (i = 0; i < n; i++) {
+        group_size = head -> size;
+        // write number of nodes in the first group
+        if ((int) fwrite(&(group_size), sizeof(int), 1, output_file) != 1)
+            exit(EXIT_FAILURE);
+
+        // followed by the indices of the nodes in the group, in increasing order
+        // TODO: sort nodes before writing to file
+        if ((int) fwrite(head -> nodes, sizeof(int), group_size, output_file) != group_size)
+            exit(EXIT_FAILURE);
+    }
+}
 
 
 int main(int argc, char* argv[]) {
@@ -89,7 +109,7 @@ int main(int argc, char* argv[]) {
     if (output_file != NULL)
         exit(EXIT_FAILURE);
 
-    write_output_file();
+    write_output_file(output_file, modularity_groups);
 
     free_matrix_structure(matrix_structure);
 

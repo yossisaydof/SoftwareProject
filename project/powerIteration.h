@@ -5,4 +5,4 @@
 #include "matrixStructure.h"
 #include "group.h"
 
-double power_iteration(matrixStructure *matrix_structure, group *g, double *eigenVector);
+double power_iteration(matrixStructure *matrix_structure, group *g, double *eigen_vector);

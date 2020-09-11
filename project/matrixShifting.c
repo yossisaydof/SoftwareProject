@@ -1,7 +1,5 @@
-#include "spmatArray.h"
 #include "matrixStructure.h"
 #include <math.h>
-#include <stdlib.h>
 
 double sum_of_row(matrixStructure *matrix_structure, int i) {
     /* calculates sum of row i in B_hat */
@@ -38,7 +36,7 @@ double sum_of_row(matrixStructure *matrix_structure, int i) {
 }
 
 
-double norm_l1(matrixStructure *matrix_structure) {
+void norm_l1(matrixStructure *matrix_structure) {
     /*
      * Calculates norm l1 of the matrix
      * ||C||_1 = max_j (sum_i (|C_ij))
@@ -53,6 +51,5 @@ double norm_l1(matrixStructure *matrix_structure) {
         tmp_sum = sum_of_row(matrix_structure, i); /* instead of calculating sum of column, we calculate sum of row */
         max = tmp_sum > max ? tmp_sum : max;
     }
-
-    return max;
+    matrix_structure -> norm_1 = max;
 }

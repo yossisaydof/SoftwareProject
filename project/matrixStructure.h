@@ -7,7 +7,7 @@ typedef struct _matrixStructure {
     spmat *A; // adjacency matrix of G
     int M; // sum of degreeList
     int n; // number of nodes, |V|
-    double const norm_1;
+    double norm_1;
 } matrixStructure;
 
 matrixStructure* allocate_matrix_structure(int *K, spmat *spmat_matrix, int M, int n);

@@ -1,4 +1,4 @@
-
+#include "group.h"
 
 // P and O for algorithm 3
 typedef struct _modularityGroups { // linked list
