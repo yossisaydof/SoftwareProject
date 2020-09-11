@@ -103,16 +103,18 @@ int check_diff(double *curr_vector, double *next_vector, int n) {
     return 0;
 }
 
-double clac_eigenvalue(const double *eigenVector, const double *Abk, int n) {
+double clac_eigenvalue(const double *curr_vector, const double *eigen_vector, int n) {
     /* Calculates an approximation of the corresponding dominant eigenvalue */
-    // TODO - change Abk naming
+    // TODO - ask Dalit about the formula
     int i;
     double denominator = 0 , numerator = 0;
-    for (i = 0; i < n ; i++) {
-        denominator += (eigenVector[i] * eigenVector[i]);
-        numerator += (eigenVector[i] * Abk[i]);
-    }
 
+    for (i = 0; i < n ; i++) {
+        denominator += (curr_vector[i] * curr_vector[i]);
+        numerator += (curr_vector[i] * eigen_vector[i]); // TODO
+    }
+    if (denominator == 0)
+        exit(EXIT_FAILURE);
     return numerator / denominator;
 }
 
@@ -139,9 +141,9 @@ double power_iteration(matrixStructure *matrix_structure, group *g, double *eige
         }
     }
 
-    eigen_value = clac_eigenvalue(next_vector, Abk, n); // TODO - change Abk naming
+    eigen_value = clac_eigenvalue(curr_vector, eigen_vector, n);
 
-    free(curr_vector); // TODO - do we need to free each element in the vector?
+    free(curr_vector);
 
     return eigen_value;
 }
