@@ -42,6 +42,8 @@ modularityGroups* divideIntoGroups(matrixStructure *matrix_structure) {
 
         divideIntoTwo(matrix_structure, g, g1, g2);
 
+
+
         /* if either g1 or g2 is of size 0: Add g to O */
         if (g1->size == 0 || g2->size == 0) {
             O->insert(O, g->nodes, g->size);

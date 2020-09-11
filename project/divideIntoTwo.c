@@ -1,5 +1,6 @@
 #include "divideIntoTwo.h"
 #include "powerIteration.h"
+#include "modularityMaximization.h"
 
 /**
  /Algorithm 2 - Divide a group into two
@@ -47,7 +48,7 @@ double compute_delta_Q(matrixStructure *matrix_structure, group *g, int *s) {
      */
     double delta_Q, B_i, sum1 = 0, sum2 = 0;
     int i;
-
+    // TODO: use s vector
     for (i = 0; i < g -> size; i++) {
         B_i = sum_row_i(matrix_structure, g, g -> nodes[i]);
         sum1 -= B_i;
@@ -105,7 +106,20 @@ void divideIntoTwo(matrixStructure *matrix_structure, group *g, group *g1, group
     }
 
     // compute deltaQ
-    deltaQ = compute_delta_Q(matrix_structure, f, g, s);
+    deltaQ = compute_delta_Q(matrix_structure, g, s);
+
+    if (eigen_value > 0) {
+        improving_division_of_the_network(matrix_structure, g, s, deltaQ);
+        cnt_negative = 0;
+        cnt_positive = 0;
+        for (i = 0; i < n; i++) {
+            if (s[i] < 0)
+                cnt_negative++;
+            else
+                cnt_positive++;
+        }
+    }
+
     if (deltaQ > 0) {
         g1->size = cnt_positive;
         g1->nodes = malloc(sizeof(int) * cnt_positive);
@@ -116,6 +130,7 @@ void divideIntoTwo(matrixStructure *matrix_structure, group *g, group *g1, group
         divide_g(g, g1, g2, s); // divide g into two groups according to s
     }
     // if deltaQ <= 0 the group g is indivisible
+
 
     free(s);
     free(eigen_vector);

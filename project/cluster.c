@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <time.h>
 #include <stdlib.h>
 #include "divideIntoGroups.h"
 
@@ -94,6 +95,8 @@ int main(int argc, char* argv[]) {
     matrixStructure *matrix_structure;
     modularityGroups *modularity_groups;
     (void) argc;
+
+    srand(time(NULL));
 
     input_matrix_filename = argv[1];
     input_matrix_file = fopen(input_matrix_filename, "r");
