@@ -43,7 +43,7 @@ double norm_l1(matrixStructure *matrix_structure) {
      * ||C||_1 = max_j (sum_i (|C_ij))
      * Notice that our matrix represents undirected graph, therefore sum of row i = sum of column i
      * */
-    int i, n;
+    int i;
     double max = 0, tmp_sum;
     spmat *A;
 

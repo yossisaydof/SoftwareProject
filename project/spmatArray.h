@@ -23,5 +23,6 @@ typedef struct _spmat {
 
 /* Allocates a new arrays sparse matrix of size n with nnz non-zero elements */
 spmat* spmat_allocate_array(int n, int nnz);
+void free_array(struct _spmat *A);
 
 #endif

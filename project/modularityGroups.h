@@ -1,8 +1,4 @@
-#include "stdlib.h"
-#include "modularityGroups.h"
-#include "divideIntoTwo.h"
-#include <mach/machine.h> // TODO: what is this?
-#include "group.h"
+
 
 // P and O for algorithm 3
 typedef struct _modularityGroups { // linked list

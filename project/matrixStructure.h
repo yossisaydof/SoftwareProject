@@ -10,5 +10,6 @@ typedef struct _matrixStructure {
     double const norm_1;
 } matrixStructure;
 
-matrixStructure* allocate_matrix_structure();
+matrixStructure* allocate_matrix_structure(int *K, spmat *spmat_matrix, int M, int n);
 double calc_norm_1(matrixStructure *matrix_structure);
+void free_matrix_structure(matrixStructure* matrix_structure);
