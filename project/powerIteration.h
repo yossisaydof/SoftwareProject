@@ -1,3 +1,15 @@
+
+/*
+ * PowerIteration module:
+ * This module is used to calculate the leading eigen-pair in divideIntoTwo.c (algorithm 2).
+ *
+ * Finding the leading eigen-vector: The power iteration algorithm starts with a random vector b0, and in each iteration
+ * uses the current vector to produce a new vector, used in the next iteration. When done, the vector produced in the
+ * final iteration is the desired eigenvector.
+ *
+ *  Finding the leading eigen-value = (b_k * A*b_k) / (b_k * b_k)
+ * */
+
 #include <stdlib.h>
 #include <time.h>
 #include <math.h>

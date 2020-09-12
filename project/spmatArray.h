@@ -1,3 +1,13 @@
+
+/*
+ * spmatArray module:
+ * This module implements a data structure to represent a sparse matrix.
+ * This module is used to store the input graph.
+ *
+ * We used a compressed sparse row implementation, which represents a matrix M by three (one-dimensional) arrays,
+ * that respectively contain nonzero values, the extents of rows, and column indices..
+ * */
+
 #ifndef _SPMATARRAY_H
 #define _SPMATARRAY_H
 

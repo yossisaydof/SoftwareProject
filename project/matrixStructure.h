@@ -1,3 +1,12 @@
+
+/* matrixStructure module
+ * This module holds all parameters to calculate matrix B:
+ *      1. sparse matrix A
+ *      2. array to hold the degree of each node
+ *      3. M = sum of all degrees
+ *      4. n = number of nodes
+ */
+
 #ifndef _MATRIXSTRUCTURE_H
 #define _MATRIXSTRUCTURE_H
 
