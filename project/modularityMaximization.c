@@ -2,10 +2,13 @@
 #include "modularityMaximization.h"
 #include "divideIntoTwo.h"
 
+#define EPSILON() (0.00001)
+#define IS_POSITIVE(X) ((X) > EPSILON())
+
 /**
  * Algorithm 4
  */
-double EPSILON = 0.00001;
+/*double EPSILON = 0.00001; */
 
 int* allocate_unmoved(group *g, int *unmoved) {
     int i;
@@ -50,7 +53,7 @@ void improving_division_of_the_network(matrixStructure *matrix_structure, group 
     unmoved = (int*) malloc(n * sizeof(int));
 
     unmoved = allocate_unmoved(g, unmoved);
-    last_available_index = n - 1; // last available index in unmoved array
+    last_available_index = n - 1; /* last available index in unmoved array */
     do {
         for (i = 0; i < n; i++) {
 
@@ -82,11 +85,11 @@ void improving_division_of_the_network(matrixStructure *matrix_structure, group 
         }
 
         if (i_index == n - 1)
-            delta_Q = EPSILON;
+            delta_Q = EPSILON();
         else
             delta_Q = improve[i_index];
 
-    } while (delta_Q > EPSILON);
+    } while (IS_POSITIVE(delta_Q));
 
     free(score);
     free(improve);

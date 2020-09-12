@@ -10,7 +10,7 @@ void insert(modularityGroups *modularity_groups ,int* nodes, int n) {
 
     new_group -> nodes = nodes;
     new_group -> size = n;
-//    new_group -> next = NULL; TODO: ?
+/*    new_group -> next = NULL; TODO: ? */
 
     if (modularity_groups -> number_of_groups == 0) {
         modularity_groups -> head = (group*) new_group;

@@ -2,7 +2,7 @@
 #include <time.h>
 #include <math.h>
 #include "powerIteration.h"
-#include "spmatArray.h"
+#include "divideIntoTwo.h"
 
 double EPSILON = 0.00001;
 
@@ -11,7 +11,7 @@ void create_random_vector(int n, double* randVector){
     int i;
 
     for (i = 0; i < n; i++) {
-        randVector[i] = (double) rand(); // TODO - check how to start rand()
+        randVector[i] = (double) rand(); /* TODO - check how to start rand() */
     }
 }
 
@@ -34,7 +34,7 @@ double calc_next_vector_i(matrixStructure *matrix_structure, group *g, const dou
      * next_vector[i] = SUM over all j in g, j != i [(A_ij - k_i*k_j/M)*(v_j - v_i)]
      */
 
-    int j = 0, k_i, k_j, *K, j_index;
+    int j = 0, k_i, k_j, *K, j_index, A_ij;
     double sum = 0, M;
 
     K = matrix_structure -> degreeList;
@@ -102,7 +102,7 @@ void calc_next_vector(matrixStructure *matrix, group *g, double* curr_vector, in
     double denominator;
     int i;
     /* calculates numerator (i.e matrix * curr_vector) */
-    mult_matrix_vector(matrix, g, curr_vector, next_vector); // TODO
+    mult_matrix_vector(matrix, g, curr_vector, next_vector); /* TODO */
 
     /* calculates denominator (i.e ||(matrix * curr_vector)||) */
     denominator = calc_vector_magnitude(next_vector, n);
@@ -128,13 +128,13 @@ int check_diff(double *curr_vector, double *next_vector, int n) {
 
 double clac_eigenvalue(const double *curr_vector, const double *eigen_vector, int n) {
     /* Calculates an approximation of the corresponding dominant eigenvalue */
-    // TODO - ask Dalit about the formula
+    /* TODO - ask Dalit about the formula */
     int i;
     double denominator = 0 , numerator = 0;
 
     for (i = 0; i < n ; i++) {
         denominator += (curr_vector[i] * curr_vector[i]);
-        numerator += (curr_vector[i] * eigen_vector[i]); // TODO
+        numerator += (curr_vector[i] * eigen_vector[i]); /* TODO */
     }
     if (denominator == 0)
         exit(EXIT_FAILURE);
@@ -155,7 +155,7 @@ double power_iteration(matrixStructure *matrix_structure, group *g, double *eige
     curr_vector = malloc(sizeof(double) * n);
     create_random_vector(n, curr_vector);
 
-    while (1) { // TODO: make sure this is not an infinite loop!
+    while (1) { /* TODO: make sure this is not an infinite loop! */
         calc_next_vector(matrix_structure, g, curr_vector, n, eigen_vector);
 
         if (check_diff(curr_vector, eigen_vector, n) == 0) {

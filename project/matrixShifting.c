@@ -1,29 +1,31 @@
 #include "matrixStructure.h"
 #include <math.h>
 
-double sum_of_row(matrixStructure *matrix_structure, int i) {
-    /* calculates sum of row i in B_hat */
-    int j, k_i, k_j, A_ij, *K;
-    double M, sum1 = 0, sum2 = 0;
+//double sum_of_row(matrixStructure *matrix_structure, int i) {
+//    /* calculates sum of row i in B_hat */
+//    int j, k_i, k_j, A_ij, *K;
+//    double M, sum1 = 0, sum2 = 0;
+//    group *g;
+//
+//    K = matrix_structure -> degreeList;
+//    k_i = K[i];
+//    M = matrix_structure -> M;
+//
+//
+//    for (j = 0; j < A -> n; j++) {
+//        if (i == j) continue;
+//        A_ij = calc_Aij(matrix_structure, g, i, j); // TODO - add g, and include the function
+//        k_j = K[j];
+//        sum1 += A_ij - (double)((k_i * k_j) / M);
+//        sum2 += fabs(A_ij - (double)((k_i * k_j) / M));
+//    }
+//
+//    sum1 = fabs(sum1);
+//
+//    return sum1 + sum2;
+//}
 
-    K = matrix_structure -> degreeList;
-    k_i = K[i];
-    M = matrix_structure -> M;
 
-    for (j = 0; j < A -> n; j++) {
-        if (i == j) continue;
-        A_ij = calc_Aij(matrix_structure, g, i, j); // TODO - add g, and include the function
-        k_j = K[j];
-        sum1 += A_ij - (double)((k_i * k_j) / M);
-        sum2 += fabs(A_ij - (double)((k_i * k_j) / M));
-    }
-
-    sum1 = fabs(sum1);
-
-    return sum1 + sum2;
-}
-
-/*
 double sum_of_row(matrixStructure *matrix_structure, int i) {
     int j, k_i, k_j, nnz_i, cnt_nnz = 0, A_ij, row_start, row_end, *K;
     double M, sum1 = 0, sum2 = 0;
@@ -55,9 +57,9 @@ double sum_of_row(matrixStructure *matrix_structure, int i) {
 
     return sum1 + sum2;
 }
-*/
 
-void norm_l1(matrixStructure *matrix_structure) {
+
+double norm_l1(matrixStructure *matrix_structure) {
     /*
      * Calculates norm l1 of the matrix
      * ||C||_1 = max_j (sum_i (|C_ij))
@@ -72,5 +74,5 @@ void norm_l1(matrixStructure *matrix_structure) {
         tmp_sum = sum_of_row(matrix_structure, i); /* instead of calculating sum of column, we calculate sum of row */
         max = tmp_sum > max ? tmp_sum : max;
     }
-    matrix_structure -> norm_1 = max;
+    return max;
 }

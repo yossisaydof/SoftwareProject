@@ -23,7 +23,7 @@ modularityGroups* create_P(int n) {
     return P;
 }
 
-modularityGroups* divideIntoGroups(matrixStructure *matrix_structure) {
+modularityGroups* divide_into_groups(matrixStructure *matrix_structure) {
     modularityGroups *O, *P;
     group *g, *g1, *g2;
 
@@ -31,7 +31,7 @@ modularityGroups* divideIntoGroups(matrixStructure *matrix_structure) {
 
     O = allocate_modularity_group();
 
-    g1 = malloc(sizeof(group*)); // TODO: Free memory
+    g1 = malloc(sizeof(group*));
     g2 = malloc(sizeof(group*));
 
     while (P->number_of_groups > 0) {

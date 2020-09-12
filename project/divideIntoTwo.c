@@ -11,7 +11,7 @@ int calc_Aij(matrixStructure *matrix_structure, group *g, int i, int j) {
      * Checks if A_ij == 0 of A_ij != 0
      * and returns A_ij
      */
-    int j, nnz_i, cnt_nnz = 0, row_start, row_end, A_ij, *nodes;
+    int nnz_i, cnt_nnz = 0, row_start, row_end, A_ij, *nodes;
     spmat *A;
 
     A = matrix_structure -> A;
@@ -29,10 +29,10 @@ int calc_Aij(matrixStructure *matrix_structure, group *g, int i, int j) {
             A_ij = (int) A -> values[row_start + cnt_nnz];
         }
     }
-    return A_ij
+    return A_ij;
 }
 
-void sum_row_i(matrixStructure *matrix_structure, group *g, int i, double *sum1, double *sum2, int *s) {
+void sum_row_i(matrixStructure *matrix_structure, group *g, int i, double *sum1, double *sum2, const int *s) {
     /* sum row i in B = SUM over j of (A_ij - (k_i * k_j / M) */
     int j, k_i, k_j, M, A_ij, *nodes, *K;
     double tmp;
@@ -46,7 +46,7 @@ void sum_row_i(matrixStructure *matrix_structure, group *g, int i, double *sum1,
         if (i == nodes[j]) continue;
         k_j =  K[nodes[j]];
         A_ij = calc_Aij(matrix_structure, g, i, j);
-        tmp = (double)(A_ij - ((double)(k_i * k_j) / M))
+        tmp = (double)(A_ij - ((double)(k_i * k_j) / M));
         *sum1 -= tmp;
         *sum2 += (s[nodes[j]] * tmp);
     }
@@ -122,16 +122,16 @@ void divide_g(group *g, group *g1,group *g2, int *s) {
 }
 
 void divideIntoTwo(matrixStructure *matrix_structure, group *g, group *g1, group *g2) {
-    // TODO - check the note written after the algorithm in page 5
+    /* TODO - check the note written after the algorithm in page 5 */
     int n, *s, i, cnt_positive = 0, cnt_negative = 0;
-    double eigen_value, calc, deltaQ, *eigen_vector;
+    double eigen_value, deltaQ, *eigen_vector;
 
     n = g -> size;
-    // compute f_g
+    /* compute f_g */
 
-    // compute leading eigenpair of the modularity matrix B_hat_g
+    /* compute leading eigenpair of the modularity matrix B_hat_g */
     eigen_vector = (double*) malloc(sizeof(double) * n);
-    eigen_value = power_iteration(matrix_structure, g, eigen_vector); // TODO: fix power iteration
+    eigen_value = power_iteration(matrix_structure, g, eigen_vector); /* TODO: fix power iteration */
 
     if (eigen_value <= 0) {
         g1 -> size = 0;
@@ -139,7 +139,7 @@ void divideIntoTwo(matrixStructure *matrix_structure, group *g, group *g1, group
         return;
     }
 
-    // compute s = {s1,....,sn} where si in {+1, -1}, according to u1
+    /* compute s = {s1,....,sn} where si in {+1, -1}, according to u1 */
     s = (int*) malloc(sizeof(int) * n);
     for (i = 0; i < n; i++) {
         if (eigen_vector[i] < 0) {
@@ -151,7 +151,7 @@ void divideIntoTwo(matrixStructure *matrix_structure, group *g, group *g1, group
         }
     }
 
-    // compute deltaQ
+    /* compute deltaQ */
     deltaQ = compute_delta_Q(matrix_structure, g, s);
 
     if (eigen_value > 0) {
@@ -173,14 +173,10 @@ void divideIntoTwo(matrixStructure *matrix_structure, group *g, group *g1, group
         g2->size = cnt_negative;
         g2->nodes = malloc(sizeof(int) * cnt_negative);
 
-        divide_g(g, g1, g2, s); // divide g into two groups according to s
+        divide_g(g, g1, g2, s); /* divide g into two groups according to s */
     }
-    // if deltaQ <= 0 the group g is indivisible
-
+    /* if deltaQ <= 0 the group g is indivisible */
 
     free(s);
     free(eigen_vector);
 }
-
-
-
