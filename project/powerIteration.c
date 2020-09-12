@@ -27,13 +27,35 @@ double calc_vector_magnitude(const double *vector, int n) {
     return sqrt(sum_squares);
 }
 
-double calc_next_vector_i(matrixStructure *matrix, group *g, const double *curr_vector, int i) {
+double calc_next_vector_i(matrixStructure *matrix_structure, group *g, const double *curr_vector, int i) {
     /*
      * Calculates next_vector[i]
      * v = curr_vector so:
      * next_vector[i] = SUM over all j in g, j != i [(A_ij - k_i*k_j/M)*(v_j - v_i)]
      */
 
+    int j = 0, k_i, k_j, *K, j_index;
+    double sum = 0, M;
+
+    K = matrix_structure -> degreeList;
+    k_i = K[i];
+    M = matrix_structure -> M;
+
+    for (j = 0; j < g -> size; j++) {
+        j_index = g -> nodes[j];
+        if (i == j_index)
+            continue;
+
+        A_ij = calc_Aij(matrix_structure, g, i, j_index);
+        k_j = K[j_index];
+        sum += ((A_ij - (double)((k_i * k_j) / M)) * (curr_vector[j] - curr_vector[i]));
+    }
+    return sum;
+}
+
+
+/*
+double calc_next_vector_i(matrixStructure *matrix, group *g, const double *curr_vector, int i) {
     int j = 0, A_ij, k_i, k_j, nnz_i, cnt_nnz = 0, row_start, row_end, *K;
     double sum = 0, M;
 
@@ -45,7 +67,7 @@ double calc_next_vector_i(matrixStructure *matrix, group *g, const double *curr_
     M = matrix -> M;
     row_start = A -> rowptr[i];
     row_end = A -> rowptr[i + 1];
-    nnz_i = row_end - row_start; /* number of non-zero elements in row i */
+    nnz_i = row_end - row_start;
 
     for (j = 0; j < g -> size; j++) {
         if (i == j)
@@ -63,6 +85,7 @@ double calc_next_vector_i(matrixStructure *matrix, group *g, const double *curr_
     }
     return sum;
 }
+*/
 
 void mult_matrix_vector(matrixStructure *matrix, group *g, double* curr_vector, double* next_vector) {
     /*
@@ -71,7 +94,7 @@ void mult_matrix_vector(matrixStructure *matrix, group *g, double* curr_vector, 
     int i;
 
     for (i = 0; i < g -> size; i++) {
-        next_vector[i] = calc_next_vector_i(matrix, g, curr_vector, i);
+        next_vector[i] = calc_next_vector_i(matrix, g, curr_vector, g -> nodes[i]);
     }
 }
 

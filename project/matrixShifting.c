@@ -3,7 +3,28 @@
 
 double sum_of_row(matrixStructure *matrix_structure, int i) {
     /* calculates sum of row i in B_hat */
-    // TODO: change naming from matrix_structure to matrix
+    int j, k_i, k_j, A_ij, *K;
+    double M, sum1 = 0, sum2 = 0;
+
+    K = matrix_structure -> degreeList;
+    k_i = K[i];
+    M = matrix_structure -> M;
+
+    for (j = 0; j < A -> n; j++) {
+        if (i == j) continue;
+        A_ij = calc_Aij(matrix_structure, g, i, j); // TODO - add g, and include the function
+        k_j = K[j];
+        sum1 += A_ij - (double)((k_i * k_j) / M);
+        sum2 += fabs(A_ij - (double)((k_i * k_j) / M));
+    }
+
+    sum1 = fabs(sum1);
+
+    return sum1 + sum2;
+}
+
+/*
+double sum_of_row(matrixStructure *matrix_structure, int i) {
     int j, k_i, k_j, nnz_i, cnt_nnz = 0, A_ij, row_start, row_end, *K;
     double M, sum1 = 0, sum2 = 0;
     spmat *A;
@@ -14,7 +35,7 @@ double sum_of_row(matrixStructure *matrix_structure, int i) {
     M = matrix_structure -> M;
     row_start = A -> rowptr[i];
     row_end = A -> rowptr[i + 1];
-    nnz_i = row_end - row_start; /* number of non-zero elements in row i */
+    nnz_i = row_end - row_start;
 
     for (j = 0; j < A -> n; j++) {
         if (i == j) continue;
@@ -34,7 +55,7 @@ double sum_of_row(matrixStructure *matrix_structure, int i) {
 
     return sum1 + sum2;
 }
-
+*/
 
 void norm_l1(matrixStructure *matrix_structure) {
     /*
