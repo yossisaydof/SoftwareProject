@@ -1,6 +1,5 @@
-#include "matrixShifting.h"
-#include "spmatArray.h"
-#include "stdlib.h"
+#include "matrixStructure.h"
+#include <stdlib.h>
 
 matrixStructure* allocate_matrix_structure(int *K, spmat *spmat_matrix, int M, int n) {
     matrixStructure* matrix_structure;
@@ -11,7 +10,6 @@ matrixStructure* allocate_matrix_structure(int *K, spmat *spmat_matrix, int M, i
     matrix_structure -> M = M;
     matrix_structure -> n = n;
 
-    matrix_structure -> norm_1 = norm_l1(matrix_structure);
 
     return matrix_structure;
 }

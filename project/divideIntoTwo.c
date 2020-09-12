@@ -1,15 +1,13 @@
 #include "divideIntoTwo.h"
-#include "powerIteration.h"
-#include "modularityMaximization.h"
 
 /**
  /Algorithm 2 - Divide a group into two
 */
 
-double sum_row_i(matrixStructure *matrix_structure, group *g, int i) {
+void sum_row_i(matrixStructure *matrix_structure, group *g, int i, double *sum1, double *sum2, const int *s) {
     /* sum row i in B = SUM over j of (A_ij - (k_i * k_j / M) */
     int j, k_i, k_j, M, nnz_i, cnt_nnz = 0, row_start, row_end, A_ij, *nodes, *K;
-    double sum_row = 0;
+    double B_ij;
     spmat *A;
 
     K = matrix_structure -> degreeList;
@@ -19,11 +17,12 @@ double sum_row_i(matrixStructure *matrix_structure, group *g, int i) {
 
     row_start = A -> rowptr[i];
     row_end = A -> rowptr[i + 1];
-    nnz_i = row_end - row_start; // number of non-zero elements in row i
+    nnz_i = row_end - row_start; /* number of non-zero elements in row i */
 
     k_i = K[i];
     for (j = 0; j < g -> size; j++) {
         if (i == nodes[j]) continue;
+
         A_ij = 0;
         k_j =  K[nodes[j]];
         if (cnt_nnz < nnz_i) {
@@ -32,10 +31,11 @@ double sum_row_i(matrixStructure *matrix_structure, group *g, int i) {
                 A_ij = (int) A -> values[row_start + cnt_nnz];
             }
         }
-        sum_row += (A_ij - (double)((double)(k_i * k_j) / M));
-    }
+        B_ij = (A_ij - (double)((double)(k_i * k_j) / M));
 
-    return sum_row;
+        *sum1 -= B_ij;
+        *sum2 += (B_ij * s[nodes[j]]);
+    }
 }
 
 
@@ -60,21 +60,21 @@ double compute_delta_Q(matrixStructure *matrix_structure, group *g, int *s) {
     return (delta_Q * 0.5);
 }
 
-void divide_g(group *g, group *g1,group *g2, int *s) {
+void divide_g(group *g, group *g1, group *g2, const int *s) {
     int i, g1_index = 0, g2_index = 0;
 
     for (i = 0; i < g -> size; i++) {
         if (s[i] == 1) {
-            g1[g1_index] = g[i];
+            g1 -> nodes[g1_index] = g -> nodes[i];
             g1_index++;
         } else {
-            g2[g2_index] = g[i];
+            g2 -> nodes[g2_index] = g -> nodes[i];
             g2_index++;
         }
     }
 }
 
-void divideIntoTwo(matrixStructure *matrix_structure, group *g, group *g1, group *g2) {
+void divide_into_two(matrixStructure *matrix_structure, group *g, group *g1, group *g2) {
     /* TODO - change name!!! */
     /* TODO - check the note written after the algorithm in page 5 */
     int n, *s, i, cnt_positive = 0, cnt_negative = 0;
@@ -87,7 +87,7 @@ void divideIntoTwo(matrixStructure *matrix_structure, group *g, group *g1, group
     eigen_vector = (double*) malloc(sizeof(double) * n);
     eigen_value = power_iteration(matrix_structure, g, eigen_vector); /* TODO: fix power iteration */
 
-    if (eigen_value <= 0) {
+    if (IS_NON_POSITIVE(eigen_value)) {
         g1 -> size = 0;
         g2 -> size = 0;
         return;
@@ -96,7 +96,7 @@ void divideIntoTwo(matrixStructure *matrix_structure, group *g, group *g1, group
     /* compute s = {s1,....,sn} where si in {+1, -1}, according to u1 */
     s = (int*) malloc(sizeof(int) * n);
     for (i = 0; i < n; i++) {
-        if (eigen_vector[i] < 0) {
+        if (eigen_vector[i] < 0) { /* TODO: check epsilon */
             s[i] = -1;
             cnt_negative++;
         } else {

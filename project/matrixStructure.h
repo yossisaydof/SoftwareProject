@@ -1,3 +1,5 @@
+#ifndef _MATRIXSTRUCTURE_H
+#define _MATRIXSTRUCTURE_H
 
 #include "spmatArray.h"
 
@@ -12,3 +14,5 @@ typedef struct _matrixStructure {
 
 matrixStructure* allocate_matrix_structure(int *K, spmat *spmat_matrix, int M, int n);
 void free_matrix_structure(matrixStructure* matrix_structure);
+
+#endif

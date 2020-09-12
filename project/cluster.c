@@ -2,8 +2,7 @@
 #include <time.h>
 #include <stdlib.h>
 #include "divideIntoGroups.h"
-#include "matrixStructure.h"
-#include "spmatArray.h"
+#include "matrixShifting.h"
 
 
 void initialize_array_of_zeros(int *array, int n) {
@@ -62,6 +61,7 @@ matrixStructure* generate_matrix_structure(FILE *matrix_file) {
             exit(EXIT_FAILURE);
     }
     matrix_structure = allocate_matrix_structure(K, spmat_matrix, M, n);
+    matrix_structure -> norm_1 = norm_l1(matrix_structure);
     free(matrix_row);
 
     return matrix_structure;

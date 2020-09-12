@@ -1,5 +1,5 @@
-#ifndef SOFTWAREPROJECT_SPMATARRAY_H
-#define SOFTWAREPROJECT_SPMATARRAY_H
+#ifndef _SPMATARRAY_H
+#define _SPMATARRAY_H
 
 typedef struct _spmat {
     /* Matrix size (n*n) */

@@ -2,9 +2,6 @@
 #include "modularityMaximization.h"
 #include "divideIntoTwo.h"
 
-#define EPSILON() (0.00001)
-#define IS_POSITIVE(X) ((X) > EPSILON())
-
 /**
  * Algorithm 4
  */
