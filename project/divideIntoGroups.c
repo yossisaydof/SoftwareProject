@@ -18,7 +18,7 @@ modularityGroups* create_P(int n) {
         nodes[i] = i;
     }
 
-    P->insert(P, nodes, n);
+    P -> insert(P, nodes, n);
     return P;
 }
 

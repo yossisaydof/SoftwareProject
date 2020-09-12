@@ -75,7 +75,6 @@ void divide_g(group *g, group *g1, group *g2, const int *s) {
 }
 
 void divide_into_two(matrixStructure *matrix_structure, group *g, group *g1, group *g2) {
-    /* TODO - change name!!! */
     /* TODO - check the note written after the algorithm in page 5 */
     int n, *s, i, cnt_positive = 0, cnt_negative = 0;
     double eigen_value, deltaQ, *eigen_vector;
@@ -108,7 +107,7 @@ void divide_into_two(matrixStructure *matrix_structure, group *g, group *g1, gro
     /* compute deltaQ */
     deltaQ = compute_delta_Q(matrix_structure, g, s);
 
-    if (eigen_value > 0) {
+    if (eigen_value > 0) { /* TODO: check epsilon */
         improving_division_of_the_network(matrix_structure, g, s, deltaQ);
         cnt_negative = 0;
         cnt_positive = 0;
@@ -120,7 +119,7 @@ void divide_into_two(matrixStructure *matrix_structure, group *g, group *g1, gro
         }
     }
 
-    if (deltaQ > 0) {
+    if (deltaQ > 0) { /* TODO: check epsilon */
         g1->size = cnt_positive;
         g1->nodes = malloc(sizeof(int) * cnt_positive);
 

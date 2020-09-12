@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include "divideIntoGroups.h"
 #include "matrixShifting.h"
+#include "error_handler.h"
 
 
 void initialize_array_of_zeros(int *array, int n) {
@@ -24,40 +25,54 @@ matrixStructure* generate_matrix_structure(FILE *matrix_file) {
     matrixStructure *matrix_structure;
     spmat *spmat_matrix;
 
-    if((int)fread(&n, sizeof(int), 1, matrix_file) == 1)
+    if ((int) fread(&n, sizeof(int), 1, matrix_file) == 1) {
+        printf("%s", FILE_READING);
         exit(EXIT_FAILURE);
+    }
 
     K = (int*) malloc(n * sizeof(int));
+    if (K == NULL) {
+        printf("%s", MALLOC_FAILED);
+        exit(EXIT_FAILURE);
+    }
+
     for (i = 0; i < n; ++i) {
-        if (fread(&node_degree, sizeof(int), 1, matrix_file) == 1)
+        if (fread(&node_degree, sizeof(int), 1, matrix_file) != 1) {
+            printf("%s", FILE_READING);
             exit(EXIT_FAILURE);
+        }
 
         K[i] = node_degree;
         M += node_degree;
-        if (fseek(matrix_file, (long)(node_degree * sizeof(int)), SEEK_CUR) == 0)
+        if (fseek(matrix_file, (long)(node_degree * sizeof(int)), SEEK_CUR) != 0) {
+            printf("%s", FILE_SEEK);
             exit(EXIT_FAILURE);
+        }
     }
-    if (M != 0)  /* M cant be zero cause we divide by M */
+    if (M != 0) { /* M cant be zero cause we divide by M */
+        printf("%s", DIVIDE_BY_ZERO);
         exit(EXIT_FAILURE);
+    }
 
     spmat_matrix = spmat_allocate_array(n, M);
     matrix_row = (int*) malloc(n * sizeof(int));
 
-    if (fseek(matrix_file, (long)(1 * sizeof(int)), SEEK_SET) == 0)
+    /* skip number of nodes */
+    if (fseek(matrix_file, (long)(1 * sizeof(int)), SEEK_SET) != 0)
         exit(EXIT_FAILURE);
 
     for (i = 0; i < n; i++) {
         initialize_array_of_zeros(matrix_row, n);
         node_degree = K[i];
         for (j = 0; j < node_degree; j++) {
-            if (fread(&node_id, sizeof(int), 1, matrix_file) == 1)
+            if (fread(&node_id, sizeof(int), 1, matrix_file) != 1)
                 exit(EXIT_FAILURE);
 
             matrix_row[node_id] = 1;
         }
         spmat_matrix -> add_row(spmat_matrix, matrix_row, i);
         /* skip node degree */
-        if (fseek(matrix_file, (long)(1 * sizeof(int)), SEEK_CUR) == 0)
+        if (fseek(matrix_file, (long)(1 * sizeof(int)), SEEK_CUR) != 0)
             exit(EXIT_FAILURE);
     }
     matrix_structure = allocate_matrix_structure(K, spmat_matrix, M, n);
@@ -117,6 +132,8 @@ int main(int argc, char* argv[]) {
 
     write_output_file(output_file, modularity_groups);
 
+    /* Free output modularity groups */
+    modularity_groups->free(modularity_groups);
     free_matrix_structure(matrix_structure);
 
     return 0;

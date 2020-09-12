@@ -10,7 +10,6 @@ matrixStructure* allocate_matrix_structure(int *K, spmat *spmat_matrix, int M, i
     matrix_structure -> M = M;
     matrix_structure -> n = n;
 
-
     return matrix_structure;
 }
 
