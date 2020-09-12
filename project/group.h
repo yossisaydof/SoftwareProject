@@ -4,3 +4,5 @@ typedef struct _group {
     int *nodes;
     int size; /* group size */
 } group;
+
+/* TODO - add free function */

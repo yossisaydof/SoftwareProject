@@ -36,7 +36,6 @@ int find_max_index(const double *score, int n) {
 }
 
 void remove_index_from_unmoved(int *unmoved, int max_index, int last_available_index) {
-
     unmoved[max_index] = unmoved[last_available_index];
     unmoved[last_available_index] = -1;
 }
