@@ -25,7 +25,7 @@ matrixStructure* generate_matrix_structure(FILE *matrix_file) {
     matrixStructure *matrix_structure;
     spmat *spmat_matrix;
 
-    if ((int) fread(&n, sizeof(int), 1, matrix_file) == 1) {
+    if ((int) fread(&n, sizeof(int), 1, matrix_file) != 1) {
         printf("%s", FILE_READING);
         exit(EXIT_FAILURE);
     }
@@ -56,24 +56,34 @@ matrixStructure* generate_matrix_structure(FILE *matrix_file) {
 
     spmat_matrix = spmat_allocate_array(n, M);
     matrix_row = (int*) malloc(n * sizeof(int));
+    if (matrix_row == NULL) {
+        printf("%s", MALLOC_FAILED);
+        exit(EXIT_FAILURE);
+    }
 
     /* skip number of nodes */
-    if (fseek(matrix_file, (long)(1 * sizeof(int)), SEEK_SET) != 0)
+    if (fseek(matrix_file, (long)(1 * sizeof(int)), SEEK_SET) != 0) {
+        printf("%s", FILE_SEEK);
         exit(EXIT_FAILURE);
+    }
 
     for (i = 0; i < n; i++) {
         initialize_array_of_zeros(matrix_row, n);
         node_degree = K[i];
         for (j = 0; j < node_degree; j++) {
-            if (fread(&node_id, sizeof(int), 1, matrix_file) != 1)
+            if (fread(&node_id, sizeof(int), 1, matrix_file) != 1) {
+                printf("%s", FILE_READING);
                 exit(EXIT_FAILURE);
+            }
 
             matrix_row[node_id] = 1;
         }
         spmat_matrix -> add_row(spmat_matrix, matrix_row, i);
         /* skip node degree */
-        if (fseek(matrix_file, (long)(1 * sizeof(int)), SEEK_CUR) != 0)
+        if (fseek(matrix_file, (long)(1 * sizeof(int)), SEEK_CUR) != 0) {
+            printf("%s", FILE_SEEK);
             exit(EXIT_FAILURE);
+        }
     }
     matrix_structure = allocate_matrix_structure(K, spmat_matrix, M, n);
     matrix_structure -> norm_1 = norm_l1(matrix_structure);
@@ -90,19 +100,25 @@ void write_output_file(FILE *output_file, modularityGroups *modularity_groups) {
     head = modularity_groups -> head;
 
     /* The first value represents the number of groups in the division */
-    if (fwrite(&n, sizeof(int), 1, output_file) != 1)
+    if (fwrite(&n, sizeof(int), 1, output_file) != 1) {
+        printf("%s", FILE_WRITING);
         exit(EXIT_FAILURE);
+    }
 
     for (i = 0; i < n; i++) {
         group_size = head -> size;
         /* write number of nodes in the first group */
-        if ((int) fwrite(&(group_size), sizeof(int), 1, output_file) != 1)
+        if ((int) fwrite(&(group_size), sizeof(int), 1, output_file) != 1) {
+            printf("%s", FILE_WRITING);
             exit(EXIT_FAILURE);
+        }
 
         /* followed by the indices of the nodes in the group, in increasing order */
         /* TODO: sort nodes before writing to file */
-        if ((int) fwrite(head -> nodes, sizeof(int), group_size, output_file) != group_size)
+        if ((int) fwrite(head -> nodes, sizeof(int), group_size, output_file) != group_size) {
+            printf("%s", FILE_WRITING);
             exit(EXIT_FAILURE);
+        }
     }
 }
 
@@ -118,8 +134,10 @@ int main(int argc, char* argv[]) {
 
     input_matrix_filename = argv[1];
     input_matrix_file = fopen(input_matrix_filename, "r");
-    if(input_matrix_file != NULL)
+    if (input_matrix_file != NULL) {
+        printf("%s", FILE_OPENING);
         exit(EXIT_FAILURE);
+    }
 
     matrix_structure = generate_matrix_structure(input_matrix_file);
 
@@ -127,8 +145,10 @@ int main(int argc, char* argv[]) {
 
     output_filename = argv[2];
     output_file = fopen(output_filename, "w");
-    if (output_file != NULL)
+    if (output_file != NULL) {
+        printf("%s", FILE_OPENING);
         exit(EXIT_FAILURE);
+    }
 
     write_output_file(output_file, modularity_groups);
 

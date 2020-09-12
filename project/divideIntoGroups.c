@@ -1,5 +1,6 @@
 #include "divideIntoGroups.h"
-
+#include "error_handler.h"
+#include <stdio.h>
 
 
 /**
@@ -13,6 +14,10 @@ modularityGroups* create_P(int n) {
 
     P = allocate_modularity_group();
     nodes = malloc(n * sizeof(int));
+    if (nodes == NULL) {
+        printf("%s", MALLOC_FAILED);
+        exit(EXIT_FAILURE);
+    }
 
     for (i = 0; i < n; i++) {
         nodes[i] = i;
@@ -32,6 +37,11 @@ modularityGroups* divide_into_groups(matrixStructure *matrix_structure) {
 
     g1 = malloc(sizeof(group*));
     g2 = malloc(sizeof(group*));
+
+    if (g1 == NULL || g2 == NULL) {
+        printf("%s", MALLOC_FAILED);
+        exit(EXIT_FAILURE);
+    }
 
     while (P -> number_of_groups > 0) {
         /* Remove a group g from P */

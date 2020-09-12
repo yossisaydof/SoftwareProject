@@ -1,3 +1,4 @@
+#include "stdlib.h"
 #include "divideIntoTwo.h"
 #include "modularityGroups.h"
 

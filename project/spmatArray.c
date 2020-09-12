@@ -1,5 +1,7 @@
 #include "spmatArray.h"
 #include <stdlib.h>
+#include "error_handler.h"
+#include <stdio.h>
 
 void add_row_array(struct _spmat *A, const int *row, int i) {
     int j, *colind, *rowptr, *values;
@@ -47,18 +49,31 @@ void free_array(struct _spmat *A) {
 
 spmat* spmat_allocate_array(int n, int nnz) {
     spmat *sparse_matrix;
+    int *values, *colind, *rowptr;
 
     /* Allocating Memory for the sparse matrix */
     sparse_matrix = malloc(sizeof(spmat));
+    if (sparse_matrix == NULL) {
+        printf("%s", MALLOC_FAILED);
+        exit(EXIT_FAILURE);
+    }
+
+    values = (int*) malloc(nnz * sizeof(int));
+    colind = (int*) malloc(nnz * sizeof(int));
+    rowptr = (int*) malloc((n + 1) * sizeof(int));
+    if (values == NULL || colind == NULL || rowptr == NULL) {
+        printf("%s", MALLOC_FAILED);
+        exit(EXIT_FAILURE);
+    }
 
     sparse_matrix -> n = n;
     sparse_matrix -> add_row = add_row_array;
     sparse_matrix -> free = free_array;
     sparse_matrix -> mult = mult_array;
 
-    sparse_matrix -> values = (int*)malloc(nnz * sizeof(int));
-    sparse_matrix -> colind = (int*)malloc(nnz * sizeof(int));
-    sparse_matrix -> rowptr = (int*)malloc((n + 1) * sizeof(int));
+    sparse_matrix -> values = values;
+    sparse_matrix -> colind = colind;
+    sparse_matrix -> rowptr = rowptr;
 
     sparse_matrix -> rowptr[0] = 0;
     sparse_matrix -> rowptr[n] = nnz;

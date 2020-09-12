@@ -1,4 +1,6 @@
 #include "divideIntoTwo.h"
+#include "error_handler.h"
+#include <stdio.h>
 
 /**
  /Algorithm 2 - Divide a group into two
@@ -84,6 +86,11 @@ void divide_into_two(matrixStructure *matrix_structure, group *g, group *g1, gro
 
     /* compute leading eigenpair of the modularity matrix B_hat_g */
     eigen_vector = (double*) malloc(sizeof(double) * n);
+    if (eigen_vector == NULL) {
+        printf("%s", MALLOC_FAILED);
+        exit(EXIT_FAILURE);
+    }
+
     eigen_value = power_iteration(matrix_structure, g, eigen_vector); /* TODO: fix power iteration */
 
     if (IS_NON_POSITIVE(eigen_value)) {
@@ -94,6 +101,11 @@ void divide_into_two(matrixStructure *matrix_structure, group *g, group *g1, gro
 
     /* compute s = {s1,....,sn} where si in {+1, -1}, according to u1 */
     s = (int*) malloc(sizeof(int) * n);
+    if (s == NULL) {
+        printf("%s", MALLOC_FAILED);
+        exit(EXIT_FAILURE);
+    }
+
     for (i = 0; i < n; i++) {
         if (eigen_vector[i] < 0) { /* TODO: check epsilon */
             s[i] = -1;
@@ -120,11 +132,19 @@ void divide_into_two(matrixStructure *matrix_structure, group *g, group *g1, gro
     }
 
     if (deltaQ > 0) { /* TODO: check epsilon */
-        g1->size = cnt_positive;
-        g1->nodes = malloc(sizeof(int) * cnt_positive);
+        g1 -> size = cnt_positive;
+        g1 -> nodes = malloc(sizeof(int) * cnt_positive);
+        if (g1 -> nodes == NULL) {
+            printf("%s", MALLOC_FAILED);
+            exit(EXIT_FAILURE);
+        }
 
-        g2->size = cnt_negative;
-        g2->nodes = malloc(sizeof(int) * cnt_negative);
+        g2 -> size = cnt_negative;
+        g2 -> nodes = malloc(sizeof(int) * cnt_negative);
+        if (g2 -> nodes == NULL) {
+            printf("%s", MALLOC_FAILED);
+            exit(EXIT_FAILURE);
+        }
 
         divide_g(g, g1, g2, s); /* divide g into two groups according to s */
     }

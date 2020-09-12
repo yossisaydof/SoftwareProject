@@ -1,6 +1,8 @@
 #include <stdlib.h>
 #include <math.h>
 #include "powerIteration.h"
+#include "error_handler.h"
+#include <stdio.h>
 
 double EPSILON = 0.00001;
 
@@ -125,6 +127,10 @@ double power_iteration(matrixStructure *matrix_structure, group *g, double *eige
 
     n = g -> size;
     curr_vector = malloc(sizeof(double) * n);
+    if (curr_vector) {
+        printf("%s", MALLOC_FAILED);
+        exit(EXIT_FAILURE);
+    }
     create_random_vector(n, curr_vector);
 
     while (1) { /* TODO: make sure this is not an infinite loop! */

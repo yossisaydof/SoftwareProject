@@ -1,6 +1,8 @@
 #include <stdlib.h>
 #include "modularityMaximization.h"
 #include "divideIntoTwo.h"
+#include "error_handler.h"
+#include <stdio.h>
 
 /**
  * Algorithm 4
@@ -47,6 +49,10 @@ void improving_division_of_the_network(matrixStructure *matrix_structure, group 
     improve = (double*) malloc(n * sizeof(double));
     indices = (int*) malloc(n * sizeof(int));
     unmoved = (int*) malloc(n * sizeof(int));
+    if (score == NULL || improve == NULL || indices == NULL || unmoved == NULL) {
+        printf("%s", MALLOC_FAILED);
+        exit(EXIT_FAILURE);
+    }
 
     unmoved = allocate_unmoved(g, unmoved);
     last_available_index = n - 1; /* last available index in unmoved array */

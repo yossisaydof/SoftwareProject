@@ -1,11 +1,17 @@
 #include "stdlib.h"
 #include "modularityGroups.h"
 #include "divideIntoTwo.h"
+#include "error_handler.h"
+#include <stdio.h>
 
 void insert_modularity_groups(modularityGroups *modularity_groups , int* nodes, int n) {
     group *new_group;
 
     new_group = (group*) malloc(sizeof(group));
+    if (new_group == NULL) {
+        printf("%s", MALLOC_FAILED);
+        exit(EXIT_FAILURE);
+    }
 
     new_group -> nodes = nodes;
     new_group -> size = n;
@@ -48,6 +54,10 @@ modularityGroups* allocate_modularity_group(){
     modularityGroups *modularity_groups;
 
     modularity_groups = (modularityGroups*) malloc(sizeof(modularityGroups*));
+    if (modularity_groups == NULL) {
+        printf("%s", MALLOC_FAILED);
+        exit(EXIT_FAILURE);
+    }
 
     modularity_groups -> number_of_groups = 0;
     modularity_groups -> head = NULL;
