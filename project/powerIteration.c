@@ -81,9 +81,10 @@ void calc_next_vector(matrixStructure *matrix, group *g, double* curr_vector, in
 
     /* calculates denominator (i.e ||(matrix * curr_vector)||) */
     denominator = calc_vector_magnitude(next_vector, n);
-    if (denominator == 0)
+    if (denominator == 0) {
+        printf("%s", DIVIDE_BY_ZERO);
         exit(EXIT_FAILURE);
-
+    }
     /* update next_vector */
     for (i = 0; i < n; i++) {
         next_vector[i] = (double) (next_vector[i] / denominator);
@@ -111,8 +112,10 @@ double clac_eigenvalue(const double *curr_vector, const double *eigen_vector, in
         denominator += (curr_vector[i] * curr_vector[i]);
         numerator += (curr_vector[i] * eigen_vector[i]); /* TODO */
     }
-    if (denominator == 0)
+    if (denominator == 0) {
+        printf("%s", DIVIDE_BY_ZERO);
         exit(EXIT_FAILURE);
+    }
     return numerator / denominator;
 }
 
@@ -128,7 +131,7 @@ double power_iteration(matrixStructure *matrix_structure, group *g, double *eige
 
     n = g -> size;
     curr_vector = malloc(sizeof(double) * n);
-    if (curr_vector) {
+    if (curr_vector == NULL) {
         printf("%s", MALLOC_FAILED);
         exit(EXIT_FAILURE);
     }

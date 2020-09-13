@@ -46,7 +46,7 @@ matrixStructure* generate_matrix_structure(FILE *matrix_file) {
             exit(EXIT_FAILURE);
         }
     }
-    if (M != 0) { /* M cant be zero cause we divide by M */
+    if (M == 0) { /* M cant be zero cause we divide by M */
         printf("%s", DIVIDE_BY_ZERO);
         exit(EXIT_FAILURE);
     }
@@ -122,16 +122,16 @@ void write_output_file(FILE *output_file, modularityGroups *modularity_groups) {
 
 int main(int argc, char* argv[]) {
     FILE *input_matrix_file, *output_file;
-    char *input_matrix_filename, *output_filename;
+    char *input_filename, *output_filename;
     matrixStructure *matrix_structure;
     modularityGroups *modularity_groups;
     (void) argc;
 
     srand(time(NULL));
 
-    input_matrix_filename = argv[1];
-    input_matrix_file = fopen(input_matrix_filename, "r");
-    if (input_matrix_file != NULL) {
+    input_filename = argv[1];
+    input_matrix_file = fopen(input_filename, "rb");
+    if (input_matrix_file == NULL) {
         printf("%s", FILE_OPENING);
         exit(EXIT_FAILURE);
     }
@@ -141,8 +141,8 @@ int main(int argc, char* argv[]) {
     modularity_groups = divide_into_groups(matrix_structure);
 
     output_filename = argv[2];
-    output_file = fopen(output_filename, "w");
-    if (output_file != NULL) {
+    output_file = fopen(output_filename, "wb");
+    if (output_file == NULL) {
         printf("%s", FILE_OPENING);
         exit(EXIT_FAILURE);
     }
