@@ -49,7 +49,7 @@ void free_modularity_groups(modularityGroups *modularity_groups) {
 modularityGroups* allocate_modularity_group(){
     modularityGroups *modularity_groups;
 
-    modularity_groups = (modularityGroups*) malloc(sizeof(modularityGroups*));
+    modularity_groups = (modularityGroups*) malloc(sizeof(modularityGroups));
     if (modularity_groups == NULL) {
         printf("%s", MALLOC_FAILED);
         exit(EXIT_FAILURE);

@@ -5,6 +5,7 @@ void free_matrix_structure(matrixStructure *matrix_structure) {
 
     free_array(matrix_structure -> A);
     free(matrix_structure -> degreeList);
+    free(matrix_structure);
 }
 
 
@@ -21,6 +22,7 @@ matrixStructure* allocate_matrix_structure(int *K, spmat *spmat_matrix, int M, i
     matrix_structure -> A = spmat_matrix;
     matrix_structure -> M = M;
     matrix_structure -> n = n;
+    matrix_structure -> norm_1 = 0;
 
     matrix_structure -> free = free_matrix_structure;
 

@@ -127,7 +127,11 @@ int main(int argc, char* argv[]) {
     modularityGroups *modularity_groups;
     (void) argc;
 
+    printf("%s", "starting...");
+
     srand(time(NULL));
+
+    printf("%s", "open input file...");
 
     input_filename = argv[1];
     input_matrix_file = fopen(input_filename, "rb");
@@ -135,10 +139,15 @@ int main(int argc, char* argv[]) {
         printf("%s", FILE_OPENING);
         exit(EXIT_FAILURE);
     }
-
+    printf("%s", "generate matrix structure...");
     matrix_structure = generate_matrix_structure(input_matrix_file);
 
-    modularity_groups = divide_into_groups(matrix_structure);
+    printf("%s", "divide into groups...");
+
+    modularity_groups = allocate_modularity_group();
+    divide_into_groups(matrix_structure, modularity_groups);
+
+    printf("%s", "writing to file...");
 
     output_filename = argv[2];
     output_file = fopen(output_filename, "wb");
