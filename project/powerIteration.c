@@ -29,7 +29,10 @@ double calc_vector_magnitude(const double *vector, int n) {
 
 
 double calc_next_vector_i(matrixStructure *matrix, group *g, const double *curr_vector, int i) {
-    int j, A_ij, k_i, k_j, nnz_i, cnt_nnz = 0, row_start, row_end, *K;
+    /*
+     * Calculates:next_vextor[i] = norm * v_i + sum over j in g, j != i of (A_ij - k_i*k_j/M) * (v_j - j_i)
+     */
+    int j, A_ij, k_i, k_j, j_index, nnz_i, cnt_nnz = 0, row_start, row_end, *K, *nodes;
     double sum = 0, M;
 
     spmat *A;
@@ -41,14 +44,16 @@ double calc_next_vector_i(matrixStructure *matrix, group *g, const double *curr_
     row_start = A -> rowptr[i];
     row_end = A -> rowptr[i + 1];
     nnz_i = row_end - row_start;
+    nodes = g -> nodes;
 
     for (j = 0; j < g -> size; j++) {
-        if (i == j) {
+        j_index = nodes[j];
+        if (i == j_index) {
             sum += ((matrix -> norm_1) * curr_vector[i]); /* matrix shifting */
             continue;
         }
         A_ij = 0;
-        k_j = K[j];
+        k_j = K[j_index];
         if (cnt_nnz < nnz_i) {
             if (j == A -> colind[row_start + cnt_nnz]) {
                 cnt_nnz++;
@@ -76,7 +81,7 @@ void calc_next_vector(matrixStructure *matrix, group *g, double* curr_vector, in
     double denominator;
     int i;
     /* calculates numerator (i.e matrix * curr_vector) */
-    mult_matrix_vector(matrix, g, curr_vector, next_vector); /* TODO */
+    mult_matrix_vector(matrix, g, curr_vector, next_vector);
 
     /* calculates denominator (i.e ||(matrix * curr_vector)||) */
     denominator = calc_vector_magnitude(next_vector, n);
