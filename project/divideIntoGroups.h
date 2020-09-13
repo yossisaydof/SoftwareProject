@@ -18,6 +18,7 @@
 #define DIVIDEINTOGROUPS_H
 
 #include "divideIntoTwo.h"
+#include "modularityGroups.h"
 
 void divide_into_groups(matrixStructure *matrix_structure, modularityGroups *O);
 

@@ -26,7 +26,7 @@ double calc_vector_magnitude(const double *vector, int n) {
 
 double calc_next_vector_i(matrixStructure *matrix, group *g, const double *curr_vector, int i) {
     /*
-     * Calculates:next_vextor[i] = norm * v_i + sum over j in g, j != i of (A_ij - k_i*k_j/M) * (v_j - j_i)
+     * Calculates:next_vector[i] = norm * v_i + sum over j in g, j != i of (A_ij - k_i*k_j/M) * (v_j - j_i)
      */
     int j, A_ij, k_i, k_j, j_index, nnz_i, cnt_nnz = 0, row_start, row_end, *K, *nodes;
     double sum = 0, M;
@@ -58,6 +58,7 @@ double calc_next_vector_i(matrixStructure *matrix, group *g, const double *curr_
         }
         sum += ((A_ij - (double)((k_i * k_j) / M)) * (curr_vector[j] - curr_vector[i]));
     }
+    printf("sum = %f\n", sum);
     return sum;
 }
 
@@ -88,6 +89,7 @@ void calc_next_vector(matrixStructure *matrix, group *g, double* curr_vector, in
     /* update next_vector */
     for (i = 0; i < n; i++) {
         next_vector[i] = (double) (next_vector[i] / denominator);
+        printf("next_vector[i] = %f\n", next_vector[i]);
     }
 }
 
@@ -127,7 +129,7 @@ double power_iteration(matrixStructure *matrix_structure, group *g, double *eige
      */
 
     double *curr_vector, eigen_value;
-    int n;
+    int n, count = 0;
 
     n = g -> size;
     curr_vector = malloc(sizeof(double) * n);
@@ -136,19 +138,25 @@ double power_iteration(matrixStructure *matrix_structure, group *g, double *eige
         exit(EXIT_FAILURE);
     }
     create_random_vector(n, curr_vector);
+    printf("%s\n", "starting loop...");
 
     while (1) { /* TODO: make sure this is not an infinite loop! */
         calc_next_vector(matrix_structure, g, curr_vector, n, eigen_vector);
-
-        if (check_diff(curr_vector, eigen_vector, n) == 0) {
-            /* the vector produced in the final iteration is the desired eigenvector */
-            break;
+        count++;
+        if (count >= (100 * matrix_structure -> M)) {
+            printf("%f\n", eigen_vector[0]);
+            if (check_diff(curr_vector, eigen_vector, n) == 0) {
+                /* the vector produced in the final iteration is the desired eigenvector */
+                break;
+            }
         }
     }
+    printf("%s\n", "done loop...");
 
     eigen_value = clac_eigenvalue(curr_vector, eigen_vector, n);
 
     free(curr_vector);
+    printf("%s\n", "Done power iteration...");
 
     return eigen_value;
 }

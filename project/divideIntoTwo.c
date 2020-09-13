@@ -89,7 +89,7 @@ void divide_into_two(matrixStructure *matrix_structure, group *g, group *g1, gro
         printf("%s", MALLOC_FAILED);
         exit(EXIT_FAILURE);
     }
-
+    printf("%s\n", "power iteration...");
     eigen_value = power_iteration(matrix_structure, g, eigen_vector); /* TODO: fix power iteration */
 
     if (IS_NON_POSITIVE(eigen_value)) {
@@ -116,6 +116,7 @@ void divide_into_two(matrixStructure *matrix_structure, group *g, group *g1, gro
     }
 
     /* compute deltaQ */
+    printf("%s\n", "compute delta Q...");
     deltaQ = compute_delta_Q(matrix_structure, g, s);
 
     if (eigen_value > 0) { /* TODO: check epsilon */
@@ -130,7 +131,7 @@ void divide_into_two(matrixStructure *matrix_structure, group *g, group *g1, gro
         }
     }
 
-    if (deltaQ > 0) { /* TODO: check epsilon */
+    if (IS_POSITIVE(deltaQ)) { /* TODO: check epsilon */
         g1 -> size = cnt_positive;
         g1 -> nodes = malloc(sizeof(int) * cnt_positive);
         if (g1 -> nodes == NULL) {

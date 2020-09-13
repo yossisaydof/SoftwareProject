@@ -1,4 +1,6 @@
 #include <time.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include "divideIntoGroups.h"
 #include "matrixShifting.h"
 
@@ -89,8 +91,9 @@ matrixStructure* generate_matrix_structure(FILE *matrix_file) {
     return matrix_structure;
 }
 
+
 void write_output_file(FILE *output_file, modularityGroups *modularity_groups) {
-    int i, n, group_size;
+    int i, j, n, group_size;
     group *head;
 
     n = modularity_groups -> number_of_groups;
@@ -105,16 +108,18 @@ void write_output_file(FILE *output_file, modularityGroups *modularity_groups) {
     for (i = 0; i < n; i++) {
         group_size = head -> size;
         /* write number of nodes in the first group */
-        if ((int) fwrite(&(group_size), sizeof(int), 1, output_file) != 1) {
+        if ((int) fwrite(&group_size, sizeof(int), 1, output_file) != 1) {
             printf("%s", FILE_WRITING);
             exit(EXIT_FAILURE);
         }
 
         /* followed by the indices of the nodes in the group, in increasing order */
         /* TODO: sort nodes before writing to file */
-        if ((int) fwrite(head -> nodes, sizeof(int), group_size, output_file) != group_size) {
-            printf("%s", FILE_WRITING);
-            exit(EXIT_FAILURE);
+        for (j = 0; j < head -> size; j++) {
+            if ((int) fwrite(&(head -> nodes[j]), sizeof(int), 1, output_file) != 1) {
+                printf("%s", FILE_WRITING);
+                exit(EXIT_FAILURE);
+            }
         }
     }
 }
@@ -127,11 +132,10 @@ int main(int argc, char* argv[]) {
     modularityGroups *modularity_groups;
     (void) argc;
 
-    printf("%s", "starting...");
+    printf("%s\n", "starting...");
 
     srand(time(NULL));
 
-    printf("%s", "open input file...");
 
     input_filename = argv[1];
     input_matrix_file = fopen(input_filename, "rb");
@@ -139,15 +143,13 @@ int main(int argc, char* argv[]) {
         printf("%s", FILE_OPENING);
         exit(EXIT_FAILURE);
     }
-    printf("%s", "generate matrix structure...");
     matrix_structure = generate_matrix_structure(input_matrix_file);
 
-    printf("%s", "divide into groups...");
-
+    /* TODO STUCK HERE \/*/
     modularity_groups = allocate_modularity_group();
     divide_into_groups(matrix_structure, modularity_groups);
 
-    printf("%s", "writing to file...");
+    printf("%s\n", "writing to file...");
 
     output_filename = argv[2];
     output_file = fopen(output_filename, "wb");
