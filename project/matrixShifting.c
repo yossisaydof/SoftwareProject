@@ -1,5 +1,4 @@
-#include "matrixStructure.h"
-#include <math.h>
+#include "matrixShifting.h"
 
 double sum_of_row(matrixStructure *matrix_structure, int i) {
     int j, k_i, k_j, nnz_i, cnt_nnz = 0, A_ij, row_start, row_end, *K;

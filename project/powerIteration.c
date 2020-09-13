@@ -1,8 +1,4 @@
-#include <stdlib.h>
-#include <math.h>
 #include "powerIteration.h"
-#include "error_handler.h"
-#include <stdio.h>
 
 double EPSILON = 0.00001;
 

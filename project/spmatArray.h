@@ -11,6 +11,10 @@
 #ifndef SPMATARRAY_H
 #define SPMATARRAY_H
 
+#include <stdlib.h>
+#include "error_handler.h"
+#include <stdio.h>
+
 typedef struct _spmat {
     /* Matrix size (n*n) */
     int		n;

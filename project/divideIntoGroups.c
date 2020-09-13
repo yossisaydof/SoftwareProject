@@ -1,6 +1,4 @@
 #include "divideIntoGroups.h"
-#include "error_handler.h"
-#include <stdio.h>
 
 
 /**

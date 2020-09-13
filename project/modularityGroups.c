@@ -1,8 +1,4 @@
-#include "stdlib.h"
 #include "modularityGroups.h"
-#include "divideIntoTwo.h"
-#include "error_handler.h"
-#include <stdio.h>
 
 void insert_modularity_groups(modularityGroups *modularity_groups , int* nodes, int n) {
     group *new_group;

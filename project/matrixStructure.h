@@ -11,6 +11,9 @@
 #define MATRIXSTRUCTURE_H
 
 #include "spmatArray.h"
+#include <stdlib.h>
+#include <time.h>
+#include <math.h>
 
 /* holds B matrix B_ij = A_ij - k_i*k_j/M */
 typedef struct _matrixStructure {

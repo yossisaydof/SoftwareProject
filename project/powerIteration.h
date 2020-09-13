@@ -12,11 +12,8 @@
 #ifndef POWERITERATION_H
 #define POWERITERATION_H
 
-#include <stdlib.h>
-#include <time.h>
-#include <math.h>
 #include "matrixStructure.h"
-#include "group.h"
+#include "modularityGroups.h"
 
 double power_iteration(matrixStructure *matrix_structure, group *g, double *eigen_vector);
 

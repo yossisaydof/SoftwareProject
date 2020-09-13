@@ -1,9 +1,6 @@
-#include <stdio.h>
 #include <time.h>
-#include <stdlib.h>
 #include "divideIntoGroups.h"
 #include "matrixShifting.h"
-#include "error_handler.h"
 
 
 void initialize_array_of_zeros(int *array, int n) {

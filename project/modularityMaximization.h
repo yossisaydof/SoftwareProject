@@ -18,7 +18,6 @@
 #define MODULARITYMAXIMIZATION_H
 
 #include "matrixStructure.h"
-#include "group.h"
 #include "modularityGroups.h"
 
 

@@ -1,8 +1,4 @@
-#include <stdlib.h>
 #include "modularityMaximization.h"
-#include "divideIntoTwo.h"
-#include "error_handler.h"
-#include <stdio.h>
 
 /**
  * Algorithm 4
@@ -62,7 +58,7 @@ void improving_division_of_the_network(matrixStructure *matrix_structure, group 
             /* Computing delta Q for the move of each unmoved vertex */
             for (k = 0; k < last_available_index; k++) {
                 s[k] = s[k] * (-1);
-                score[k] = compute_delta_Q(matrix_structure, g, s) - Q_0;
+                score[k] = (matrix_structure -> n - Q_0); /*TODO!!!!!!!!!!!! */
                 s[k] = s[k] * (-1);
             }
 

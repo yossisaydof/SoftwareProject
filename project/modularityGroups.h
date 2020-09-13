@@ -10,6 +10,9 @@
 #define MODULARITYGROUPS_H
 
 #include "group.h"
+#include "stdlib.h"
+#include "error_handler.h"
+#include <stdio.h>
 
 /* P and O for algorithm 3 */
 typedef struct _modularityGroups {

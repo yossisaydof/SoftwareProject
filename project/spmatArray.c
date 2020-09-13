@@ -1,7 +1,5 @@
 #include "spmatArray.h"
-#include <stdlib.h>
-#include "error_handler.h"
-#include <stdio.h>
+
 
 void add_row_array(struct _spmat *A, const int *row, int i) {
     int j, *colind, *rowptr, *values;

@@ -1,7 +1,4 @@
 #include "matrixStructure.h"
-#include <stdlib.h>
-#include "error_handler.h"
-#include <stdio.h>
 
 
 void free_matrix_structure(matrixStructure *matrix_structure) {
