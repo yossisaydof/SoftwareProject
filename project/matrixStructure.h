@@ -19,9 +19,11 @@ typedef struct _matrixStructure {
     int M; /* sum of degreeList */
     int n; /* number of nodes, |V| */
     double norm_1;
+
+    void	(*free)(struct _matrixStructure *matrix_structure);
+
 } matrixStructure;
 
 matrixStructure* allocate_matrix_structure(int *K, spmat *spmat_matrix, int M, int n);
-void free_matrix_structure(matrixStructure* matrix_structure);
 
 #endif

@@ -153,8 +153,8 @@ int main(int argc, char* argv[]) {
     write_output_file(output_file, modularity_groups);
 
     /* Free output modularity groups */
-    modularity_groups->free(modularity_groups);
-    free_matrix_structure(matrix_structure);
+    modularity_groups -> free(modularity_groups);
+    matrix_structure -> free(matrix_structure);
 
     return 0;
 }
