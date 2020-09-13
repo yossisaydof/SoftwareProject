@@ -9,12 +9,15 @@
  *
  *  Finding the leading eigen-value = (b_k * A*b_k) / (b_k * b_k)
  * */
+#ifndef POWERITERATION_H
+#define POWERITERATION_H
 
 #include <stdlib.h>
 #include <time.h>
 #include <math.h>
-#include "spmatArray.h"
 #include "matrixStructure.h"
 #include "group.h"
 
 double power_iteration(matrixStructure *matrix_structure, group *g, double *eigen_vector);
+
+#endif

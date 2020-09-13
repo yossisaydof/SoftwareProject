@@ -7,8 +7,8 @@
  *      4. n = number of nodes
  */
 
-#ifndef _MATRIXSTRUCTURE_H
-#define _MATRIXSTRUCTURE_H
+#ifndef MATRIXSTRUCTURE_H
+#define MATRIXSTRUCTURE_H
 
 #include "spmatArray.h"
 

@@ -8,8 +8,8 @@
  * that respectively contain nonzero values, the extents of rows, and column indices..
  * */
 
-#ifndef _SPMATARRAY_H
-#define _SPMATARRAY_H
+#ifndef SPMATARRAY_H
+#define SPMATARRAY_H
 
 typedef struct _spmat {
     /* Matrix size (n*n) */

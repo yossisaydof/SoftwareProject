@@ -14,8 +14,12 @@
  * 4. Output the division given by O
  */
 
-#include "stdlib.h"
+#ifndef DIVIDEINTOGROUPS_H
+#define DIVIDEINTOGROUPS_H
+
+#include <stdlib.h>
 #include "divideIntoTwo.h"
-#include "modularityGroups.h"
 
 modularityGroups* divide_into_groups(matrixStructure *matrix_structure);
+
+#endif

@@ -6,8 +6,8 @@
  * This structure is used to represent P and O in divideIntoGroups.c
  */
 
-#ifndef _MODULARITYGROUPS_H
-#define _MODULARITYGROUPS_H
+#ifndef MODULARITYGROUPS_H
+#define MODULARITYGROUPS_H
 
 #include "group.h"
 
