@@ -13,6 +13,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <math.h>
+#include "spmatArray.h"
 #include "matrixStructure.h"
 #include "group.h"
 
