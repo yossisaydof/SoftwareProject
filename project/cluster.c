@@ -67,6 +67,11 @@ matrixStructure* generate_matrix_structure(FILE *matrix_file) {
     }
 
     for (i = 0; i < n; i++) {
+        /* skip node degree */
+        if (fseek(matrix_file, (long)(1 * sizeof(int)), SEEK_CUR) != 0) {
+            printf("%s", FILE_SEEK);
+            exit(EXIT_FAILURE);
+        }
         initialize_array_of_zeros(matrix_row, n);
         node_degree = K[i];
         for (j = 0; j < node_degree; j++) {
@@ -74,15 +79,10 @@ matrixStructure* generate_matrix_structure(FILE *matrix_file) {
                 printf("%s", FILE_READING);
                 exit(EXIT_FAILURE);
             }
-
             matrix_row[node_id] = 1;
         }
         spmat_matrix -> add_row(spmat_matrix, matrix_row, i);
-        /* skip node degree */
-        if (fseek(matrix_file, (long)(1 * sizeof(int)), SEEK_CUR) != 0) {
-            printf("%s", FILE_SEEK);
-            exit(EXIT_FAILURE);
-        }
+
     }
     matrix_structure = allocate_matrix_structure(K, spmat_matrix, M, n);
     matrix_structure -> norm_1 = norm_l1(matrix_structure);
@@ -132,10 +132,7 @@ int main(int argc, char* argv[]) {
     modularityGroups *modularity_groups;
     (void) argc;
 
-    printf("%s\n", "starting...");
-
     srand(time(NULL));
-
 
     input_filename = argv[1];
     input_matrix_file = fopen(input_filename, "rb");
@@ -148,8 +145,6 @@ int main(int argc, char* argv[]) {
     /* TODO STUCK HERE \/*/
     modularity_groups = allocate_modularity_group();
     divide_into_groups(matrix_structure, modularity_groups);
-
-    printf("%s\n", "writing to file...");
 
     output_filename = argv[2];
     output_file = fopen(output_filename, "wb");

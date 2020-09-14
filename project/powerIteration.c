@@ -52,8 +52,8 @@ double calc_next_vector_i(matrixStructure *matrix, group *g, const double *curr_
         k_j = K[j_index];
         if (cnt_nnz < nnz_i) {
             if (j == A -> colind[row_start + cnt_nnz]) {
-                cnt_nnz++;
                 A_ij = (int) A -> values[row_start + cnt_nnz];
+                cnt_nnz++;
             }
         }
         sum += ((A_ij - (double)((k_i * k_j) / M)) * (curr_vector[j] - curr_vector[i]));
@@ -73,60 +73,6 @@ void mult_matrix_vector(matrixStructure *matrix, group *g, double* curr_vector, 
     }
 }
 
-/*
-void mult_matrix_vector(matrixStructure *matrix_structure, group *g, double* curr_vector, double* next_vector) {
-
-     * Calculates B_hat[g] * curr_vector
-     * We split B_hat[g] to 3 matrices:
-     *      1. f[g]
-     *      2. A[g]
-     *      3. matrix[i][j] = k_i * k_j / M
-     * We calculate f[g]*curr_vector, A[g]*curr_vector, matrix*curr_vector and sum them all together
-     *
-    double *f, *f_s, *k_m_v, *v, tmp_sum;
-    int i, n;
-
-    n = g -> size;
-
-    f = malloc(sizeof(double) * n);
-    if (f == NULL) {
-        printf("%s", MALLOC_FAILED);
-        exit(EXIT_FAILURE);
-    }
-
-    f_s = malloc(sizeof(double) * n);
-    if (f_s == NULL) {
-        printf("%s", MALLOC_FAILED);
-        exit(EXIT_FAILURE);
-    }
-
-    k_m_v = malloc(sizeof(double) * n);
-    if (k_m_v == NULL) {
-        printf("%s", MALLOC_FAILED);
-        exit(EXIT_FAILURE);
-    }
-
-    v = malloc(sizeof(double) * n);
-    if (v == NULL) {
-        printf("%s", MALLOC_FAILED);
-        exit(EXIT_FAILURE);
-    }
-
-    calc_f_g(matrix_structure, g, f);
-    mult_f_v_double(f, curr_vector, f_s, n);
-    mult_A_g_double(matrix_structure -> A, curr_vector, g, v);
-    mult_kkM_double(matrix_structure, g, curr_vector, k_m_v);
-
-    for (i = 0; i < n; i++) {
-        tmp_sum = f_s[i] + k_m_v[i] + v[i];
-        next_vector[i] = tmp_sum;
-    }
-
-    free(f);
-    free(f_s);
-    free(v);
-    free(k_m_v);
-}*/
 
 void calc_next_vector(matrixStructure *matrix_structure, group *g, double* curr_vector, int n, double *next_vector) {
     double denominator;
@@ -161,55 +107,24 @@ int check_diff(double *curr_vector, double *next_vector, int n) {
 }
 
 double clac_eigenvalue(matrixStructure *matrix_structure, group *g, double *eigen_vector) {
-    /* Calculates an approximation of the corresponding dominant eigenvalue */
-    int i, n;
-    double denominator = 0 , numerator = 0, *f, *f_v, *k_m_v, *A_v, B_g_i;
+    /*
+     * Calculates eigen value.
+     * bk is our approximation of the dominant eigenvector, an approximation of the corresponding
+     * dominant eigenvalue can be found as follows:
+     *      eigen_value = (b_k * (A*b_k)) / (b_k * b_k)
+     */
+    int i;
+    double *mult_vector, denominator = 0, numerator = 0;
+    mult_vector = malloc((g -> size) * sizeof(double));
 
-    n = g -> size;
+    /* calculates B_hat[g] * eigen_vector */
+    mult_matrix_vector(matrix_structure, g, eigen_vector, mult_vector);
 
-    f = malloc(sizeof(double) * n);
-    if (f == NULL) {
-        printf("%s", MALLOC_FAILED);
-        exit(EXIT_FAILURE);
-    }
-
-    k_m_v = malloc(sizeof(double) * n);
-    if (k_m_v == NULL) {
-        printf("%s", MALLOC_FAILED);
-        exit(EXIT_FAILURE);
-    }
-
-    A_v = malloc(sizeof(double) * n);
-    if (A_v == NULL) {
-        printf("%s", MALLOC_FAILED);
-        exit(EXIT_FAILURE);
-    }
-
-    f_v = malloc(sizeof(double) * n);
-    if (f_v == NULL) {
-        printf("%s", MALLOC_FAILED);
-        exit(EXIT_FAILURE);
-    }
-
-    calc_f_g(matrix_structure, g, f);
-    mult_f_v_double(f, eigen_vector, f_v, n);
-    mult_A_g_double(matrix_structure -> A, eigen_vector, g, A_v);
-    mult_kkM_double(matrix_structure, g, eigen_vector, k_m_v);
-
-    for (i = 0; i < n ; i++) {
+    for (i = 0; i < g -> size; i++) {
+        numerator += (mult_vector[i] * eigen_vector[i]);
         denominator += (eigen_vector[i] * eigen_vector[i]);
-        B_g_i = f_v[i] + k_m_v[i] + A_v[i];
-        numerator += (B_g_i * eigen_vector[i]);
     }
-    if (denominator == 0) {
-        printf("%s", DIVIDE_BY_ZERO);
-        exit(EXIT_FAILURE);
-    }
-
-    free(f);
-    free(k_m_v);
-    free(A_v);
-    free(f_v);
+    if (denominator == 0) exit(EXIT_FAILURE);
 
     return (numerator / denominator);
 }
@@ -233,12 +148,6 @@ double power_iteration(matrixStructure *matrix_structure, group *g, double *eige
     create_random_vector(n, curr_vector);
     printf("%s\n", "Created random vector.. ");
 
-    eigen_vector = malloc(sizeof(double) * n);
-    if (eigen_vector == NULL) {
-        printf("%s", MALLOC_FAILED);
-        exit(EXIT_FAILURE);
-    }
-
     while (1) { /* TODO: make sure this is not an infinite loop! */
         calc_next_vector(matrix_structure, g, curr_vector, n, eigen_vector);
         cnt_diff++;
@@ -254,7 +163,6 @@ double power_iteration(matrixStructure *matrix_structure, group *g, double *eige
     eigen_value = clac_eigenvalue(matrix_structure, g, eigen_vector);
     printf("%s%f\n", "Eigen value is: ", eigen_value);
     free(curr_vector);
-    free(eigen_vector);
 
-    return eigen_value;
+    return (eigen_value + matrix_structure -> norm_1);
 }

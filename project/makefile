@@ -9,7 +9,7 @@ all: $(FILES)
 	$(CC) $(FILES) -o $(EXEC) $(LIBS)
 
 clean:
-	rm -f $(FILES)
+	rm -f $(FILES) $(EXEC)
 
 $(EXEC): $(FILES)
 	$(CC) $(FILES) -o $@ $(LIBS)

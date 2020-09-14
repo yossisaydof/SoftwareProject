@@ -19,8 +19,8 @@ double sum_of_row(matrixStructure *matrix_structure, int i) {
         k_j = K[j];
         if (cnt_nnz < nnz_i) {
             if (j == A -> colind[row_start + cnt_nnz]) {
-                cnt_nnz++;
                 A_ij = (int) A -> values[row_start + cnt_nnz];
+                cnt_nnz++;
             }
         }
         sum1 += A_ij - (double)((k_i * k_j) / M);

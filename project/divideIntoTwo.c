@@ -4,10 +4,8 @@
  /Algorithm 2 - Divide a group into two
 */
 
-
-/*
 void sum_row_i(matrixStructure *matrix_structure, group *g, int i, double *sum1, double *sum2, const int *s) {
-    * sum row i in B = SUM over j of (A_ij - (k_i * k_j / M)
+    /*  sum row i in B = SUM over j of (A_ij - (k_i * k_j / M) */
     int j, k_i, k_j, M, nnz_i, cnt_nnz = 0, row_start, row_end, A_ij, *nodes, *K;
     double B_ij;
     spmat *A;
@@ -39,16 +37,14 @@ void sum_row_i(matrixStructure *matrix_structure, group *g, int i, double *sum1,
         *sum2 += (B_ij * s[nodes[j]]);
     }
 }
-*/
 
-/*
-double compute_delta_Q_2(matrixStructure *matrix_structure, group *g, int *s) {
+double compute_delta_Q(matrixStructure *matrix_structure, group *g, int *s) {
 
-     * deltaQ = 0.5 * (s^T * B_hat[g] * s)
+     /* deltaQ = 0.5 * (s^T * B_hat[g] * s)
      * notice that: s^T * B_hat[g] * s = SUM1 + SUM2
      * SUM1 = -SUM over i != j of (A_ij - (k_i * k_j / M))
      * SUM2 = 2 * SUM over i != j of [s_i * s_j *(A_ij - (k_i * k_j / M))]
-
+    */
     double delta_Q, sum1 = 0, sum2 = 0;
     int i, index_i;
     for (i = 0; i < g -> size; i++) {
@@ -62,61 +58,7 @@ double compute_delta_Q_2(matrixStructure *matrix_structure, group *g, int *s) {
 
     return (delta_Q * 0.5);
 }
-*/
 
-double compute_delta_Q(matrixStructure *matrix_structure, group *g, int *s) {
-    /*
-     * deltaQ = 0.5 * (s^T * B_hat[g] * s)
-     * First we calculate (B_hat[g] * s) using methods from BMatrixFunctions:
-     *      B_hat[g] * s = A[g] * s + (k_i*k_j/M)[g] * s + f_g * s
-     * Then we sum all vectors and multiply it by s^T
-     */
-    double *f, *f_s, *k_m_s, *A_s, delta_Q = 0, tmp_sum;
-    int i, n;
-
-    n = g -> size;
-
-    f = malloc(sizeof(double) * n);
-    if (f == NULL) {
-        printf("%s", MALLOC_FAILED);
-        exit(EXIT_FAILURE);
-    }
-
-    k_m_s = malloc(sizeof(double) * n);
-    if (k_m_s == NULL) {
-        printf("%s", MALLOC_FAILED);
-        exit(EXIT_FAILURE);
-    }
-
-    A_s = malloc(sizeof(double) * n);
-    if (A_s == NULL) {
-        printf("%s", MALLOC_FAILED);
-        exit(EXIT_FAILURE);
-    }
-
-    f_s = malloc(sizeof(double) * n);
-    if (f_s == NULL) {
-        printf("%s", MALLOC_FAILED);
-        exit(EXIT_FAILURE);
-    }
-
-    calc_f_g(matrix_structure, g, f);
-    mult_f_v_int(f, s, f_s, n);
-    mult_A_g_int(matrix_structure -> A, s, g, A_s);
-    mult_kkM_int(matrix_structure, g, s, k_m_s);
-
-    for (i = 0; i < g -> size; i++) {
-        tmp_sum = f_s[i] + k_m_s[i] + A_s[i];
-        delta_Q += tmp_sum * s[i];
-    }
-
-    free(f);
-    free(k_m_s);
-    free(A_s);
-    free(f_s);
-
-    return (delta_Q * 0.5);
-}
 
 void divide_g(group *g, group *g1, group *g2, const int *s) {
     int i, g1_index = 0, g2_index = 0;
@@ -146,13 +88,10 @@ void divide_into_two(matrixStructure *matrix_structure, group *g, group *g1, gro
         exit(EXIT_FAILURE);
     }
 
-    printf("%s\n", "power iteration...");
     eigen_value = power_iteration(matrix_structure, g, eigen_vector);
-    printf("%s\n", "Done power iteration...");
 
     if (IS_NON_POSITIVE(eigen_value)) {
         /* eigen value is non zero so the group g is indivisible */
-        printf("%s\n", "eigen value <= 0");
         g1 -> size = 0;
         g2 -> size = 0;
         return;
@@ -167,17 +106,15 @@ void divide_into_two(matrixStructure *matrix_structure, group *g, group *g1, gro
 
     for (i = 0; i < n; i++) {
         if (eigen_vector[i] < EPSILON()) {
-            s[cnt_negative] = -1;
+            s[i] = -1;
             cnt_negative++;
         } else {
-            s[cnt_positive] = 1;
+            s[i] = 1;
             cnt_positive++;
         }
-        printf("%d\n", s[i]);
     }
 
     /* compute deltaQ */
-    printf("%s\n", "compute delta Q...");
     deltaQ = compute_delta_Q(matrix_structure, g, s);
 
     if (eigen_value > EPSILON()) { /* TODO: check epsilon */

@@ -3,6 +3,8 @@
 
 
 void free_group(group *group) {
-    free(group -> nodes);
+    if (group -> size) {
+        free(group -> nodes);
+    }
     free(group);
 }
