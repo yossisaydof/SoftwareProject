@@ -18,8 +18,7 @@
 #define MODULARITYMAXIMIZATION_H
 
 #include "matrixStructure.h"
-#include "modularityGroups.h"
-
+#include "group.h"
 
 #define EPSILON() (0.00001)
 #define IS_POSITIVE(X) ((X) > EPSILON())
