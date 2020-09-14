@@ -1,6 +1,6 @@
 /*
  * modularityGroups module:
- * This module implements a linked list of groups.
+ * This module implements a stack of groups.
  * Each modularityGroup contains groups and the number of groups in it.
  *
  * This structure is used to represent P and O in divideIntoGroups.c

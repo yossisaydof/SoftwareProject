@@ -2,7 +2,7 @@ FLAGS = -ansi -Wall -Wextra -Werror -pedantic-errors
 LIBS = -lm
 CC = gcc
 EXEC = cluster
-FILES = cluster.o spmatArray.o divideIntoTwo.o matrixStructure.o matrixShifting.o modularityGroups.o group.o divideIntoGroups.o powerIteration.o modularityMaximization.o
+FILES = cluster.o spmatArray.o divideIntoTwo.o matrixStructure.o matrixShifting.o modularityGroups.o group.o divideIntoGroups.o powerIteration.o modularityMaximization.o BMatrixFunctions.o
 
 
 all: $(FILES)
@@ -38,9 +38,13 @@ group.o: group.h group.c
 divideIntoGroups.o: divideIntoGroups.c divideIntoGroups.h divideIntoTwo.h
 	$(CC) $(FLAGS) -c $*.c
 
-powerIteration.o: powerIteration.c powerIteration.h matrixStructure.h modularityGroups.h
+powerIteration.o: powerIteration.c powerIteration.h matrixStructure.h modularityGroups.h BMatrixFunctions.h
 	$(CC) $(FLAGS) -c $*.c
 
 modularityMaximization.o: modularityMaximization.c modularityMaximization.h matrixStructure.h modularityGroups.h
 	$(CC) $(FLAGS) -c $*.c
+
+BMatrixFunctions.o: BMatrixFunctions.c matrixStructure.h group.h
+	$(CC) $(FLAGS) -c $*.c
+
 

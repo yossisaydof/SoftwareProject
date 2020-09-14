@@ -4,6 +4,7 @@
  /Algorithm 2 - Divide a group into two
 */
 
+
 /*
 void sum_row_i(matrixStructure *matrix_structure, group *g, int i, double *sum1, double *sum2, const int *s) {
     * sum row i in B = SUM over j of (A_ij - (k_i * k_j / M)
@@ -100,9 +101,9 @@ double compute_delta_Q(matrixStructure *matrix_structure, group *g, int *s) {
     }
 
     calc_f_g(matrix_structure, g, f);
-    mult_f_v(f, s, f_s, n);
-    mult_A_g(matrix_structure -> A, s, g, A_s);
-    mult_kkM(matrix_structure, g, s, k_m_s);
+    mult_f_v_int(f, s, f_s, n);
+    mult_A_g_int(matrix_structure -> A, s, g, A_s);
+    mult_kkM_int(matrix_structure, g, s, k_m_s);
 
     for (i = 0; i < g -> size; i++) {
         tmp_sum = f_s[i] + k_m_s[i] + A_s[i];
@@ -122,17 +123,17 @@ void divide_g(group *g, group *g1, group *g2, const int *s) {
 
     for (i = 0; i < g -> size; i++) {
         if (s[i] == 1) {
-            g1 -> nodes[g1_index] = g -> nodes[i];
+            g1 -> nodes[g1_index] = (g -> nodes[i]);
             g1_index++;
         } else {
-            g2 -> nodes[g2_index] = g -> nodes[i];
+            g2 -> nodes[g2_index] = (g -> nodes[i]);
             g2_index++;
         }
     }
 }
 
 void divide_into_two(matrixStructure *matrix_structure, group *g, group *g1, group *g2) {
-    int n, *s, i, cnt_positive = 0, cnt_negative = 0;
+    int n, i, cnt_positive = 0, cnt_negative = 0, *s;
     double eigen_value, deltaQ, *eigen_vector;
 
     n = g -> size;
@@ -144,10 +145,14 @@ void divide_into_two(matrixStructure *matrix_structure, group *g, group *g1, gro
         printf("%s", MALLOC_FAILED);
         exit(EXIT_FAILURE);
     }
+
     printf("%s\n", "power iteration...");
-    eigen_value = power_iteration(matrix_structure, g, eigen_vector); /* TODO: fix power iteration */
+    eigen_value = power_iteration(matrix_structure, g, eigen_vector);
+    printf("%s\n", "Done power iteration...");
 
     if (IS_NON_POSITIVE(eigen_value)) {
+        /* eigen value is non zero so the group g is indivisible */
+        printf("%s\n", "eigen value <= 0");
         g1 -> size = 0;
         g2 -> size = 0;
         return;
@@ -161,20 +166,21 @@ void divide_into_two(matrixStructure *matrix_structure, group *g, group *g1, gro
     }
 
     for (i = 0; i < n; i++) {
-        if (eigen_vector[i] < 0) {
-            s[i] = -1;
+        if (eigen_vector[i] < EPSILON()) {
+            s[cnt_negative] = -1;
             cnt_negative++;
         } else {
-            s[i] = 1;
+            s[cnt_positive] = 1;
             cnt_positive++;
         }
+        printf("%d\n", s[i]);
     }
 
     /* compute deltaQ */
     printf("%s\n", "compute delta Q...");
     deltaQ = compute_delta_Q(matrix_structure, g, s);
 
-    if (eigen_value > 0) { /* TODO: check epsilon */
+    if (eigen_value > EPSILON()) { /* TODO: check epsilon */
         improving_division_of_the_network(matrix_structure, g, s, deltaQ);
         cnt_negative = 0;
         cnt_positive = 0;
@@ -186,7 +192,8 @@ void divide_into_two(matrixStructure *matrix_structure, group *g, group *g1, gro
         }
     }
 
-    if (IS_POSITIVE(deltaQ)) { /* TODO: check epsilon */
+    if (IS_POSITIVE(deltaQ)) {
+        /* */
         g1 -> size = cnt_positive;
         g1 -> nodes = malloc(sizeof(int) * cnt_positive);
         if (g1 -> nodes == NULL) {
@@ -202,8 +209,12 @@ void divide_into_two(matrixStructure *matrix_structure, group *g, group *g1, gro
         }
 
         divide_g(g, g1, g2, s); /* divide g into two groups according to s */
+    } else {
+        /* if deltaQ <= 0 the group g is indivisible */
+        g1 -> size = 0;
+        g2 -> size = 0;
+        return;
     }
-    /* if deltaQ <= 0 the group g is indivisible */
 
     free(s);
     free(eigen_vector);

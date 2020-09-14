@@ -23,10 +23,10 @@ double calc_vector_magnitude(const double *vector, int n) {
     return sqrt(sum_squares);
 }
 
-/*
+
 double calc_next_vector_i(matrixStructure *matrix, group *g, const double *curr_vector, int i) {
 
-     * Calculates:next_vextor[i] = norm * v_i + sum over j in g, j != i of (A_ij - k_i*k_j/M) * (v_j - j_i)
+     /* Calculates: next_vextor[i] = norm * v_i + sum over j in g, j != i of (A_ij - k_i*k_j/M) * (v_j - j_i) */
 
     int j, A_ij, k_i, k_j, j_index, nnz_i, cnt_nnz = 0, row_start, row_end, *K, *nodes;
     double sum = 0, M;
@@ -45,7 +45,7 @@ double calc_next_vector_i(matrixStructure *matrix, group *g, const double *curr_
     for (j = 0; j < g -> size; j++) {
         j_index = nodes[j];
         if (i == j_index) {
-            sum += ((matrix -> norm_1) * curr_vector[i]); * matrix shifting *
+            sum += ((matrix -> norm_1) * curr_vector[i]); /* matrix shifting */
             continue;
         }
         A_ij = 0;
@@ -59,44 +59,74 @@ double calc_next_vector_i(matrixStructure *matrix, group *g, const double *curr_
         sum += ((A_ij - (double)((k_i * k_j) / M)) * (curr_vector[j] - curr_vector[i]));
     }
     return sum;
-}*/
+}
 
-/*
+
 void mult_matrix_vector(matrixStructure *matrix, group *g, double* curr_vector, double* next_vector) {
 
-     * Calculates B_hat[h] * curr_vector
+     /* Calculates B_hat[h] * curr_vector */
 
     int i;
 
     for (i = 0; i < g -> size; i++) {
         next_vector[i] = calc_next_vector_i(matrix, g, curr_vector, g -> nodes[i]);
     }
-}*/
+}
 
+/*
 void mult_matrix_vector(matrixStructure *matrix_structure, group *g, double* curr_vector, double* next_vector) {
-    /*
+
      * Calculates B_hat[g] * curr_vector
      * We split B_hat[g] to 3 matrices:
      *      1. f[g]
      *      2. A[g]
      *      3. matrix[i][j] = k_i * k_j / M
      * We calculate f[g]*curr_vector, A[g]*curr_vector, matrix*curr_vector and sum them all together
-     */
-    double *f, *f_s, *k_m_v, *v, delta_Q = 0, tmp_sum;
+     *
+    double *f, *f_s, *k_m_v, *v, tmp_sum;
     int i, n;
 
     n = g -> size;
 
+    f = malloc(sizeof(double) * n);
+    if (f == NULL) {
+        printf("%s", MALLOC_FAILED);
+        exit(EXIT_FAILURE);
+    }
+
+    f_s = malloc(sizeof(double) * n);
+    if (f_s == NULL) {
+        printf("%s", MALLOC_FAILED);
+        exit(EXIT_FAILURE);
+    }
+
+    k_m_v = malloc(sizeof(double) * n);
+    if (k_m_v == NULL) {
+        printf("%s", MALLOC_FAILED);
+        exit(EXIT_FAILURE);
+    }
+
+    v = malloc(sizeof(double) * n);
+    if (v == NULL) {
+        printf("%s", MALLOC_FAILED);
+        exit(EXIT_FAILURE);
+    }
+
     calc_f_g(matrix_structure, g, f);
-    mult_f_v(f, curr_vector, f_s, n);
-    mult_A_g(matrix_structure -> A, curr_vector, g, v);
-    mult_kkM(matrix_structure, g, curr_vector, k_m_v);
+    mult_f_v_double(f, curr_vector, f_s, n);
+    mult_A_g_double(matrix_structure -> A, curr_vector, g, v);
+    mult_kkM_double(matrix_structure, g, curr_vector, k_m_v);
 
     for (i = 0; i < n; i++) {
         tmp_sum = f_s[i] + k_m_v[i] + v[i];
         next_vector[i] = tmp_sum;
     }
-}
+
+    free(f);
+    free(f_s);
+    free(v);
+    free(k_m_v);
+}*/
 
 void calc_next_vector(matrixStructure *matrix_structure, group *g, double* curr_vector, int n, double *next_vector) {
     double denominator;
@@ -110,6 +140,7 @@ void calc_next_vector(matrixStructure *matrix_structure, group *g, double* curr_
         printf("%s", DIVIDE_BY_ZERO);
         exit(EXIT_FAILURE);
     }
+
     /* update next_vector */
     for (i = 0; i < n; i++) {
         next_vector[i] = (double) (next_vector[i] / denominator);
@@ -119,15 +150,17 @@ void calc_next_vector(matrixStructure *matrix_structure, group *g, double* curr_
 int check_diff(double *curr_vector, double *next_vector, int n) {
     /* Returns 1 if all differences are smaller than EPSILON */
     int i;
+    double diff;
     for (i = 0; i < n; i++) {
-        if (fabs(curr_vector[i] - next_vector[i]) >= EPSILON) {
+        diff = fabs(curr_vector[i] - next_vector[i]);
+        if (diff > EPSILON) {
             return 1;
         }
     }
     return 0;
 }
 
-double clac_eigenvalue(matrixStructure *matrix_structure, group *g, const double *eigen_vector) {
+double clac_eigenvalue(matrixStructure *matrix_structure, group *g, double *eigen_vector) {
     /* Calculates an approximation of the corresponding dominant eigenvalue */
     int i, n;
     double denominator = 0 , numerator = 0, *f, *f_v, *k_m_v, *A_v, B_g_i;
@@ -159,9 +192,9 @@ double clac_eigenvalue(matrixStructure *matrix_structure, group *g, const double
     }
 
     calc_f_g(matrix_structure, g, f);
-    mult_f_v(f, eigen_vector, f_v, n);
-    mult_A_g(matrix_structure -> A, eigen_vector, g, A_v);
-    mult_kkM(matrix_structure, g, eigen_vector, k_m_v);
+    mult_f_v_double(f, eigen_vector, f_v, n);
+    mult_A_g_double(matrix_structure -> A, eigen_vector, g, A_v);
+    mult_kkM_double(matrix_structure, g, eigen_vector, k_m_v);
 
     for (i = 0; i < n ; i++) {
         denominator += (eigen_vector[i] * eigen_vector[i]);
@@ -189,7 +222,7 @@ double power_iteration(matrixStructure *matrix_structure, group *g, double *eige
      */
 
     double *curr_vector, eigen_value;
-    int n, cnt_diff;
+    int n, cnt_diff = 0, i;
 
     n = g -> size;
     curr_vector = malloc(sizeof(double) * n);
@@ -198,6 +231,7 @@ double power_iteration(matrixStructure *matrix_structure, group *g, double *eige
         exit(EXIT_FAILURE);
     }
     create_random_vector(n, curr_vector);
+    printf("%s\n", "Created random vector.. ");
 
     eigen_vector = malloc(sizeof(double) * n);
     if (eigen_vector == NULL) {
@@ -208,17 +242,17 @@ double power_iteration(matrixStructure *matrix_structure, group *g, double *eige
     while (1) { /* TODO: make sure this is not an infinite loop! */
         calc_next_vector(matrix_structure, g, curr_vector, n, eigen_vector);
         cnt_diff++;
-        if (cnt_diff >= (matrix_structure -> M * 10)) {
-            if (check_diff(curr_vector, eigen_vector, n) == 0) {
-                /* the vector produced in the final iteration is the desired eigenvector */
-                break;
-            }
+        if (check_diff(curr_vector, eigen_vector, n) == 0) {
+            /* the vector produced in the final iteration is the desired eigenvector */
+            break;
         }
-
+        for (i = 0; i < n; i++) {
+            curr_vector[i] = eigen_vector[i];
+        }
     }
 
     eigen_value = clac_eigenvalue(matrix_structure, g, eigen_vector);
-
+    printf("%s%f\n", "Eigen value is: ", eigen_value);
     free(curr_vector);
     free(eigen_vector);
 

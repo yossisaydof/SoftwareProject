@@ -27,7 +27,7 @@ group* remove_modularity_groups(modularityGroups *modularity_groups) {
     group *tmp;
 
     tmp = modularity_groups -> head;
-    modularity_groups -> head = tmp->next;
+    modularity_groups -> head = tmp -> next;
     modularity_groups -> number_of_groups--;
 
     return tmp;
@@ -61,7 +61,6 @@ modularityGroups* allocate_modularity_group(){
     modularity_groups -> insert = insert_modularity_groups;
     modularity_groups -> remove = remove_modularity_groups;
     modularity_groups -> free = free_modularity_groups;
-
 
     return modularity_groups;
 }

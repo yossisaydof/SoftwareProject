@@ -49,7 +49,7 @@ void calc_f_g (matrixStructure *matrix_structure, group *g, double *f) {
 
 }
 
-void mult_f_v (double *f, double *v, double *result, int n) {
+void mult_f_v_double (double *f, double *v, double *result, int n) {
     /*
      * Multiples f_g * v and place it in result
      */
@@ -59,11 +59,21 @@ void mult_f_v (double *f, double *v, double *result, int n) {
     }
 }
 
-void mult_A_g (spmat *A, double *v, group *g, double *result) {
+void mult_f_v_int (double *f, int *v, double *result, int n) {
+    /*
+     * Multiples f_g * v and place it in result
+     */
+    int i;
+    for (i = 0; i < n; i++) {
+        result[i] = f[i] * v[i];
+    }
+}
+
+void mult_A_g_double (spmat *A, double *v, group *g, double *result) {
     /*
      * Multiples A[g] * v and stores it in result
      */
-    int i, j, *values, i_index, j_index, *colind, *rowptr, *g_nodes, cnt;
+    int i, j, *values, i_index, *colind, *rowptr, *g_nodes, cnt;
     double sum;
 
     g_nodes = g -> nodes;
@@ -87,7 +97,35 @@ void mult_A_g (spmat *A, double *v, group *g, double *result) {
     }
 }
 
-void mult_kkM (matrixStructure *matrix_structure, group *g, double *v, double *result) {
+void mult_A_g_int (spmat *A, int *v, group *g, double *result) {
+    /*
+     * Multiples A[g] * v and stores it in result
+     */
+    int i, j, *values, i_index, *colind, *rowptr, *g_nodes, cnt;
+    double sum;
+
+    g_nodes = g -> nodes;
+    rowptr = (int*) A -> rowptr;
+    values = (int*) A -> values;
+    colind = (int*) A -> colind;
+
+    for (i = 0; i < g -> size; i++) {
+        i_index = g_nodes[i];
+        sum = 0;
+        cnt = 0;
+        for (j = rowptr[i_index]; j < rowptr[i_index + 1]; j++) {
+            /* iterating over nnz elements in row i_index */
+            if (colind[j] == g_nodes[cnt]) {
+                /* check if the column j is in g */
+                sum += (double) (values[j] * v[colind[j]]);
+                cnt++;
+            }
+        }
+        result[i] = sum;
+    }
+}
+
+void mult_kkM_double (matrixStructure *matrix_structure, group *g, double *v, double *result) {
     /*
      * result[i] = sum over j of ((k_i * k_j)/M * v[j])
      */
@@ -112,6 +150,34 @@ void mult_kkM (matrixStructure *matrix_structure, group *g, double *v, double *r
     }
 }
 
-double calc_norm_g (matrixStructure *matrix_structure, group *g) {
-    return 0.0;
+void mult_kkM_int (matrixStructure *matrix_structure, group *g, int *v, double *result) {
+    /*
+     * result[i] = sum over j of ((k_i * k_j)/M * v[j])
+     */
+    int i, j, i_index, j_index, n, k_i, k_j, M, *g_nodes, *K;
+    double tmp_sum = 0;
+
+    n = g -> size;
+    g_nodes = g -> nodes;
+    M = matrix_structure -> M;
+    K = matrix_structure -> degreeList;
+
+    for (i = 0; i < n; i++) {
+        i_index = g_nodes[i];
+        k_i = K[i_index];
+        for (j = 0; j < n; j++) {
+            j_index = g_nodes[j];
+            k_j = K[j_index];
+            tmp_sum += ((double)(k_i * k_j) / M) * v[j];
+        }
+        result[i] = tmp_sum;
+        tmp_sum = 0;
+    }
 }
+
+
+/* TODO
+double calc_norm_g (matrixStructure *matrix_structure, group *g) {
+
+    return 0.0;
+}*/

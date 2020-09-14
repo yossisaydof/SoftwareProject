@@ -44,14 +44,17 @@ void divide_into_groups(matrixStructure *matrix_structure, modularityGroups *O) 
         /* Remove a group g from P */
         printf("%s\n", "removing group g from P...");
         g = (group *) P -> remove(P);
-
+        printf("%s%d\n", "Num of groups in P : " ,P->number_of_groups);
         /* Divide g into g1, g2 with Algorithm 2 */
 
         divide_into_two(matrix_structure, g, g1, g2);
-        printf("%d\n", P -> number_of_groups);
+        printf("%s%d\n", "g1 size " ,g1->size);
+        printf("%s%d\n", "g2 size " ,g1->size);
+
 
         /* if either g1 or g2 is of size 0: Add g to O */
         if (g1 -> size == 0 || g2 -> size == 0) {
+            printf("%s\n", "insert g to O ");
             O -> insert(O, g -> nodes, g -> size);
         }
         else {
@@ -66,7 +69,7 @@ void divide_into_groups(matrixStructure *matrix_structure, modularityGroups *O) 
             } else {
                 P -> insert(P, g2 -> nodes, g2 -> size);
             }
-
+            printf("%s%d\n", "Num of groups in P : " ,P->number_of_groups);
             free(g1 -> nodes);
             free(g2 -> nodes);
         }
