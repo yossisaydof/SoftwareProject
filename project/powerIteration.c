@@ -51,7 +51,7 @@ double calc_next_vector_i(matrixStructure *matrix, group *g, const double *curr_
         A_ij = 0;
         k_j = K[j_index];
         if (cnt_nnz < nnz_i) {
-            if (j == A -> colind[row_start + cnt_nnz]) {
+            if (j_index == A -> colind[row_start + cnt_nnz]) {
                 A_ij = (int) A -> values[row_start + cnt_nnz];
                 cnt_nnz++;
             }
@@ -146,7 +146,6 @@ double power_iteration(matrixStructure *matrix_structure, group *g, double *eige
         exit(EXIT_FAILURE);
     }
     create_random_vector(n, curr_vector);
-    printf("%s\n", "Created random vector.. ");
 
     while (1) { /* TODO: make sure this is not an infinite loop! */
         calc_next_vector(matrix_structure, g, curr_vector, n, eigen_vector);
@@ -161,7 +160,6 @@ double power_iteration(matrixStructure *matrix_structure, group *g, double *eige
     }
 
     eigen_value = clac_eigenvalue(matrix_structure, g, eigen_vector);
-    printf("%s%f\n", "Eigen value is: ", eigen_value);
     free(curr_vector);
 
     return (eigen_value + matrix_structure -> norm_1);

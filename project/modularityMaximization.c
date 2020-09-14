@@ -98,7 +98,7 @@ void remove_index_from_unmoved(int *unmoved, int max_index, int last_available_i
 }
 
 
-void improving_division_of_the_network(matrixStructure *matrix_structure, group *g, int *s, double Q_0) {
+double improving_division_of_the_network(matrixStructure *matrix_structure, group *g, int *s, double Q_0) {
     int i, k, j, n, j_index, i_index, *indices, *unmoved, last_available_index;
     double *score, *improve, delta_Q;
 
@@ -155,4 +155,6 @@ void improving_division_of_the_network(matrixStructure *matrix_structure, group 
     free(improve);
     free(indices);
     free(unmoved);
+
+    return delta_Q;
 }

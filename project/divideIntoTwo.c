@@ -118,7 +118,7 @@ void divide_into_two(matrixStructure *matrix_structure, group *g, group *g1, gro
     deltaQ = compute_delta_Q(matrix_structure, g, s);
 
     if (eigen_value > EPSILON()) { /* TODO: check epsilon */
-        improving_division_of_the_network(matrix_structure, g, s, deltaQ);
+        deltaQ = improving_division_of_the_network(matrix_structure, g, s, deltaQ);
         cnt_negative = 0;
         cnt_positive = 0;
         for (i = 0; i < n; i++) {

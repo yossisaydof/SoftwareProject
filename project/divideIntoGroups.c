@@ -30,7 +30,6 @@ void divide_into_groups(matrixStructure *matrix_structure, modularityGroups *O) 
     group *g, *g1, *g2;
 
     P = create_P(matrix_structure -> n);
-    printf("%s\n", "creating P...");
 
     g1 = malloc(sizeof(group));
     g2 = malloc(sizeof(group));
