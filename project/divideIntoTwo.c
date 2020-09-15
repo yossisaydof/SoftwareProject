@@ -13,31 +13,35 @@ double calc_next_vector_i_2(matrixStructure *matrix, group *g, const int *curr_v
 
     /* Calculates: next_vextor[i] = norm * v_i + sum over j in g, j != i of (A_ij - k_i*k_j/M) * (v_j - j_i) */
 
-    int j, A_ij, k_i, k_j, j_index, nnz_i, cnt_nnz = 0, row_start, row_end, *K, *nodes;
+    int j, A_ij, k_i, k_j, j_index, i_index, nnz_i, cnt_nnz = 0, row_start, row_end, *K, *nodes;
     double sum = 0, M;
 
     spmat *A;
 
     A = matrix -> A;
     K = matrix -> degreeList;
+    nodes = g -> nodes;
+    i_index = nodes[i];
     k_i = K[i];
     M = matrix -> M;
-    row_start = A -> rowptr[i];
-    row_end = A -> rowptr[i + 1];
+    row_start = A -> rowptr[i_index];
+    row_end = A -> rowptr[i_index + 1];
     nnz_i = row_end - row_start;
-    nodes = g -> nodes;
 
     for (j = 0; j < g -> size; j++) {
         j_index = nodes[j];
-        if (i == j_index) {
+        if (i_index == j_index) {
             sum += ((matrix -> norm_1) * curr_vector[i]); /* matrix shifting */
             continue;
         }
         A_ij = 0;
         k_j = K[j_index];
         if (cnt_nnz < nnz_i) {
-            if (j_index == A -> colind[row_start + cnt_nnz]) {
-                A_ij = (int) A -> values[row_start + cnt_nnz];
+            while (j_index > (A->colind)[row_start + cnt_nnz]) {
+                cnt_nnz++;
+            }
+            if (j_index == (A->colind)[row_start + cnt_nnz]) {
+                A_ij = (int) A->values[row_start + cnt_nnz];
                 cnt_nnz++;
             }
         }
@@ -54,7 +58,7 @@ void mult_matrix_vector_2(matrixStructure *matrix, group *g, int *curr_vector, d
     int i;
 
     for (i = 0; i < g -> size; i++) {
-        tmp = calc_next_vector_i_2(matrix, g, curr_vector, g -> nodes[i]);
+        tmp = calc_next_vector_i_2(matrix, g, curr_vector, i);
         next_vector[i] = tmp;
     }
 }
@@ -67,14 +71,16 @@ double compute_delta_Q(matrixStructure *matrix_structure, group *g, int *s) {
      * deltaQ = s^t * B_hat[g] * s
      */
     int i;
-    double delta_Q, *mult_vector;
+    double delta_Q = 0, *mult_vector;
 
     mult_vector = (double*) malloc(sizeof(double) * g -> size);
     mult_matrix_vector_2(matrix_structure, g, s, mult_vector);
 
     for (i = 0; i < g -> size; ++i) {
-        delta_Q += s[i] * mult_vector[i];
+        delta_Q += (s[i] * mult_vector[i]);
     }
+
+    free(mult_vector);
     return (delta_Q * 0.5);
 }
 
@@ -91,6 +97,8 @@ void divide_g(group *g, group *g1, group *g2, const int *s) {
             g2_index++;
         }
     }
+    g1 -> next = NULL;
+    g2 -> next = NULL;
 }
 
 void divide_into_two(matrixStructure *matrix_structure, group *g, group *g1, group *g2) {
@@ -107,12 +115,13 @@ void divide_into_two(matrixStructure *matrix_structure, group *g, group *g1, gro
     }
 
     eigen_value = power_iteration(matrix_structure, g, eigen_vector);
-    printf("%s%f\n", "eigen value is: ", eigen_value);
 
     if (IS_NON_POSITIVE(eigen_value)) {
         /* eigen value is non zero so the group g is indivisible */
         g1 -> size = 0;
         g2 -> size = 0;
+        g1 -> next = NULL;
+        g2 -> next = NULL;
         return;
     }
 
@@ -135,10 +144,8 @@ void divide_into_two(matrixStructure *matrix_structure, group *g, group *g1, gro
 
     /* compute deltaQ */
     deltaQ = compute_delta_Q(matrix_structure, g, s);
-    printf("%f\n", deltaQ);
     if (eigen_value > EPSILON()) {
         /*deltaQ = improving_division_of_the_network(matrix_structure, g, s, deltaQ);*/
-        printf("%f\n", deltaQ);
         cnt_negative = 0;
         cnt_positive = 0;
         for (i = 0; i < n; i++) {
@@ -152,14 +159,14 @@ void divide_into_two(matrixStructure *matrix_structure, group *g, group *g1, gro
     if (IS_POSITIVE(deltaQ)) {
         /* */
         g1 -> size = cnt_positive;
-        g1 -> nodes = malloc(sizeof(int) * cnt_positive);
+        g1 -> nodes = (int*) malloc(sizeof(int) * cnt_positive);
         if (g1 -> nodes == NULL) {
             printf("%s", MALLOC_FAILED);
             exit(EXIT_FAILURE);
         }
 
         g2 -> size = cnt_negative;
-        g2 -> nodes = malloc(sizeof(int) * cnt_negative);
+        g2 -> nodes = (int*) malloc(sizeof(int) * cnt_negative);
         if (g2 -> nodes == NULL) {
             printf("%s", MALLOC_FAILED);
             exit(EXIT_FAILURE);
@@ -171,6 +178,8 @@ void divide_into_two(matrixStructure *matrix_structure, group *g, group *g1, gro
         /* if deltaQ <= 0 the group g is indivisible */
         g1 -> size = 0;
         g2 -> size = 0;
+        g1 -> next = NULL;
+        g2 -> next = NULL;
         return;
     }
 

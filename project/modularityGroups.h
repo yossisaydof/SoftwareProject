@@ -13,6 +13,7 @@
 #include <stdlib.h>
 #include "error_handler.h"
 #include <stdio.h>
+#include <string.h>
 
 /* P and O for algorithm 3 */
 typedef struct _modularityGroups {

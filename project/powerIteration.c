@@ -28,31 +28,35 @@ double calc_next_vector_i(matrixStructure *matrix, group *g, const double *curr_
 
      /* Calculates: next_vextor[i] = norm * v_i + sum over j in g, j != i of (A_ij - k_i*k_j/M) * (v_j - j_i) */
 
-    int j, A_ij, k_i, k_j, j_index, nnz_i, cnt_nnz = 0, row_start, row_end, *K, *nodes;
+    int j, A_ij, k_i, k_j, j_index, i_index, nnz_i, cnt_nnz = 0, row_start, row_end, *K, *nodes;
     double sum = 0, M;
 
     spmat *A;
 
     A = matrix -> A;
     K = matrix -> degreeList;
+    nodes = g -> nodes;
+    i_index = nodes[i];
     k_i = K[i];
     M = matrix -> M;
-    row_start = A -> rowptr[i];
-    row_end = A -> rowptr[i + 1];
+    row_start = A -> rowptr[i_index];
+    row_end = A -> rowptr[i_index + 1];
     nnz_i = row_end - row_start;
-    nodes = g -> nodes;
 
     for (j = 0; j < g -> size; j++) {
         j_index = nodes[j];
-        if (i == j_index) {
+        if (i_index == j_index) {
             sum += ((matrix -> norm_1) * curr_vector[i]); /* matrix shifting */
             continue;
         }
         A_ij = 0;
         k_j = K[j_index];
         if (cnt_nnz < nnz_i) {
-            if (j_index == A -> colind[row_start + cnt_nnz]) {
-                A_ij = (int) A -> values[row_start + cnt_nnz];
+            while (j_index > (A->colind)[row_start + cnt_nnz]) {
+                cnt_nnz++;
+            }
+            if (j_index == (A->colind)[row_start + cnt_nnz]) {
+                A_ij = (int) A->values[row_start + cnt_nnz];
                 cnt_nnz++;
             }
         }
@@ -69,7 +73,7 @@ void mult_matrix_vector(matrixStructure *matrix, group *g, double* curr_vector, 
     int i;
 
     for (i = 0; i < g -> size; i++) {
-        tmp = calc_next_vector_i(matrix, g, curr_vector, (g -> nodes[i]));
+        tmp = calc_next_vector_i(matrix, g, curr_vector, i);
         next_vector[i] = tmp;
     }
 }
@@ -115,6 +119,7 @@ double clac_eigenvalue(matrixStructure *matrix_structure, group *g, double *eige
      */
     int i;
     double *mult_vector, denominator = 0, numerator = 0;
+
     mult_vector = (double*) malloc((g -> size) * sizeof(double));
     if (mult_vector == NULL) {
         printf("%s", MALLOC_FAILED);
@@ -142,7 +147,7 @@ double power_iteration(matrixStructure *matrix_structure, group *g, double *eige
      */
 
     double *curr_vector, eigen_value;
-    int n, cnt_diff = 0, i;
+    int n, cnt_diff = 0;
 
     n = g -> size;
     curr_vector = (double*) malloc(sizeof(double) * n);
@@ -159,10 +164,8 @@ double power_iteration(matrixStructure *matrix_structure, group *g, double *eige
             /* the vector produced in the final iteration is the desired eigenvector */
             break;
         }
-        for (i = 0; i < n; i++) {
-            curr_vector[i] = eigen_vector[i];
-        }
 
+        memcpy(curr_vector, eigen_vector, n * sizeof(double));
     }
 
     eigen_value = clac_eigenvalue(matrix_structure, g, eigen_vector);

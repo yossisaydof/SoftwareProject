@@ -9,7 +9,9 @@ void insert_modularity_groups(modularityGroups *modularity_groups , int* nodes, 
         exit(EXIT_FAILURE);
     }
 
-    new_group -> nodes = nodes;
+    new_group -> nodes = (int*) malloc(n * sizeof(int));
+    memcpy(new_group -> nodes, nodes, n * sizeof(int));
+
     new_group -> size = n;
     new_group -> next = NULL;
 
