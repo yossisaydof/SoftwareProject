@@ -26,6 +26,7 @@ modularityGroups* create_P(int n) {
 void divide_into_groups(matrixStructure *matrix_structure, modularityGroups *O) {
     modularityGroups *P;
     group *g, *g1, *g2;
+    int i;
 
     P = create_P(matrix_structure -> n);
 
@@ -40,6 +41,7 @@ void divide_into_groups(matrixStructure *matrix_structure, modularityGroups *O) 
     while (P -> number_of_groups > 0) {
         /* Remove a group g from P */
         g = (group *) P -> remove(P);
+
         /* Divide g into g1, g2 with Algorithm 2 */
 
         divide_into_two(matrix_structure, g, g1, g2);
@@ -69,5 +71,6 @@ void divide_into_groups(matrixStructure *matrix_structure, modularityGroups *O) 
     P -> free(P);
     free_group(g1);
     free_group(g2);
+    printf("%s%d\n", "num of groups in O: ",O -> number_of_groups);
 }
 

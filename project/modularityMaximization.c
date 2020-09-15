@@ -7,58 +7,70 @@
 
 
 /* TODO - delete from here*/
-void sum_row_i_2(matrixStructure *matrix_structure, group *g, int i, double *sum1, double *sum2, const int *s) {
-    /*  sum row i in B = SUM over j of (A_ij - (k_i * k_j / M) */
-    int j, k_i, k_j, M, nnz_i, cnt_nnz = 0, row_start, row_end, A_ij, *nodes, *K;
-    double B_ij;
+double calc_next_vector_i_3(matrixStructure *matrix, group *g, const int *curr_vector, int i) {
+
+    /* Calculates: next_vextor[i] = norm * v_i + sum over j in g, j != i of (A_ij - k_i*k_j/M) * (v_j - j_i) */
+
+    int j, A_ij, k_i, k_j, j_index, nnz_i, cnt_nnz = 0, row_start, row_end, *K, *nodes;
+    double sum = 0, M;
+
     spmat *A;
 
-    K = matrix_structure -> degreeList;
-    M = matrix_structure -> M;
-    A = matrix_structure -> A;
-    nodes = g -> nodes;
-
+    A = matrix -> A;
+    K = matrix -> degreeList;
+    k_i = K[i];
+    M = matrix -> M;
     row_start = A -> rowptr[i];
     row_end = A -> rowptr[i + 1];
     nnz_i = row_end - row_start;
+    nodes = g -> nodes;
 
-    k_i = K[i];
     for (j = 0; j < g -> size; j++) {
-        if (i == nodes[j]) continue;
-
+        j_index = nodes[j];
+        if (i == j_index) {
+            sum += ((matrix -> norm_1) * curr_vector[i]); /* matrix shifting */
+            continue;
+        }
         A_ij = 0;
-        k_j =  K[nodes[j]];
+        k_j = K[j_index];
         if (cnt_nnz < nnz_i) {
-            if (nodes[j] == A -> colind[row_start + cnt_nnz]) {
-                cnt_nnz++;
+            if (j_index == A -> colind[row_start + cnt_nnz]) {
                 A_ij = (int) A -> values[row_start + cnt_nnz];
+                cnt_nnz++;
             }
         }
-        B_ij = (A_ij - (double)((double)(k_i * k_j) / M));
+        sum += ((A_ij - (double)((k_i * k_j) / M)) * (curr_vector[j] - curr_vector[i]));
+    }
+    return sum;
+}
 
-        *sum1 -= B_ij;
-        *sum2 += (B_ij * s[nodes[j]]);
+
+void mult_matrix_vector_3(matrixStructure *matrix, group *g, int *curr_vector, double* next_vector) {
+
+    /* Calculates B_hat[h] * curr_vector */
+    double tmp;
+    int i;
+
+    for (i = 0; i < g -> size; i++) {
+        tmp = calc_next_vector_i_3(matrix, g, curr_vector, g -> nodes[i]);
+        next_vector[i] = tmp;
     }
 }
 
+
 double compute_delta_Q_2(matrixStructure *matrix_structure, group *g, int *s) {
+    /*
+     * deltaQ = s^t * B_hat[g] * s
+     */
+    int i;
+    double delta_Q, *mult_vector;
 
-    /* deltaQ = 0.5 * (s^T * B_hat[g] * s)
-    * notice that: s^T * B_hat[g] * s = SUM1 + SUM2
-    * SUM1 = -SUM over i != j of (A_ij - (k_i * k_j / M))
-    * SUM2 = 2 * SUM over i != j of [s_i * s_j *(A_ij - (k_i * k_j / M))]
-   */
-    double delta_Q, sum1 = 0, sum2 = 0;
-    int i, index_i;
-    for (i = 0; i < g -> size; i++) {
-        index_i = g -> nodes[i];
-        sum_row_i_2(matrix_structure, g, index_i, &sum1, &sum2, s);
-        sum2 *= s[index_i];
+    mult_vector = (double*) malloc(sizeof(double) * g -> size);
+    mult_matrix_vector_3(matrix_structure, g, s, mult_vector);
+
+    for (i = 0; i < g -> size; ++i) {
+        delta_Q += s[i] * mult_vector[i];
     }
-
-    sum2 *= 2;
-    delta_Q = sum1 + sum2;
-
     return (delta_Q * 0.5);
 }
 
@@ -117,7 +129,7 @@ double improving_division_of_the_network(matrixStructure *matrix_structure, grou
             /* Computing delta Q for the move of each unmoved vertex */
             for (k = 0; k < last_available_index; k++) {
                 s[k] = s[k] * (-1);
-                score[k] = (compute_delta_Q_2(matrix_structure, g, s) - Q_0); /*TODO!!!!!!!!!!!! */
+                score[k] = (compute_delta_Q_2(matrix_structure, g, s)); /*TODO!!!!!!!!!!!! */
                 s[k] = s[k] * (-1);
             }
 

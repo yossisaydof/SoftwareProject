@@ -65,11 +65,12 @@ double calc_next_vector_i(matrixStructure *matrix, group *g, const double *curr_
 void mult_matrix_vector(matrixStructure *matrix, group *g, double* curr_vector, double* next_vector) {
 
      /* Calculates B_hat[h] * curr_vector */
-
+    double tmp;
     int i;
 
     for (i = 0; i < g -> size; i++) {
-        next_vector[i] = calc_next_vector_i(matrix, g, curr_vector, g -> nodes[i]);
+        tmp = calc_next_vector_i(matrix, g, curr_vector, (g -> nodes[i]));
+        next_vector[i] = tmp;
     }
 }
 
@@ -161,10 +162,11 @@ double power_iteration(matrixStructure *matrix_structure, group *g, double *eige
         for (i = 0; i < n; i++) {
             curr_vector[i] = eigen_vector[i];
         }
+
     }
 
     eigen_value = clac_eigenvalue(matrix_structure, g, eigen_vector);
     free(curr_vector);
 
-    return (eigen_value - matrix_structure -> norm_1);
+    return (eigen_value - (matrix_structure -> norm_1));
 }
