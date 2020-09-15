@@ -115,7 +115,10 @@ double clac_eigenvalue(matrixStructure *matrix_structure, group *g, double *eige
     int i;
     double *mult_vector, denominator = 0, numerator = 0;
     mult_vector = malloc((g -> size) * sizeof(double));
-
+    if (mult_vector == NULL) {
+        printf("%s", MALLOC_FAILED);
+        exit(EXIT_FAILURE);
+    }
     /* calculates B_hat[g] * eigen_vector */
     mult_matrix_vector(matrix_structure, g, eigen_vector, mult_vector);
 
@@ -124,6 +127,8 @@ double clac_eigenvalue(matrixStructure *matrix_structure, group *g, double *eige
         denominator += (eigen_vector[i] * eigen_vector[i]);
     }
     if (denominator == 0) exit(EXIT_FAILURE);
+
+    free(mult_vector);
 
     return (numerator / denominator);
 }

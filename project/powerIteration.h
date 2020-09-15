@@ -14,7 +14,6 @@
 
 #include "matrixStructure.h"
 #include "modularityGroups.h"
-#include "BMatrixFunctions.h"
 
 double power_iteration(matrixStructure *matrix_structure, group *g, double *eigen_vector);
 

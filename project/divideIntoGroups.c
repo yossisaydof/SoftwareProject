@@ -1,17 +1,15 @@
 #include "divideIntoGroups.h"
 
-
 /**
  * Algorithm 3 - Divide a network into modularity groups
  */
-
 
 modularityGroups* create_P(int n) {
     int i, *nodes;
     modularityGroups *P;
 
     P = allocate_modularity_group();
-    nodes = malloc(n * sizeof(int));
+    nodes = (int*) malloc(n * sizeof(int));
     if (nodes == NULL) {
         printf("%s", MALLOC_FAILED);
         exit(EXIT_FAILURE);
@@ -31,8 +29,8 @@ void divide_into_groups(matrixStructure *matrix_structure, modularityGroups *O) 
 
     P = create_P(matrix_structure -> n);
 
-    g1 = malloc(sizeof(group));
-    g2 = malloc(sizeof(group));
+    g1 = (group*) malloc(sizeof(group));
+    g2 = (group*) malloc(sizeof(group));
 
     if (g1 == NULL || g2 == NULL) {
         printf("%s", MALLOC_FAILED);

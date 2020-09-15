@@ -158,6 +158,7 @@ int main(int argc, char* argv[]) {
 
     /* Free output modularity groups */
     modularity_groups -> free(modularity_groups);
+
     matrix_structure -> free(matrix_structure);
 
     return 0;

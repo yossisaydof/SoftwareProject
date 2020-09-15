@@ -64,9 +64,6 @@ double compute_delta_Q_2(matrixStructure *matrix_structure, group *g, int *s) {
 
 /*TODO - delete until here */
 
-
-
-
 int* allocate_unmoved(group *g, int *unmoved) {
     int i;
 

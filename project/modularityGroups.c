@@ -11,10 +11,10 @@ void insert_modularity_groups(modularityGroups *modularity_groups , int* nodes, 
 
     new_group -> nodes = nodes;
     new_group -> size = n;
-/*    new_group -> next = NULL; TODO: ? */
+    new_group -> next = NULL;
 
     if (modularity_groups -> number_of_groups == 0) {
-        modularity_groups -> head = (group*) new_group;
+        modularity_groups -> head = new_group;
     }
     else {
         new_group -> next = modularity_groups -> head;
@@ -34,10 +34,16 @@ group* remove_modularity_groups(modularityGroups *modularity_groups) {
 }
 
 void free_modularity_groups(modularityGroups *modularity_groups) {
-    int i;
+    /*int i;*/
     group *tmp, *current;
 
-    for (i = 0; i < modularity_groups -> number_of_groups; i++) {
+    /*for (i = 0; i < modularity_groups -> number_of_groups; i++) {
+        current = modularity_groups -> head;
+        tmp = current -> next;
+        free_group(current);
+        modularity_groups -> head = tmp;
+    } */
+    while (modularity_groups -> head != NULL) {
         current = modularity_groups -> head;
         tmp = current -> next;
         free_group(current);
