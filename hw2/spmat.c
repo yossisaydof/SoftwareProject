@@ -114,8 +114,6 @@ void add_row_array(struct _spmat *A, const double *row, int i) {
 
 
 void free_array(struct _spmat *A) {
-    Array *array_struct;
-    array_struct = A -> private;
 
     free(array_struct -> rowptr);
     free(array_struct -> colind);

@@ -6,7 +6,7 @@
 
 void sum_row_i(matrixStructure *matrix_structure, group *g, int i, double *sum1, double *sum2, const int *s) {
     /*  sum row i in B = SUM over j of (A_ij - (k_i * k_j / M) */
-    int j, k_i, k_j, M, nnz_i, cnt_nnz = 0, row_start, row_end, A_ij, *nodes, *K;
+    int j, j_index, k_i, k_j, M, nnz_i, cnt_nnz = 0, row_start, row_end, A_ij, *nodes, *K;
     double B_ij;
     spmat *A;
 
@@ -21,12 +21,13 @@ void sum_row_i(matrixStructure *matrix_structure, group *g, int i, double *sum1,
 
     k_i = K[i];
     for (j = 0; j < g -> size; j++) {
-        if (i == nodes[j]) continue;
-
+        j_index = nodes[j];
+        if (i == j_index) continue;
         A_ij = 0;
-        k_j =  K[nodes[j]];
+
+        k_j =  K[j_index];
         if (cnt_nnz < nnz_i) {
-            if (nodes[j] == A -> colind[row_start + cnt_nnz]) {
+            if (j_index == A -> colind[row_start + cnt_nnz]) {
                 cnt_nnz++;
                 A_ij = (int) A -> values[row_start + cnt_nnz];
             }
@@ -34,7 +35,7 @@ void sum_row_i(matrixStructure *matrix_structure, group *g, int i, double *sum1,
         B_ij = (A_ij - (double)((double)(k_i * k_j) / M));
 
         *sum1 -= B_ij;
-        *sum2 += (B_ij * s[nodes[j]]);
+        *sum2 += (B_ij * s[j_index]);
     }
 }
 
@@ -79,7 +80,6 @@ void divide_into_two(matrixStructure *matrix_structure, group *g, group *g1, gro
     double eigen_value, deltaQ, *eigen_vector;
 
     n = g -> size;
-    /* compute f_g */
 
     /* compute leading eigenpair of the modularity matrix B_hat_g */
     eigen_vector = (double*) malloc(sizeof(double) * n);
@@ -117,7 +117,7 @@ void divide_into_two(matrixStructure *matrix_structure, group *g, group *g1, gro
     /* compute deltaQ */
     deltaQ = compute_delta_Q(matrix_structure, g, s);
 
-    if (eigen_value > EPSILON()) { /* TODO: check epsilon */
+    if (eigen_value > EPSILON()) {
         deltaQ = improving_division_of_the_network(matrix_structure, g, s, deltaQ);
         cnt_negative = 0;
         cnt_positive = 0;

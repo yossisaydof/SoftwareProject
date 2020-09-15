@@ -174,10 +174,3 @@ void mult_kkM_int (matrixStructure *matrix_structure, group *g, int *v, double *
         tmp_sum = 0;
     }
 }
-
-
-/* TODO
-double calc_norm_g (matrixStructure *matrix_structure, group *g) {
-
-    return 0.0;
-}*/

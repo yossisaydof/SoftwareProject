@@ -73,7 +73,6 @@ void mult_matrix_vector(matrixStructure *matrix, group *g, double* curr_vector, 
     }
 }
 
-
 void calc_next_vector(matrixStructure *matrix_structure, group *g, double* curr_vector, int n, double *next_vector) {
     double denominator;
     int i;
@@ -162,5 +161,5 @@ double power_iteration(matrixStructure *matrix_structure, group *g, double *eige
     eigen_value = clac_eigenvalue(matrix_structure, g, eigen_vector);
     free(curr_vector);
 
-    return (eigen_value + matrix_structure -> norm_1);
+    return (eigen_value - matrix_structure -> norm_1);
 }

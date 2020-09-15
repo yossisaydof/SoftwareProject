@@ -35,7 +35,7 @@ matrixStructure* generate_matrix_structure(FILE *matrix_file) {
         exit(EXIT_FAILURE);
     }
 
-    for (i = 0; i < n; ++i) {
+    for (i = 0; i < n; i++) {
         if (fread(&node_degree, sizeof(int), 1, matrix_file) != 1) {
             printf("%s", FILE_READING);
             exit(EXIT_FAILURE);
@@ -54,6 +54,7 @@ matrixStructure* generate_matrix_structure(FILE *matrix_file) {
     }
 
     spmat_matrix = spmat_allocate_array(n, M);
+
     matrix_row = (int*) malloc(n * sizeof(int));
     if (matrix_row == NULL) {
         printf("%s", MALLOC_FAILED);
@@ -142,7 +143,7 @@ int main(int argc, char* argv[]) {
     }
     matrix_structure = generate_matrix_structure(input_matrix_file);
 
-    /* TODO STUCK HERE \/*/
+    /* TODO STUCK HERE */
     modularity_groups = allocate_modularity_group();
     divide_into_groups(matrix_structure, modularity_groups);
 

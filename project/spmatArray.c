@@ -37,12 +37,10 @@ void mult_array(const struct _spmat *A, const double *v, double *result) {
 }
 
 void free_array(struct _spmat *A) {
-
     free(A -> rowptr);
     free(A -> colind);
     free(A -> values);
     free(A);
-
 }
 
 spmat* spmat_allocate_array(int n, int nnz) {
@@ -50,7 +48,7 @@ spmat* spmat_allocate_array(int n, int nnz) {
     int *values, *colind, *rowptr;
 
     /* Allocating Memory for the sparse matrix */
-    sparse_matrix = malloc(sizeof(spmat));
+    sparse_matrix = (spmat*) malloc(sizeof(spmat));
     if (sparse_matrix == NULL) {
         printf("%s", MALLOC_FAILED);
         exit(EXIT_FAILURE);
