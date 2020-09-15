@@ -37,11 +37,11 @@ double calc_next_vector_i_2(matrixStructure *matrix, group *g, const int *curr_v
         A_ij = 0;
         k_j = K[j_index];
         if (cnt_nnz < nnz_i) {
-            while (j_index > (A->colind)[row_start + cnt_nnz]) {
+            while (j_index > (A -> colind)[row_start + cnt_nnz]) {
                 cnt_nnz++;
             }
-            if (j_index == (A->colind)[row_start + cnt_nnz]) {
-                A_ij = (int) A->values[row_start + cnt_nnz];
+            if (j_index == (A -> colind)[row_start + cnt_nnz]) {
+                A_ij = (int) A -> values[row_start + cnt_nnz];
                 cnt_nnz++;
             }
         }

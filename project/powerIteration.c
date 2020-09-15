@@ -17,7 +17,7 @@ double calc_vector_magnitude(const double *vector, int n) {
     int i;
 
     for (i = 0; i < n; i++){
-        sum_squares += vector[i] * vector[i];
+        sum_squares += (vector[i] * vector[i]);
     }
 
     return sqrt(sum_squares);
@@ -52,11 +52,11 @@ double calc_next_vector_i(matrixStructure *matrix, group *g, const double *curr_
         A_ij = 0;
         k_j = K[j_index];
         if (cnt_nnz < nnz_i) {
-            while (j_index > (A->colind)[row_start + cnt_nnz]) {
+            while (j_index > (A -> colind)[row_start + cnt_nnz]) {
                 cnt_nnz++;
             }
-            if (j_index == (A->colind)[row_start + cnt_nnz]) {
-                A_ij = (int) A->values[row_start + cnt_nnz];
+            if (j_index == (A -> colind)[row_start + cnt_nnz]) {
+                A_ij = (int) A -> values[row_start + cnt_nnz];
                 cnt_nnz++;
             }
         }
@@ -132,7 +132,7 @@ double clac_eigenvalue(matrixStructure *matrix_structure, group *g, double *eige
         numerator += (mult_vector[i] * eigen_vector[i]);
         denominator += (eigen_vector[i] * eigen_vector[i]);
     }
-    if (denominator == 0) exit(EXIT_FAILURE);
+    if (denominator == 0) exit(EXIT_FAILURE); /*TODO: add print */
 
     free(mult_vector);
 
