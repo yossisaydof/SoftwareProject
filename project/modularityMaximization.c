@@ -66,7 +66,7 @@ double compute_delta_Q_2(matrixStructure *matrix_structure, group *g, int *s) {
      * deltaQ = s^t * B_hat[g] * s
      */
     int i;
-    double delta_Q, *mult_vector;
+    double delta_Q = 0, *mult_vector;
 
     mult_vector = (double*) malloc(sizeof(double) * g -> size);
     mult_matrix_vector_3(matrix_structure, g, s, mult_vector);
@@ -168,5 +168,5 @@ double improving_division_of_the_network(matrixStructure *matrix_structure, grou
     free(indices);
     free(unmoved);
 
-    return delta_Q - Q_0; /* TODO: Delete Q_0*/
+    return delta_Q - Q_0; /* TODO : change to deltaQ */
 }

@@ -114,7 +114,6 @@ void write_output_file(FILE *output_file, modularityGroups *modularity_groups) {
             exit(EXIT_FAILURE);
         }
         printf("size %d:\t", group_size);
-
         /* followed by the indices of the nodes in the group, in increasing order */
         /* TODO: sort nodes before writing to file */
         for (j = 0; j < head -> size; j++) {
@@ -145,7 +144,6 @@ int main(int argc, char* argv[]) {
         printf("%s", FILE_OPENING);
         exit(EXIT_FAILURE);
     }
-
     matrix_structure = generate_matrix_structure(input_matrix_file);
 
     /* Run Algorithm 3 to find modularity groups */
@@ -153,7 +151,7 @@ int main(int argc, char* argv[]) {
     divide_into_groups(matrix_structure, modularity_groups);
 
     output_filename = argv[2];
-    output_file = fopen(output_filename, "wb");
+    output_file = fopen(output_filename, "w");
     if (output_file == NULL) {
         printf("%s", FILE_OPENING);
         exit(EXIT_FAILURE);

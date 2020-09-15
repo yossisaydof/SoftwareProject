@@ -37,7 +37,7 @@ double calc_next_vector_i(matrixStructure *matrix, group *g, const double *curr_
     K = matrix -> degreeList;
     nodes = g -> nodes;
     i_index = nodes[i];
-    k_i = K[i];
+    k_i = K[i_index];
     M = matrix -> M;
     row_start = A -> rowptr[i_index];
     row_end = A -> rowptr[i_index + 1];
@@ -119,7 +119,6 @@ double clac_eigenvalue(matrixStructure *matrix_structure, group *g, double *eige
      */
     int i;
     double *mult_vector, denominator = 0, numerator = 0;
-
     mult_vector = (double*) malloc((g -> size) * sizeof(double));
     if (mult_vector == NULL) {
         printf("%s", MALLOC_FAILED);
@@ -132,7 +131,7 @@ double clac_eigenvalue(matrixStructure *matrix_structure, group *g, double *eige
         numerator += (mult_vector[i] * eigen_vector[i]);
         denominator += (eigen_vector[i] * eigen_vector[i]);
     }
-    if (denominator == 0) exit(EXIT_FAILURE); /*TODO: add print */
+    if (denominator == 0) exit(EXIT_FAILURE);
 
     free(mult_vector);
 
@@ -164,7 +163,6 @@ double power_iteration(matrixStructure *matrix_structure, group *g, double *eige
             /* the vector produced in the final iteration is the desired eigenvector */
             break;
         }
-
         memcpy(curr_vector, eigen_vector, n * sizeof(double));
     }
 

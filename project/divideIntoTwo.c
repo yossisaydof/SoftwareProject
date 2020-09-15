@@ -90,10 +90,10 @@ void divide_g(group *g, group *g1, group *g2, const int *s) {
 
     for (i = 0; i < g -> size; i++) {
         if (s[i] == 1) {
-            g1 -> nodes[g1_index] = (g -> nodes[i]);
+            (g1 -> nodes)[g1_index] = (g -> nodes)[i];
             g1_index++;
         } else {
-            g2 -> nodes[g2_index] = (g -> nodes[i]);
+            (g2 -> nodes)[g2_index] = (g -> nodes)[i];
             g2_index++;
         }
     }
@@ -122,6 +122,7 @@ void divide_into_two(matrixStructure *matrix_structure, group *g, group *g1, gro
         g2 -> size = 0;
         g1 -> next = NULL;
         g2 -> next = NULL;
+        free(eigen_vector);
         return;
     }
 
@@ -180,6 +181,8 @@ void divide_into_two(matrixStructure *matrix_structure, group *g, group *g1, gro
         g2 -> size = 0;
         g1 -> next = NULL;
         g2 -> next = NULL;
+        free(s);
+        free(eigen_vector);
         return;
     }
 

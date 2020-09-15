@@ -2,7 +2,7 @@
 
 double sum_of_row(matrixStructure *matrix_structure, int i) {
     int j, k_i, k_j, nnz_i, cnt_nnz = 0, A_ij, row_start, row_end, *K;
-    double M, sum1 = 0, sum2 = 0;
+    double M, tmp, sum1 = 0, sum2 = 0;
     spmat *A;
 
     A = matrix_structure -> A;
@@ -23,8 +23,9 @@ double sum_of_row(matrixStructure *matrix_structure, int i) {
                 cnt_nnz++;
             }
         }
-        sum1 += A_ij - (double)((k_i * k_j) / M);
-        sum2 += fabs(A_ij - (double)((k_i * k_j) / M));
+        sum1 += (A_ij - (double)((k_i * k_j) / M));
+        tmp = (double) ((k_i * k_j) / M);
+        sum2 += (fabs(A_ij - tmp));
     }
 
     sum1 = fabs(sum1);

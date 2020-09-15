@@ -20,6 +20,7 @@ modularityGroups* create_P(int n) {
     }
 
     P -> insert(P, nodes, n);
+    free(nodes);
     return P;
 }
 
