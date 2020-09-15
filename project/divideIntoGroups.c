@@ -49,6 +49,7 @@ void divide_into_groups(matrixStructure *matrix_structure, modularityGroups *O) 
             O -> insert(O, g -> nodes, g -> size);
         }
         else {
+
             if (g1 -> size == 1) {
                 O -> insert(O, g1 -> nodes, g1 -> size);
             } else {

@@ -5,9 +5,9 @@ void add_row_array(struct _spmat *A, const int *row, int i) {
     int j, *colind, *rowptr, *values;
     static int index = 0;
 
-    values = A -> values;
-    colind = A -> colind;
-    rowptr = A -> rowptr;
+    rowptr = (int*) A -> rowptr;
+    values = (int*) A -> values;
+    colind = (int*) A -> colind;
 
     for (j = 0; j < A -> n ; j++) {
         if (row[j] == 0)

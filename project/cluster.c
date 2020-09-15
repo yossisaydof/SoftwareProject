@@ -160,6 +160,7 @@ int main(int argc, char* argv[]) {
     modularity_groups -> free(modularity_groups);
 
     matrix_structure -> free(matrix_structure);
-
+    fclose(input_matrix_file);
+    fclose(output_file);
     return 0;
 }

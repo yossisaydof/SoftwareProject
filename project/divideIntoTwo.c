@@ -146,7 +146,8 @@ void divide_into_two(matrixStructure *matrix_structure, group *g, group *g1, gro
         }
 
         divide_g(g, g1, g2, s); /* divide g into two groups according to s */
-    } else {
+    }
+    else {
         /* if deltaQ <= 0 the group g is indivisible */
         g1 -> size = 0;
         g2 -> size = 0;

@@ -114,7 +114,7 @@ double clac_eigenvalue(matrixStructure *matrix_structure, group *g, double *eige
      */
     int i;
     double *mult_vector, denominator = 0, numerator = 0;
-    mult_vector = malloc((g -> size) * sizeof(double));
+    mult_vector = (double*) malloc((g -> size) * sizeof(double));
     if (mult_vector == NULL) {
         printf("%s", MALLOC_FAILED);
         exit(EXIT_FAILURE);
@@ -144,7 +144,7 @@ double power_iteration(matrixStructure *matrix_structure, group *g, double *eige
     int n, cnt_diff = 0, i;
 
     n = g -> size;
-    curr_vector = malloc(sizeof(double) * n);
+    curr_vector = (double*) malloc(sizeof(double) * n);
     if (curr_vector == NULL) {
         printf("%s", MALLOC_FAILED);
         exit(EXIT_FAILURE);
