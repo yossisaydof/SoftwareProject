@@ -57,15 +57,19 @@ double mult_Bg_vector_i(matrixStructure *matrix, group *g, double *vector, int i
                 sum += ((matrix -> norm_1) * vector[i]); /* matrix shifting */
             continue;
         }
+
         A_ij = 0;
         k_j = K[j_index];
         if (cnt_nnz < nnz_i) {
-            while (j_index > (A -> colind)[row_start + cnt_nnz]) {
+            while (((row_start + cnt_nnz) < M) && (j_index > (A -> colind)[row_start + cnt_nnz])) {
                 cnt_nnz++;
+                if (((row_start + cnt_nnz) < M)) break;
             }
-            if (j_index == (A -> colind)[row_start + cnt_nnz]) {
-                A_ij = (int) A -> values[row_start + cnt_nnz];
-                cnt_nnz++;
+            if ((row_start + cnt_nnz) < M) {
+                if ((j_index == (A->colind)[row_start + cnt_nnz])) {
+                    A_ij = (int) A->values[row_start + cnt_nnz];
+                    cnt_nnz++;
+                }
             }
         }
         sum += ((A_ij - (double)((k_i * k_j) / M)) * (vector[j] - vector[i]));

@@ -58,13 +58,17 @@ double calc_score_i(matrixStructure *matrix_structure, group *g, int i, double *
         A_ij = 0;
         k_j = matrix_structure -> degreeList[j_index];
         if (cnt_nnz < nnz_i) {
-            while (j_index > (A -> colind)[row_start + cnt_nnz]) {
+            while (((row_start + cnt_nnz) < M) && j_index > (A -> colind)[row_start + cnt_nnz]) {
                 cnt_nnz++;
+                if (((row_start + cnt_nnz) < M)) break;
             }
-            if (j_index == (A -> colind)[row_start + cnt_nnz]) {
-                A_ij = (int) A -> values[row_start + cnt_nnz];
-                cnt_nnz++;
+            if (((row_start + cnt_nnz) < M)) {
+                if (j_index == (A -> colind)[row_start + cnt_nnz]) {
+                    A_ij = (int) A -> values[row_start + cnt_nnz];
+                    cnt_nnz++;
+                }
             }
+
         }
         sum += ((A_ij - (k_j * k_j / M)) * d[j]);
     }
