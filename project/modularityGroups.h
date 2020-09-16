@@ -4,10 +4,10 @@
  * Each modularityGroup contains groups and the number of groups in it.
  * This structure is used to represent P and O in divideIntoGroups.c.
  *
- * insert_modularity_groups     -
- * remove_modularity_groups     -
- * free_modularity_groups       -
- * allocate_modularity_group    -
+ * insert_modularity_groups     - Insert a group to the modularity group.
+ * remove_modularity_groups     - Remove a group from the modularity group, and return it.
+ * free_modularity_groups       - Free modularity group.
+ * allocate_modularity_group    - Allocate modularity group.
  */
 
 #ifndef MODULARITYGROUPS_H

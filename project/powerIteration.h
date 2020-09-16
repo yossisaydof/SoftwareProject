@@ -8,6 +8,14 @@
  * final iteration is the desired eigenvector.
  *
  *  Finding the leading eigen-value = (b_k * A*b_k) / (b_k * b_k)
+ *
+ *  create_random_vector    - Creates a random vector.
+ *  calc_vector_magnitude   - Calculates vector magnitude.
+ *  calc_next_vector        - Calculates the next vector according to the power iteration algorithm.
+ *  check_diff              - Check if the difference between the current vector to the previous one is smaller/greater
+ *                            than EPSILON.
+ *  clac_eigenvalue         - Calculates an approximation of the dominant eigen value.
+ *  power_iteration         - Implementation of power iteration algorithm.
  * */
 #ifndef POWERITERATION_H
 #define POWERITERATION_H
