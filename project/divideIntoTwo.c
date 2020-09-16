@@ -11,7 +11,7 @@ double compute_delta_Q(matrixStructure *matrix_structure, group *g, double *s) {
     int i;
     double delta_Q = 0, *mult_vector;
 
-    mult_vector = (double*) malloc(sizeof(double) * g -> size);
+    mult_vector = (double*) malloc(g -> size * sizeof(double));
 
     /* computes B_hat[g] * s and store the result in mult_vector */
     mult_Bg_vector(matrix_structure, g, s, mult_vector, 0);
@@ -48,7 +48,7 @@ void divide_into_two(matrixStructure *matrix_structure, group *g, group *g1, gro
     /*
      * Implementation of algorithm 2 - divide g to 2 groups: g1, g2 if possible
      */
-    int n, i, cnt_positive = 0, cnt_negative = 0;
+    int n, i, cnt_positive, cnt_negative;
     double eigen_value, deltaQ, deltaQ_before, *eigen_vector, *s;
 
     n = g -> size;

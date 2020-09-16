@@ -75,7 +75,7 @@ double calc_score_i(matrixStructure *matrix_structure, group *g, int i, double *
 }
 double improving_division_of_the_network(matrixStructure *matrix_structure, group *g, double *s, double Q_0) {
     int i, k, j, n, j_index, i_index, *indices, *unmoved, last_available_index;
-    double *score, *improve, delta_Q, *d;
+    double delta_Q, *score, *improve, *d;
 
     n = g -> size;
 
@@ -83,7 +83,7 @@ double improving_division_of_the_network(matrixStructure *matrix_structure, grou
     improve = (double*) malloc(n * sizeof(double));
     indices = (int*) malloc(n * sizeof(int));
     unmoved = (int*) malloc(n * sizeof(int));
-    d = (double*) malloc(sizeof(double) * n);
+    d = (double*) malloc(n * sizeof(double));
     if (score == NULL || improve == NULL || indices == NULL || unmoved == NULL || d == NULL) {
         printf("%s", MALLOC_FAILED);
         exit(EXIT_FAILURE);
@@ -96,16 +96,17 @@ double improving_division_of_the_network(matrixStructure *matrix_structure, grou
     last_available_index = n - 1; /* last available index in unmoved array */
     do {
         for (i = 0; i < n; i++) {
-
-            /* Computing delta Q for the move of each unmoved vertex */
+            last_available_index = n - 1;
             for (k = 0; k <= last_available_index; k++) {
+                /* iterating over all unmoved vertices */
                 d[k] = d[k] * (-1);
                 score[k] = calc_score_i(matrix_structure, g, k, d);
                 d[k] = d[k] * (-1);
             }
 
+            /* moving vertex j' with a maximal score */
             j_index = find_max_index(score, n);
-            d[j_index] =  d[j_index] * (-1);
+            d[j_index] *= (-1);
             indices[i] = j_index;
 
             if (i == 0)
@@ -131,16 +132,17 @@ double improving_division_of_the_network(matrixStructure *matrix_structure, grou
 
     } while (IS_POSITIVE(delta_Q));
 
-    free(score);
-    free(improve);
-    free(indices);
-    free(unmoved);
-
     if (delta_Q > Q_0) {
         memcpy(s, d, n * sizeof(double));
     } else {
         delta_Q = Q_0;
     }
+
+    free(score);
+    free(improve);
+    free(indices);
+    free(unmoved);
     free(d);
+
     return delta_Q;
 }
