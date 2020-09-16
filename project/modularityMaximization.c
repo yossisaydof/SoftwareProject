@@ -14,7 +14,7 @@ int* allocate_unmoved(group *g, int *unmoved) {
     return unmoved;
 }
 
-int find_max_index(const double *score, int n) {
+int find_max_index(double *score, int n) {
     int i, max_index;
     double max, tmp_max;
 
@@ -78,20 +78,18 @@ double improving_division_of_the_network(matrixStructure *matrix_structure, grou
     double *score, *improve, delta_Q, *d;
 
     n = g -> size;
+
     score = (double*) malloc(n * sizeof(double));
     improve = (double*) malloc(n * sizeof(double));
     indices = (int*) malloc(n * sizeof(int));
     unmoved = (int*) malloc(n * sizeof(int));
-    if (score == NULL || improve == NULL || indices == NULL || unmoved == NULL) {
+    d = (double*) malloc(sizeof(double) * n);
+    if (score == NULL || improve == NULL || indices == NULL || unmoved == NULL || d == NULL) {
         printf("%s", MALLOC_FAILED);
         exit(EXIT_FAILURE);
     }
 
-    d = (double*) malloc(sizeof(double) * n);
-    if (d == NULL) {
-        printf("%s", MALLOC_FAILED);
-        exit(EXIT_FAILURE);
-    }
+    /* copy vector s to vector d */
     memcpy(d, s, n * sizeof(double));
 
     unmoved = allocate_unmoved(g, unmoved);
@@ -100,7 +98,7 @@ double improving_division_of_the_network(matrixStructure *matrix_structure, grou
         for (i = 0; i < n; i++) {
 
             /* Computing delta Q for the move of each unmoved vertex */
-            for (k = 0; k < last_available_index; k++) {
+            for (k = 0; k <= last_available_index; k++) {
                 d[k] = d[k] * (-1);
                 score[k] = calc_score_i(matrix_structure, g, k, d);
                 d[k] = d[k] * (-1);

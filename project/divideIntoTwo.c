@@ -49,7 +49,7 @@ void divide_into_two(matrixStructure *matrix_structure, group *g, group *g1, gro
      * Implementation of algorithm 2 - divide g to 2 groups: g1, g2 if possible
      */
     int n, i, cnt_positive = 0, cnt_negative = 0;
-    double eigen_value, deltaQ, *eigen_vector, *s;
+    double eigen_value, deltaQ, deltaQ_before, *eigen_vector, *s;
 
     n = g -> size;
 
@@ -79,6 +79,8 @@ void divide_into_two(matrixStructure *matrix_structure, group *g, group *g1, gro
         exit(EXIT_FAILURE);
     }
 
+    cnt_negative = 0;
+    cnt_positive = 0;
     for (i = 0; i < n; i++) {
         if (eigen_vector[i] < EPSILON()) {
             s[i] = -1;
@@ -91,15 +93,19 @@ void divide_into_two(matrixStructure *matrix_structure, group *g, group *g1, gro
 
     /* compute deltaQ */
     deltaQ = compute_delta_Q(matrix_structure, g, s);
+    deltaQ_before = deltaQ;
     if (eigen_value > EPSILON()) {
         deltaQ = improving_division_of_the_network(matrix_structure, g, s, deltaQ);
-        cnt_negative = 0; /* TODO - we can do it with other loops */
-        cnt_positive = 0;
-        for (i = 0; i < n; i++) {
-            if (s[i] < 0)
-                cnt_negative++;
-            else
-                cnt_positive++;
+        if (deltaQ_before != deltaQ) {
+            /* deltaQ has changes */
+            cnt_negative = 0;
+            cnt_positive = 0;
+            for (i = 0; i < n; i++) {
+                if (s[i] < 0)
+                    cnt_negative++;
+                else
+                    cnt_positive++;
+            }
         }
     }
 
