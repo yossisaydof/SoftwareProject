@@ -109,6 +109,7 @@ double power_iteration(matrixStructure *matrix_structure, group *g, double *eige
             /* the vector produced in the final iteration is the desired eigenvector */
             break;
         }
+
         memcpy(curr_vector, eigen_vector, n * sizeof(double));
     }
 

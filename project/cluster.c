@@ -105,7 +105,7 @@ void write_output_file(FILE *output_file, modularityGroups *modularity_groups) {
         printf("%s", FILE_WRITING);
         exit(EXIT_FAILURE);
     }
-    printf("Number of groups: %d\n", n);
+    /* printf("Number of groups: %d\n", n);*/ /*TODO - delete*/
     for (i = 0; i < n; i++) {
         group_size = head -> size;
         /* write number of nodes in the first group */
