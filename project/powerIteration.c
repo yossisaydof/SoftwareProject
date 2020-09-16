@@ -24,65 +24,11 @@ double calc_vector_magnitude(const double *vector, int n) {
 }
 
 
-double calc_next_vector_i(matrixStructure *matrix, group *g, const double *curr_vector, int i) {
-
-     /* Calculates: next_vextor[i] = norm * v_i + sum over j in g, j != i of (A_ij - k_i*k_j/M) * (v_j - j_i) */
-
-    int j, A_ij, k_i, k_j, j_index, i_index, nnz_i, cnt_nnz = 0, row_start, row_end, *K, *nodes;
-    double sum = 0, M;
-
-    spmat *A;
-
-    A = matrix -> A;
-    K = matrix -> degreeList;
-    nodes = g -> nodes;
-    i_index = nodes[i];
-    k_i = K[i_index];
-    M = matrix -> M;
-    row_start = A -> rowptr[i_index];
-    row_end = A -> rowptr[i_index + 1];
-    nnz_i = row_end - row_start;
-
-    for (j = 0; j < g -> size; j++) {
-        j_index = nodes[j];
-        if (i_index == j_index) {
-            sum += ((matrix -> norm_1) * curr_vector[i]); /* matrix shifting */
-            continue;
-        }
-        A_ij = 0;
-        k_j = K[j_index];
-        if (cnt_nnz < nnz_i) {
-            while (j_index > (A -> colind)[row_start + cnt_nnz]) {
-                cnt_nnz++;
-            }
-            if (j_index == (A -> colind)[row_start + cnt_nnz]) {
-                A_ij = (int) A -> values[row_start + cnt_nnz];
-                cnt_nnz++;
-            }
-        }
-        sum += ((A_ij - (double)((k_i * k_j) / M)) * (curr_vector[j] - curr_vector[i]));
-    }
-    return sum;
-}
-
-
-void mult_matrix_vector(matrixStructure *matrix, group *g, double* curr_vector, double* next_vector) {
-
-     /* Calculates B_hat[h] * curr_vector */
-    double tmp;
-    int i;
-
-    for (i = 0; i < g -> size; i++) {
-        tmp = calc_next_vector_i(matrix, g, curr_vector, i);
-        next_vector[i] = tmp;
-    }
-}
-
 void calc_next_vector(matrixStructure *matrix_structure, group *g, double* curr_vector, int n, double *next_vector) {
     double denominator;
     int i;
     /* calculates numerator (i.e matrix_structure * curr_vector) */
-    mult_matrix_vector(matrix_structure, g, curr_vector, next_vector);
+    mult_Bg_vector(matrix_structure, g, curr_vector, next_vector, 1);
 
     /* calculates denominator (i.e ||(matrix_structure * curr_vector)||) */
     denominator = calc_vector_magnitude(next_vector, n);
@@ -125,7 +71,7 @@ double clac_eigenvalue(matrixStructure *matrix_structure, group *g, double *eige
         exit(EXIT_FAILURE);
     }
     /* calculates B_hat[g] * eigen_vector */
-    mult_matrix_vector(matrix_structure, g, eigen_vector, mult_vector);
+    mult_Bg_vector(matrix_structure, g, eigen_vector, mult_vector, 1);
 
     for (i = 0; i < g -> size; i++) {
         numerator += (mult_vector[i] * eigen_vector[i]);

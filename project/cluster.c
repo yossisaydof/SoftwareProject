@@ -113,7 +113,7 @@ void write_output_file(FILE *output_file, modularityGroups *modularity_groups) {
             printf("%s", FILE_WRITING);
             exit(EXIT_FAILURE);
         }
-        printf("size %d:\t", group_size);
+        /*printf("size %d:\t", group_size);*/ /*TODO - delete*/
         /* followed by the indices of the nodes in the group, in increasing order */
         /* TODO: sort nodes before writing to file */
         for (j = 0; j < head -> size; j++) {
@@ -121,9 +121,9 @@ void write_output_file(FILE *output_file, modularityGroups *modularity_groups) {
                 printf("%s", FILE_WRITING);
                 exit(EXIT_FAILURE);
             }
-            printf("%d  ", head -> nodes[j]);
+            /* printf("%d  ", head -> nodes[j]);*/ /* TODO - delete*/
         }
-        printf("\n");
+        /*printf("\n");*/ /* TODO - delete*/
         head = head -> next;
     }
 }
@@ -134,7 +134,12 @@ int main(int argc, char* argv[]) {
     char *input_filename, *output_filename;
     matrixStructure *matrix_structure;
     modularityGroups *modularity_groups;
+    clock_t begin, end; /* TODO - delete*/
+    double time_spent; /* TODO - delete*/
+
     (void) argc;
+
+    begin = clock(); /* TODO - delete*/
 
     srand(time(NULL));
 
@@ -165,5 +170,9 @@ int main(int argc, char* argv[]) {
     matrix_structure -> free(matrix_structure);
     fclose(input_matrix_file);
     fclose(output_file);
+
+    end = clock(); /* TODO - delete*/
+    time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+    printf("Total time: %f\n", time_spent);
     return 0;
 }

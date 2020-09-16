@@ -1,6 +1,9 @@
 #include "matrixShifting.h"
 
 double sum_of_row(matrixStructure *matrix_structure, int i) {
+    /*
+     * Compute sum of row i in matrix B
+     */
     int j, k_i, k_j, nnz_i, cnt_nnz = 0, A_ij, row_start, row_end, *K;
     double M, tmp, sum1 = 0, sum2 = 0;
     spmat *A;
@@ -37,7 +40,7 @@ double sum_of_row(matrixStructure *matrix_structure, int i) {
 double norm_l1(matrixStructure *matrix_structure) {
     /*
      * Calculates norm l1 of the matrix
-     * ||C||_1 = max_j (sum_i (|C_ij))
+     * ||matrix||_1 = max_j (sum_i (|matrix_ij))
      * Notice that our matrix represents undirected graph, therefore sum of row i = sum of column i
      * */
     int i;

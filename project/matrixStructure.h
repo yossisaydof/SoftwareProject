@@ -1,10 +1,19 @@
 
-/* matrixStructure module
+/*
+ * matrixStructure Summary:
+ *
  * This module holds all parameters to calculate matrix B:
- *      1. sparse matrix A
- *      2. array to hold the degree of each node
- *      3. M = sum of all degrees
- *      4. n = number of nodes
+ *      1. sparse matrix A = the graph is represented as adjacency matrix which we store as a sparse matrix.
+ *      2. degreeList = array to hold the degree of each node.
+ *      3. M = sum of all degrees.
+ *      4. n = number of nodes.
+ *      5. norm_1 = norm l1 of matrix B.
+ *
+ * allocate_matrix_structure    - Allocate matrix structure and updates all of its parameters except for norm_1.
+ * free_matrix_structure        - Free matrix structure.
+ * mult_Bg_vector               - Calculates a multiplication of B_hat[g] by a vector.
+ * mult_Bg_vector_i             - Calculates place i in the result vector of the previous function.
+ *
  */
 
 #ifndef MATRIXSTRUCTURE_H
@@ -14,6 +23,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <math.h>
+#include "group.h"
 
 /* holds B matrix B_ij = A_ij - k_i*k_j/M */
 typedef struct _matrixStructure {
@@ -28,5 +38,6 @@ typedef struct _matrixStructure {
 } matrixStructure;
 
 matrixStructure* allocate_matrix_structure(int *K, spmat *spmat_matrix, int M, int n);
+void mult_Bg_vector(matrixStructure *matrix, group *g, double* vector, double* next_vector, int norm_flag);
 
 #endif

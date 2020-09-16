@@ -1,9 +1,11 @@
 
-/* Group module:
- * This module implement nodes of the modularityGroups.
+/* group Summary:
  *
- * Each group contains an array of nodes that exist in the group, its size
- * and a pointer to the next group in the modularityGroup.
+ * This module implement nodes of the modularityGroups.
+ * Each group contains an array of nodes that exist in the group, its size and a pointer to the.
+ * next group in the modularityGroup.
+ *
+ * free_group   - free group g.
  */
 
 #ifndef GROUP_H
@@ -15,7 +17,7 @@ typedef struct _group {
     int size;
 } group;
 
-void free_group(group *group);
+void free_group(group *g);
 
 
 #endif

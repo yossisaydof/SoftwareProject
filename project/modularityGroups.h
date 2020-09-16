@@ -1,9 +1,13 @@
 /*
- * modularityGroups module:
+ * modularityGroups Summary:
  * This module implements a stack of groups.
  * Each modularityGroup contains groups and the number of groups in it.
+ * This structure is used to represent P and O in divideIntoGroups.c.
  *
- * This structure is used to represent P and O in divideIntoGroups.c
+ * insert_modularity_groups     -
+ * remove_modularity_groups     -
+ * free_modularity_groups       -
+ * allocate_modularity_group    -
  */
 
 #ifndef MODULARITYGROUPS_H

@@ -25,6 +25,10 @@ modularityGroups* create_P(int n) {
 }
 
 void divide_into_groups(matrixStructure *matrix_structure, modularityGroups *O) {
+    /*
+     * Implementation of algorithm 3.
+     * The function updates modularityGroup O to contain all modularity groups.
+     */
     modularityGroups *P;
     group *g, *g1, *g2;
 
