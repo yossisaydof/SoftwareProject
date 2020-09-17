@@ -58,17 +58,17 @@ double calc_score_i(matrixStructure *matrix_structure, group *g, int i, double *
         A_ij = 0;
         k_j = matrix_structure -> degreeList[j_index];
         if (cnt_nnz < nnz_i) {
-            while (((row_start + cnt_nnz) < M) && j_index > (A -> colind)[row_start + cnt_nnz]) {
+            while ((row_start + cnt_nnz < M) && j_index > (A -> colind)[row_start + cnt_nnz]) {
                 cnt_nnz++;
-                if (((row_start + cnt_nnz) < M)) break;
+                if ((row_start + cnt_nnz < M))
+                    break;
             }
-            if (((row_start + cnt_nnz) < M)) {
+            if ((row_start + cnt_nnz < M)) {
                 if (j_index == (A -> colind)[row_start + cnt_nnz]) {
                     A_ij = (int) A -> values[row_start + cnt_nnz];
                     cnt_nnz++;
                 }
             }
-
         }
         sum += ((A_ij - (k_j * k_j / M)) * d[j]);
     }
@@ -88,10 +88,8 @@ double improving_division_of_the_network(matrixStructure *matrix_structure, grou
     indices = (int*) malloc(n * sizeof(int));
     unmoved = (int*) malloc(n * sizeof(int));
     d = (double*) malloc(n * sizeof(double));
-    if (score == NULL || improve == NULL || indices == NULL || unmoved == NULL || d == NULL) {
-        printf("%s", MALLOC_FAILED);
-        exit(EXIT_FAILURE);
-    }
+    if (score == NULL || improve == NULL || indices == NULL || unmoved == NULL || d == NULL)
+        ERROR_HANDLER(MALLOC_FAILED)
 
     /* copy vector s to vector d */
     memcpy(d, s, n * sizeof(double));

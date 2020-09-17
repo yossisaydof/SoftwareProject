@@ -10,10 +10,7 @@ modularityGroups* create_P(int n) {
 
     P = allocate_modularity_group();
     nodes = (int*) malloc(n * sizeof(int));
-    if (nodes == NULL) {
-        printf("%s", MALLOC_FAILED);
-        exit(EXIT_FAILURE);
-    }
+    if (nodes == NULL) ERROR_HANDLER(MALLOC_FAILED);
 
     for (i = 0; i < n; i++) {
         nodes[i] = i;
@@ -37,10 +34,7 @@ void divide_into_groups(matrixStructure *matrix_structure, modularityGroups *O) 
     g1 = (group*) malloc(sizeof(group));
     g2 = (group*) malloc(sizeof(group));
 
-    if (g1 == NULL || g2 == NULL) {
-        printf("%s", MALLOC_FAILED);
-        exit(EXIT_FAILURE);
-    }
+    if (g1 == NULL || g2 == NULL) ERROR_HANDLER(MALLOC_FAILED);
 
     while (P -> number_of_groups > 0) {
         /* Remove a group g from P */

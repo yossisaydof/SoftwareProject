@@ -7,7 +7,8 @@ void create_random_vector(int n, double *randVector){
     int i;
 
     for (i = 0; i < n; i++) {
-        randVector[i] = (double) rand();
+//        randVector[i] = (double) rand();
+        randVector[i] = (double) i;
     }
 }
 
@@ -32,10 +33,7 @@ void calc_next_vector(matrixStructure *matrix_structure, group *g, double* curr_
 
     /* calculates denominator (i.e ||(matrix_structure * curr_vector)||) */
     denominator = calc_vector_magnitude(next_vector, n);
-    if (denominator == 0) {
-        printf("%s", DIVIDE_BY_ZERO);
-        exit(EXIT_FAILURE);
-    }
+    if (denominator == 0) ERROR_HANDLER(MALLOC_FAILED)
 
     /* update next_vector */
     for (i = 0; i < n; i++) {
@@ -66,10 +64,8 @@ double clac_eigenvalue(matrixStructure *matrix_structure, group *g, double *eige
     int i;
     double *mult_vector, denominator = 0, numerator = 0;
     mult_vector = (double*) malloc((g -> size) * sizeof(double));
-    if (mult_vector == NULL) {
-        printf("%s", MALLOC_FAILED);
-        exit(EXIT_FAILURE);
-    }
+    if (mult_vector == NULL) ERROR_HANDLER(MALLOC_FAILED)
+
     /* calculates B_hat[g] * eigen_vector */
     mult_Bg_vector(matrix_structure, g, eigen_vector, mult_vector, 1);
 
@@ -77,7 +73,7 @@ double clac_eigenvalue(matrixStructure *matrix_structure, group *g, double *eige
         numerator += (mult_vector[i] * eigen_vector[i]);
         denominator += (eigen_vector[i] * eigen_vector[i]);
     }
-    if (denominator == 0) exit(EXIT_FAILURE);
+    if (denominator == 0) ERROR_HANDLER(DIVIDE_BY_ZERO)
 
     free(mult_vector);
 
@@ -96,10 +92,8 @@ double power_iteration(matrixStructure *matrix_structure, group *g, double *eige
 
     n = g -> size;
     curr_vector = (double*) malloc(sizeof(double) * n);
-    if (curr_vector == NULL) {
-        printf("%s", MALLOC_FAILED);
-        exit(EXIT_FAILURE);
-    }
+    if (curr_vector == NULL) ERROR_HANDLER(MALLOC_FAILED)
+
     create_random_vector(n, curr_vector);
 
     while (1) { /* TODO: make sure this is not an infinite loop! */

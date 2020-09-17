@@ -12,10 +12,7 @@ matrixStructure* allocate_matrix_structure(int *K, spmat *spmat_matrix, int M, i
     matrixStructure* matrix_structure;
 
     matrix_structure = (matrixStructure*) malloc(sizeof(matrixStructure));
-    if (matrix_structure == NULL) {
-        printf("%s", MALLOC_FAILED);
-        exit(EXIT_FAILURE);
-    }
+    if (matrix_structure == NULL) ERROR_HANDLER(MALLOC_FAILED)
 
     matrix_structure -> degreeList = K;
     matrix_structure -> A = spmat_matrix;
@@ -57,16 +54,16 @@ double mult_Bg_vector_i(matrixStructure *matrix, group *g, double *vector, int i
                 sum += ((matrix -> norm_1) * vector[i]); /* matrix shifting */
             continue;
         }
-
         A_ij = 0;
         k_j = K[j_index];
         if (cnt_nnz < nnz_i) {
-            while (((row_start + cnt_nnz) < M) && (j_index > (A -> colind)[row_start + cnt_nnz])) {
+            while ((row_start + cnt_nnz < M) && j_index > (A -> colind)[row_start + cnt_nnz]) {
                 cnt_nnz++;
-                if (((row_start + cnt_nnz) < M)) break;
+                if ((row_start + cnt_nnz < M))
+                    break;
             }
-            if ((row_start + cnt_nnz) < M) {
-                if ((j_index == (A->colind)[row_start + cnt_nnz])) {
+            if ((row_start + cnt_nnz < M)) {
+                if (j_index == (A->colind)[row_start + cnt_nnz]) {
                     A_ij = (int) A->values[row_start + cnt_nnz];
                     cnt_nnz++;
                 }

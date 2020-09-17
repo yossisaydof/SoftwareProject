@@ -4,10 +4,7 @@ void insert_modularity_groups(modularityGroups *modularity_groups , int* nodes, 
     group *new_group;
 
     new_group = (group*) malloc(sizeof(group));
-    if (new_group == NULL) {
-        printf("%s", MALLOC_FAILED);
-        exit(EXIT_FAILURE);
-    }
+    if (new_group == NULL) ERROR_HANDLER(MALLOC_FAILED)
 
     new_group -> nodes = (int*) malloc(n * sizeof(int));
     memcpy(new_group -> nodes, nodes, n * sizeof(int));
@@ -54,10 +51,7 @@ modularityGroups* allocate_modularity_group(){
     modularityGroups *modularity_groups;
 
     modularity_groups = (modularityGroups*) malloc(sizeof(modularityGroups));
-    if (modularity_groups == NULL) {
-        printf("%s", MALLOC_FAILED);
-        exit(EXIT_FAILURE);
-    }
+    if (modularity_groups == NULL) ERROR_HANDLER(MALLOC_FAILED)
 
     modularity_groups -> number_of_groups = 0;
     modularity_groups -> head = NULL;
