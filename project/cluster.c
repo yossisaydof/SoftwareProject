@@ -83,7 +83,6 @@ matrixStructure* generate_matrix_structure(FILE *matrix_file) {
             matrix_row[node_id] = 1;
         }
         spmat_matrix -> add_row(spmat_matrix, matrix_row, i);
-
     }
     matrix_structure = allocate_matrix_structure(K, spmat_matrix, M, n);
     matrix_structure -> norm_1 = norm_l1(matrix_structure);
