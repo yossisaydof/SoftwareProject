@@ -29,6 +29,11 @@ matrixStructure* generate_matrix_structure(FILE *matrix_file) {
         exit(EXIT_FAILURE);
     }
 
+    if (n == 0) {
+        printf("%s", DIVIDE_BY_ZERO); /* TODO - change error */
+        exit(EXIT_FAILURE);
+    }
+
     K = (int*) malloc(n * sizeof(int));
     if (K == NULL) {
         printf("%s", MALLOC_FAILED);
