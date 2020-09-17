@@ -44,18 +44,16 @@ void divide_g(group *g, group *g1, group *g2, const double *s) {
     g2 -> next = NULL;
 }
 
-void divide_into_two(matrixStructure *matrix_structure, group *g, group *g1, group *g2) {
+void divide_into_two(matrixStructure *matrix_structure, group *g, group *g1, group *g2, double *eigen_vector) {
     /*
      * Implementation of algorithm 2 - divide g to 2 groups: g1, g2 if possible
      */
     int n, i, cnt_positive, cnt_negative;
-    double eigen_value, deltaQ, deltaQ_before, *eigen_vector, *s;
+    double eigen_value, deltaQ, deltaQ_before, *s;
 
     n = g -> size;
 
     /* compute leading eigenpair of the modularity matrix B_hat_g */
-    eigen_vector = (double*) malloc(sizeof(double) * n);
-    if (eigen_vector == NULL) ERROR_HANDLER(MALLOC_FAILED)
 
     eigen_value = power_iteration(matrix_structure, g, eigen_vector);
 
@@ -65,7 +63,6 @@ void divide_into_two(matrixStructure *matrix_structure, group *g, group *g1, gro
         g2 -> size = 0;
         g1 -> next = NULL;
         g2 -> next = NULL;
-        free(eigen_vector);
         return;
     }
 
@@ -122,10 +119,8 @@ void divide_into_two(matrixStructure *matrix_structure, group *g, group *g1, gro
         g1 -> next = NULL;
         g2 -> next = NULL;
         free(s);
-        free(eigen_vector);
         return;
     }
 
     free(s);
-    free(eigen_vector);
 }

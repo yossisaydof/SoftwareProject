@@ -16,6 +16,6 @@
 #include "modularityMaximization.h"
 #include "powerIteration.h"
 
-void divide_into_two(matrixStructure *matrix_structure, group *g, group *g1, group *g2);
+void divide_into_two(matrixStructure *matrix_structure, group *g, group *g1, group *g2, double *eigen_vector);
 
 #endif

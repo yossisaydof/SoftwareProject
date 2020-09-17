@@ -28,6 +28,7 @@ void divide_into_groups(matrixStructure *matrix_structure, modularityGroups *O) 
      */
     modularityGroups *P;
     group *g, *g1, *g2;
+    double *eigen_vector;
 
     P = create_P(matrix_structure -> n);
 
@@ -36,13 +37,16 @@ void divide_into_groups(matrixStructure *matrix_structure, modularityGroups *O) 
 
     if (g1 == NULL || g2 == NULL) ERROR_HANDLER(MALLOC_FAILED);
 
+    eigen_vector = (double*) malloc(sizeof(double) * matrix_structure -> n);
+    if (eigen_vector == NULL) ERROR_HANDLER(MALLOC_FAILED)
+
     while (P -> number_of_groups > 0) {
         /* Remove a group g from P */
         g = (group *) P -> remove(P);
 
         /* Divide g into g1, g2 with Algorithm 2 */
 
-        divide_into_two(matrix_structure, g, g1, g2);
+        divide_into_two(matrix_structure, g, g1, g2, eigen_vector);
 
         /* if either g1 or g2 is of size 0: Add g to O */
         if (g1 -> size == 0 || g2 -> size == 0) {
@@ -70,5 +74,6 @@ void divide_into_groups(matrixStructure *matrix_structure, modularityGroups *O) 
     P -> free(P);
     free_group(g1);
     free_group(g2);
+    free(eigen_vector);
 }
 

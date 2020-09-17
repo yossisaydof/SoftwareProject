@@ -7,8 +7,7 @@ void create_random_vector(int n, double *randVector){
     int i;
 
     for (i = 0; i < n; i++) {
-//        randVector[i] = (double) rand();
-        randVector[i] = (double) i;
+        randVector[i] = (double) rand();
     }
 }
 
