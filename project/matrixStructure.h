@@ -38,6 +38,6 @@ typedef struct _matrixStructure {
 } matrixStructure;
 
 matrixStructure* allocate_matrix_structure(int *K, spmat *spmat_matrix, int M, int n);
-void mult_Bg_vector(matrixStructure *matrix, group *g, double* vector, double* next_vector, int norm_flag);
+void mult_Bg_vector(matrixStructure *matrix, group *g, int *g_arr, double* vector, double* next_vector, int norm_flag);
 
 #endif
