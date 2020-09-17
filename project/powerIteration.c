@@ -24,11 +24,11 @@ double calc_vector_magnitude(const double *vector, int n) {
 }
 
 
-void calc_next_vector(matrixStructure *matrix_structure, group *g, double* curr_vector, int n, double *next_vector) {
+void calc_next_vector(matrixStructure *matrix_structure, group *g, int *g_arr, double* curr_vector, int n, double *next_vector) {
     double denominator;
     int i;
     /* calculates numerator (i.e matrix_structure * curr_vector) */
-    mult_Bg_vector(matrix_structure, g, curr_vector, next_vector, 1);
+    mult_Bg_vector(matrix_structure, g, g_arr, curr_vector, next_vector, 1);
 
     /* calculates denominator (i.e ||(matrix_structure * curr_vector)||) */
     denominator = calc_vector_magnitude(next_vector, n);
@@ -84,7 +84,7 @@ double clac_eigenvalue(matrixStructure *matrix_structure, group *g, double *eige
     return (numerator / denominator);
 }
 
-double power_iteration(matrixStructure *matrix_structure, group *g, double *eigen_vector) {
+double power_iteration(matrixStructure *matrix_structure, group *g, double *eigen_vector, int *g_arr) {
     /*
      * Approximates the dominant eigenpair
      * Stores the corresponding eigenvector in eigen_vector
@@ -103,7 +103,7 @@ double power_iteration(matrixStructure *matrix_structure, group *g, double *eige
     create_random_vector(n, curr_vector);
 
     while (1) { /* TODO: make sure this is not an infinite loop! */
-        calc_next_vector(matrix_structure, g, curr_vector, n, eigen_vector);
+        calc_next_vector(matrix_structure, g, g_arr, curr_vector, n, eigen_vector);
         cnt_diff++;
         if (check_diff(curr_vector, eigen_vector, n) == 0) {
             /* the vector produced in the final iteration is the desired eigenvector */

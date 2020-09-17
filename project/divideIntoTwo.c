@@ -44,7 +44,7 @@ void divide_g(group *g, group *g1, group *g2, const double *s) {
     g2 -> next = NULL;
 }
 
-void divide_into_two(matrixStructure *matrix_structure, group *g, group *g1, group *g2) {
+void divide_into_two(matrixStructure *matrix_structure, group *g, group *g1, group *g2, int *g_arr) {
     /*
      * Implementation of algorithm 2 - divide g to 2 groups: g1, g2 if possible
      */
@@ -60,7 +60,7 @@ void divide_into_two(matrixStructure *matrix_structure, group *g, group *g1, gro
         exit(EXIT_FAILURE);
     }
 
-    eigen_value = power_iteration(matrix_structure, g, eigen_vector);
+    eigen_value = power_iteration(matrix_structure, g, eigen_vector, g_arr);
 
     if (IS_NON_POSITIVE(eigen_value)) {
         /* eigen value is non zero so the group g is indivisible */
