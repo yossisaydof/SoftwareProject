@@ -21,6 +21,11 @@ matrixStructure* generate_matrix_structure(FILE *matrix_file) {
     if ((int) fread(&n, sizeof(int), 1, matrix_file) != 1)
         ERROR_HANDLER(FILE_READING)
 
+    if (n == 0) {
+        printf("%s", DIVIDE_BY_ZERO); /* TODO - change error */
+        exit(EXIT_FAILURE);
+    }
+
     K = (int*) malloc(n * sizeof(int));
     if (K == NULL) ERROR_HANDLER(MALLOC_FAILED)
 

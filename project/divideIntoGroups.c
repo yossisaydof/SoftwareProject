@@ -21,11 +21,24 @@ modularityGroups* create_P(int n) {
     return P;
 }
 
+
+void update_g_arr(int *g_arr, group *g) {
+    int i, i_index, *nodes;
+
+    nodes = g -> nodes;
+
+    for (i = 0; i < g -> size; ++i) {
+        i_index = nodes[i];
+        g_arr[i_index] = i + 1;
+    }
+}
+
 void divide_into_groups(matrixStructure *matrix_structure, modularityGroups *O) {
     /*
      * Implementation of algorithm 3.
      * The function updates modularityGroup O to contain all modularity groups.
      */
+    int *g_arr;
     modularityGroups *P;
     group *g, *g1, *g2;
 
@@ -36,13 +49,21 @@ void divide_into_groups(matrixStructure *matrix_structure, modularityGroups *O) 
 
     if (g1 == NULL || g2 == NULL) ERROR_HANDLER(MALLOC_FAILED);
 
+    g_arr = (int*) calloc(matrix_structure -> n, sizeof(int));
+
+
     while (P -> number_of_groups > 0) {
         /* Remove a group g from P */
         g = (group *) P -> remove(P);
 
-        /* Divide g into g1, g2 with Algorithm 2 */
+        /* Updates g_arr according to g */
+        update_g_arr(g_arr, g);
 
-        divide_into_two(matrix_structure, g, g1, g2);
+        /* Divide g into g1, g2 with Algorithm 2 */
+        divide_into_two(matrix_structure, g, g1, g2, g_arr);
+
+        /* Reset g_arr */
+        memset(g_arr, 0, matrix_structure -> n * sizeof(int));
 
         /* if either g1 or g2 is of size 0: Add g to O */
         if (g1 -> size == 0 || g2 -> size == 0) {
