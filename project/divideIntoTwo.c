@@ -4,7 +4,7 @@
  /Algorithm 2 - Divide a group into two
 */
 
-double compute_delta_Q(matrixStructure *matrix_structure, group *g, double *s) {
+double compute_delta_Q(matrixStructure *matrix_structure, group *g, int *g_arr, double *s) {
     /*
      * Computes deltaQ = s^t * B_hat[g] * s
      */
@@ -14,7 +14,7 @@ double compute_delta_Q(matrixStructure *matrix_structure, group *g, double *s) {
     mult_vector = (double*) malloc(g -> size * sizeof(double));
 
     /* computes B_hat[g] * s and store the result in mult_vector */
-    mult_Bg_vector(matrix_structure, g, s, mult_vector, 0);
+    mult_Bg_vector(matrix_structure, g, g_arr, s, mult_vector, 0);
 
     /* computes s^t * mult_vector */
     for (i = 0; i < g -> size; ++i) {
@@ -92,7 +92,7 @@ void divide_into_two(matrixStructure *matrix_structure, group *g, group *g1, gro
     }
 
     /* compute deltaQ */
-    deltaQ = compute_delta_Q(matrix_structure, g, s);
+    deltaQ = compute_delta_Q(matrix_structure, g, g_arr, s);
     deltaQ_before = deltaQ;
     if (eigen_value > EPSILON()) {
         deltaQ = improving_division_of_the_network(matrix_structure, g, s, deltaQ);

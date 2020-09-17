@@ -56,7 +56,7 @@ int check_diff(double *curr_vector, double *next_vector, int n) {
     return 0;
 }
 
-double clac_eigenvalue(matrixStructure *matrix_structure, group *g, double *eigen_vector) {
+double clac_eigenvalue(matrixStructure *matrix_structure, group *g, int *g_arr, double *eigen_vector) {
     /*
      * Calculates eigen value.
      * bk is our approximation of the dominant eigenvector, an approximation of the corresponding
@@ -71,7 +71,7 @@ double clac_eigenvalue(matrixStructure *matrix_structure, group *g, double *eige
         exit(EXIT_FAILURE);
     }
     /* calculates B_hat[g] * eigen_vector */
-    mult_Bg_vector(matrix_structure, g, eigen_vector, mult_vector, 1);
+    mult_Bg_vector(matrix_structure, g, g_arr, eigen_vector, mult_vector, 1);
 
     for (i = 0; i < g -> size; i++) {
         numerator += (mult_vector[i] * eigen_vector[i]);
@@ -113,7 +113,7 @@ double power_iteration(matrixStructure *matrix_structure, group *g, double *eige
         memcpy(curr_vector, eigen_vector, n * sizeof(double));
     }
 
-    eigen_value = clac_eigenvalue(matrix_structure, g, eigen_vector);
+    eigen_value = clac_eigenvalue(matrix_structure, g, g_arr, eigen_vector);
     free(curr_vector);
 
     return (eigen_value - (matrix_structure -> norm_1));

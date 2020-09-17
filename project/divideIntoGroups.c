@@ -32,7 +32,7 @@ void update_g_arr(int *g_arr, group *g) {
 
     for (i = 0; i < g -> size; ++i) {
         i_index = nodes[i];
-        g_arr[i_index] = 1;
+        g_arr[i_index] = i + 1;
     }
 }
 
@@ -55,7 +55,7 @@ void divide_into_groups(matrixStructure *matrix_structure, modularityGroups *O) 
         exit(EXIT_FAILURE);
     }
 
-    g_arr = (int*) calloc(matrix_structure -> n * sizeof(int));
+    g_arr = (int*) calloc(matrix_structure -> n, sizeof(int));
 
 
     while (P -> number_of_groups > 0) {

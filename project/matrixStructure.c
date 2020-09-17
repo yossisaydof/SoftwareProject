@@ -55,7 +55,7 @@ void mult_kg_vector(matrixStructure *matrix, group *g, double *vector, double *r
 
     for (i = 0; i < g -> size; i++) {
         i_index = nodes[i];
-        result[i] = (tmp / M) * K[i_index];
+        result[i] -= ((tmp / M) * K[i_index]);
     }
 }
 
@@ -76,40 +76,18 @@ int sum_k_g(matrixStructure *matrix, group *g) {
     return sum;
 }
 
-void mult_Kg_vector(matrixStructure *matrix, group *g, const double* vector, double* result) {
-    int i, i_index, sum, *nodes, *K;
 
-    sum = sum_k_g(matrix, g);
-    nodes = g -> nodes;
-    K = matrix -> degreeList;
-
-    for (i = 0; i < g -> size; i++) {
-        i_index = nodes[i];
-        result[i] -= (sum * vector[i] * K[i_index]);
-    }
-}
-
-void mult_f_g_v(matrixStructure *matrix, group *g, double* vector, double* f_g) {
-    /*
-     * Calculates f_g and update f_g vector according to it.
-     * Reminder: f_g is a diagonal matrix, so we hold its values in a vector.
-     */
-
-    mult_Kg_vector(matrix, g, vector, f_g);
-}
-
-void mult_Ag_v(matrixStructure *matrix, group *g, int *g_arr, double* vector, double* result) {
+void mult_Ag_v(matrixStructure *matrix, group *g, const int *g_arr, const double* vector, double* result) {
     /*
      * Calculates A[g]*v
      */
-    int i, i_index, j, j_index, row_start, row_end, *nodes, *colind, *values;
+    int i, i_index, j, j_index, row_start, row_end, *nodes, *colind;
     spmat *A;
     double sum;
 
     nodes = g -> nodes;
     A = matrix -> A;
     colind = A -> colind;
-    values = A -> values;
 
     for (i = 0; i < g -> size; i++) {
         i_index = nodes[i];
@@ -118,21 +96,82 @@ void mult_Ag_v(matrixStructure *matrix, group *g, int *g_arr, double* vector, do
         sum = 0;
         for (j = row_start; j < row_end; j++) {
             j_index = colind[j];
-            if (g_arr[j_index] == 1) {
-                sum += (values[j] * vector[???]);
+            if (g_arr[j_index] != 0) {
+                sum += (vector[g_arr[j_index] - 1]);
             }
         }
         result[i] = sum;
     }
 }
 
-void mult_Bg_vector(matrixStructure *matrix, group *g, int *g_arr, double* vector, double* next_vector, int norm_flag) {
-    /* Calculates B_hat[g] * vector */
-    double tmp;
+
+void mult_Kg_f_vector(matrixStructure *matrix, group *g, const double* vector, double* result) {
+    int i, i_index, sum, *nodes, *K;
+
+    sum = sum_k_g(matrix, g);
+    nodes = g -> nodes;
+    K = matrix -> degreeList;
+
+    for (i = 0; i < g -> size; i++) {
+        i_index = nodes[i];
+        result[i] += (sum * vector[i] * K[i_index]);
+    }
+}
+
+double mult_Ag_i_f(matrixStructure *matrix, group *g, int *g_arr, double* vector, int i) {
+    int i_index, j, j_index, row_start, row_end, *nodes, *colind;
+    spmat *A;
+    double sum;
+
+    nodes = g -> nodes;
+    A = matrix -> A;
+    colind = A -> colind;
+
+    i_index = nodes[i];
+    row_start = A -> rowptr[i_index];
+    row_end = A -> rowptr[i_index + 1];
+    sum = 0;
+    for (j = row_start; j < row_end; j++) {
+        j_index = colind[j];
+        if (g_arr[j_index] != 0) {
+            sum += (vector[g_arr[j_index] - 1]);
+        }
+    }
+    return sum;
+}
+
+void mult_Ag_f(matrixStructure *matrix, group *g, int *g_arr, double* vector, double *result) {
     int i;
 
+    for (i = 0; i < g -> size; i++) {
+        result[i] -= mult_Ag_i_f(matrix, g, g_arr, vector, i);
+    }
+}
+
+void mult_f_g_v(matrixStructure *matrix, group *g, int *g_arr, double* vector, double* f_g) {
+    /*
+     * Calculates f_g and update f_g vector according to it.
+     * Reminder: f_g is a diagonal matrix, so we hold its values in a vector.
+     */
+    mult_Ag_f(matrix, g, g_arr, vector, f_g);
+    mult_Kg_f_vector(matrix, g, vector, f_g);
+}
+
+void add_norm(matrixStructure *matrix, double* vector, double* next_vector, int n) {
+    int i;
+
+    for (i = 0; i < n; i++) {
+        next_vector[i] += (matrix->norm_1 * vector[i]);
+    }
+}
+
+void mult_Bg_vector(matrixStructure *matrix, group *g, int *g_arr, double* vector, double* next_vector, int norm_flag) {
+    /* Calculates B_hat[g] * vector */
+
+    mult_Ag_v(matrix, g, g_arr, vector, next_vector);
     mult_kg_vector(matrix, g, vector, next_vector);
-    mult_f_g_v(matrix, g, vector, f_g); /* TODO - think if we want to create a new vector f_g */
-
-
+    mult_f_g_v(matrix, g, g_arr, vector, next_vector);
+    if (norm_flag == 1) {
+        add_norm(matrix, vector, next_vector, g -> size);
+    }
 }
