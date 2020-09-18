@@ -31,11 +31,6 @@ int find_max_index(const double *score, int n) {
     return max_index;
 }
 
-void remove_index_from_unmoved(int *unmoved, int max_index, int last_available_index) {
-    unmoved[max_index] = unmoved[last_available_index];
-    unmoved[last_available_index] = -1;
-}
-
 double calac_sum_Ai(matrixStructure *matrix_structure, group *g, const int *g_arr, const double *s, int i) {
     int i_index, j, j_index, row_start, row_end, *nodes, *colind;
     spmat *A;
@@ -75,31 +70,31 @@ double calac_sum_Ki(matrixStructure *matrix_structure, group *g, const double *s
     return sum;
 }
 
-void update_score(matrixStructure *matrix_structure, group *g, int *g_arr, double *s, double *score, const int *unmoved, int unmoved_index) {
+void update_score(matrixStructure *matrix_structure, group *g, int *g_arr, double *s, double *score, const int *unmoved) {
     int k, i, k_i, M, *K;
     double sum_Ai, sum_ki;
 
     M = matrix_structure -> M;
     K = matrix_structure -> degreeList;
 
-    for (i = 0; i <= unmoved_index; i++) {
-        k = unmoved[i];
-        s[k] *= (-1);
+    for (i = 0; i < g -> size; i++) {
+        if (unmoved[i] != -1){
+            k = unmoved[i];
+            s[k] *= (-1);
 
-        k_i = K[g -> nodes[k]];
-        sum_Ai = calac_sum_Ai(matrix_structure, g, g_arr, s, k);
-        sum_ki = calac_sum_Ki(matrix_structure, g, s, k);
-        score[k] = 4 * s[k] * (sum_Ai - sum_ki) + ((double)4 * (k_i * k_i) / M);
+            k_i = K[g -> nodes[k]];
+            sum_Ai = calac_sum_Ai(matrix_structure, g, g_arr, s, k);
+            sum_ki = calac_sum_Ki(matrix_structure, g, s, k);
+            score[k] = 4 * s[k] * (sum_Ai - sum_ki) + ((double)4 * (k_i * k_i) / M);
 
-        s[k] *= (-1);
+            s[k] *= (-1);
+        }
     }
-
 }
 
-
-double improving_division_of_the_network(matrixStructure *matrix_structure, group *g, int *g_arr, double *s, double Q_0) {
-    int i, j, n, j_index, i_index, unmoved_index, *indices, *unmoved;
-    double delta_Q, *score, *improve, *d;
+void improving_division_of_the_network(matrixStructure *matrix_structure, group *g, int *g_arr, double *s) {
+    int i, j, n, j_index, i_index, *indices, *unmoved;
+    double delta_Q, *score, *improve;
 
     n = g -> size;
 
@@ -107,23 +102,19 @@ double improving_division_of_the_network(matrixStructure *matrix_structure, grou
     improve = (double*) malloc(n * sizeof(double));
     indices = (int*) malloc(n * sizeof(int));
     unmoved = (int*) malloc(n * sizeof(int));
-    d = (double*) malloc(n * sizeof(double));
+    s = (double*) malloc(n * sizeof(double));
     if (score == NULL || improve == NULL || indices == NULL || unmoved == NULL)
         ERROR_HANDLER(MALLOC_FAILED)
 
-    memcpy(d, s, n * sizeof(int));
 
     do {
-        unmoved_index = n - 1;
         init_unmoved(n, unmoved);
 
-
         for (i = 0; i < n; i++) {
-            update_score(matrix_structure, g, g_arr, d, score, unmoved, unmoved_index);
+            update_score(matrix_structure, g, g_arr, s, score, unmoved);
 
-            j_index = find_max_index(score, unmoved_index);
-            d[j_index] *= (-1);
-
+            j_index = find_max_index(score, n);
+            s[j_index] *= (-1);
             indices[i] = j_index;
 
             if (i == 0) {
@@ -131,19 +122,18 @@ double improving_division_of_the_network(matrixStructure *matrix_structure, grou
             } else {
                 improve[i] = improve[i-1] + score[j_index];
             }
-            remove_index_from_unmoved(unmoved, j_index, unmoved_index);
-            unmoved_index--;
+            unmoved[j_index] = -1;
         }
 
         /* Find the maximum improvement of s and update s accordingly */
         i_index = find_max_index(improve, n);
-        for (i = n - 1; i > i_index + 1; i--) {
+        for (i = n - 1; i > i_index; i--) {
             j = indices[i];
-            d[j] *= (-1);
+            s[j] *= (-1);
         }
 
         if (i_index == n - 1) {
-            delta_Q = EPSILON();
+            delta_Q = 0;
         }
         else {
             delta_Q = improve[i_index];
@@ -151,17 +141,8 @@ double improving_division_of_the_network(matrixStructure *matrix_structure, grou
 
     } while (delta_Q > EPSILON());
 
-    if (delta_Q > Q_0) {
-        memcpy(s, d, n * sizeof(double));
-    } else {
-        delta_Q = Q_0;
-    }
-
     free(score);
     free(improve);
     free(indices);
     free(unmoved);
-    free(d);
-
-    return delta_Q;
 }
