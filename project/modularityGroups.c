@@ -2,12 +2,15 @@
 
 void insert_modularity_groups(modularityGroups *modularity_groups , int* nodes, int n) {
     group *new_group;
+    int i;
 
     new_group = (group*) malloc(sizeof(group));
     if (new_group == NULL) ERROR_HANDLER(MALLOC_FAILED)
 
     new_group -> nodes = (int*) malloc(n * sizeof(int));
-    memcpy(new_group -> nodes, nodes, n * sizeof(int));
+    for (i = 0; i < n; i++) {
+        new_group->nodes[i] = nodes[i];
+    }
 
     new_group -> size = n;
     new_group -> next = NULL;

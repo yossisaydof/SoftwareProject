@@ -18,6 +18,6 @@ typedef struct _group {
 } group;
 
 void free_group(group *g);
-
+void reset_group(group *g);
 
 #endif

@@ -4,7 +4,7 @@
  /Algorithm 2 - Divide a group into two
 */
 
-double compute_delta_Q(matrixStructure *matrix_structure, group *g, double *s) {
+double compute_delta_Q(matrixStructure *matrix_structure, group *g, int *g_arr, double *s) {
     /*
      * Computes deltaQ = s^t * B_hat[g] * s
      */
@@ -14,7 +14,7 @@ double compute_delta_Q(matrixStructure *matrix_structure, group *g, double *s) {
     mult_vector = (double*) malloc(g -> size * sizeof(double));
 
     /* computes B_hat[g] * s and store the result in mult_vector */
-    mult_Bg_vector(matrix_structure, g, s, mult_vector, 0);
+    mult_Bg_vector(matrix_structure, g, g_arr, s, mult_vector, 0);
 
     /* computes s^t * mult_vector */
     for (i = 0; i < g -> size; ++i) {
@@ -44,25 +44,27 @@ void divide_g(group *g, group *g1, group *g2, const double *s) {
     g2 -> next = NULL;
 }
 
-void divide_into_two(matrixStructure *matrix_structure, group *g, group *g1, group *g2, double *eigen_vector) {
+
+void divide_into_two(matrixStructure *matrix_structure, group *g, group *g1, group *g2, int *g_arr) {
     /*
      * Implementation of algorithm 2 - divide g to 2 groups: g1, g2 if possible
      */
     int n, i, cnt_positive, cnt_negative;
-    double eigen_value, deltaQ, deltaQ_before, *s;
+    double eigen_value, deltaQ, deltaQ_before, *eigen_vector, *s;
 
     n = g -> size;
 
     /* compute leading eigenpair of the modularity matrix B_hat_g */
+    eigen_vector = (double*) malloc(sizeof(double) * n);
+    if (eigen_vector == NULL) ERROR_HANDLER(MALLOC_FAILED)
 
-    eigen_value = power_iteration(matrix_structure, g, eigen_vector);
+    eigen_value = power_iteration(matrix_structure, g, eigen_vector, g_arr);
 
     if (IS_NON_POSITIVE(eigen_value)) {
         /* eigen value is non zero so the group g is indivisible */
-        g1 -> size = 0;
-        g2 -> size = 0;
-        g1 -> next = NULL;
-        g2 -> next = NULL;
+        reset_group(g1);
+        reset_group(g2);
+        free(eigen_vector);
         return;
     }
 
@@ -83,10 +85,10 @@ void divide_into_two(matrixStructure *matrix_structure, group *g, group *g1, gro
     }
 
     /* compute deltaQ */
-    deltaQ = compute_delta_Q(matrix_structure, g, s);
+    deltaQ = compute_delta_Q(matrix_structure, g, g_arr, s);
     deltaQ_before = deltaQ;
     if (eigen_value > EPSILON()) {
-        deltaQ = improving_division_of_the_network(matrix_structure, g, s, deltaQ);
+//        deltaQ = improving_division_of_the_network(matrix_structure, g, g_arr, s, deltaQ);
         if (deltaQ_before != deltaQ) {
             /* deltaQ has changes */
             cnt_negative = 0;
@@ -114,13 +116,10 @@ void divide_into_two(matrixStructure *matrix_structure, group *g, group *g1, gro
     }
     else {
         /* if deltaQ <= EPSILON the group g is indivisible */
-        g1 -> size = 0;
-        g2 -> size = 0;
-        g1 -> next = NULL;
-        g2 -> next = NULL;
-        free(s);
-        return;
+        reset_group(g1);
+        reset_group(g2);
     }
 
     free(s);
+    free(eigen_vector);
 }

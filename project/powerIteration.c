@@ -72,7 +72,7 @@ double clac_eigenvalue(matrixStructure *matrix_structure, group *g, int *g_arr, 
         numerator += (mult_vector[i] * eigen_vector[i]);
         denominator += (eigen_vector[i] * eigen_vector[i]);
     }
-    if (denominator == 0) ERROR_HANDLER(DIVIDE_BY_ZERO)
+    if (denominator == 0) exit(EXIT_FAILURE);
 
     free(mult_vector);
 

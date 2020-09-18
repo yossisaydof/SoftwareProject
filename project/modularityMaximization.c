@@ -3,20 +3,21 @@
 /**
  * Algorithm 4
  */
-/*double EPSILON = 0.00001; */
 
-int* allocate_unmoved(group *g, int *unmoved) {
+void init_unmoved(int n, int *unmoved) {
     int i;
 
-    for (i = 0; i < g -> size; i++) {
+    for (i = 0; i < n; i++) {
         unmoved[i] = i;
     }
-    return unmoved;
 }
 
 int find_max_index(double *score, int n) {
     int i, max_index;
     double max, tmp_max;
+
+    if (n == 0)
+        return 0;
 
     max = score[0];
     max_index = 0;
@@ -35,50 +36,69 @@ void remove_index_from_unmoved(int *unmoved, int max_index, int last_available_i
     unmoved[last_available_index] = -1;
 }
 
-double calc_score_i(matrixStructure *matrix_structure, group *g, int i, double *d) {
-    /*
-     * score[i] = 4 * d_j * sum over j in g of [(A[g]_ij - (k_i * k_j)/M) * d_j] + 4 * (k_i * k_i)/M
-     */
-    int j, j_index, i_index, A_ij, M, n, k_i, k_j, nnz_i, cnt_nnz = 0, row_start, row_end, *nodes;
-    double sum = 0;
+double calac_sum_Ai(matrixStructure *matrix_structure, group *g, int *g_arr, double *s, int i) {
+    int i_index, j, j_index, row_start, row_end, *nodes, *colind;
     spmat *A;
+    double sum = 0;
 
-    M = matrix_structure -> M;
-    A = matrix_structure -> A;
     nodes = g -> nodes;
+    A = matrix_structure -> A;
+    colind = A -> colind;
     i_index = nodes[i];
-    k_i = matrix_structure -> degreeList[i_index];
-    n = g -> size;
     row_start = A -> rowptr[i_index];
     row_end = A -> rowptr[i_index + 1];
-    nnz_i = row_end - row_start;
 
-    for (j = 0; j < n; j++) {
-        j_index = nodes[j];
-        A_ij = 0;
-        k_j = matrix_structure -> degreeList[j_index];
-        if (cnt_nnz < nnz_i) {
-            while ((row_start + cnt_nnz < M) && j_index > (A -> colind)[row_start + cnt_nnz]) {
-                cnt_nnz++;
-                if ((row_start + cnt_nnz < M))
-                    break;
-            }
-            if ((row_start + cnt_nnz < M)) {
-                if (j_index == (A -> colind)[row_start + cnt_nnz]) {
-                    A_ij = (int) A -> values[row_start + cnt_nnz];
-                    cnt_nnz++;
-                }
-            }
+    for (j = row_start; j < row_end; j++) {
+        j_index = colind[j];
+        if (g_arr[j_index] != 0) {
+            sum += (s[g_arr[j_index] - 1]);
         }
-        sum += ((A_ij - (k_j * k_j / M)) * d[j]);
     }
+    return sum;
+}
 
-    sum = (4 * d[i]) * sum + (4 * (k_i * k_i / M));
+double calac_sum_Ki(matrixStructure *matrix_structure, group *g, double *s, int i){
+    int i_index, j, j_index, M, k_i, k_j, *K, *nodes;
+    double sum = 0;
+    M = matrix_structure -> M;
+    K = matrix_structure -> degreeList;
+    nodes = g -> nodes;
+    i_index = nodes[i];
+    k_i = K[i_index];
+
+    for (j = 0; j < g -> size; j++) {
+        j_index = nodes[j];
+        k_j = K[j_index];
+        sum += ((k_i * k_j * s[j]) / M);
+    }
 
     return sum;
 }
-double improving_division_of_the_network(matrixStructure *matrix_structure, group *g, double *s, double Q_0) {
-    int i, k, j, n, j_index, i_index, *indices, *unmoved, last_available_index;
+
+void update_score(matrixStructure *matrix_structure, group *g, int *g_arr, double *s, double *score, int *unmoved, int unmoved_index) {
+    int k, i, k_i, M, *K;
+    double sum_Ai, sum_ki;
+
+    M = matrix_structure -> M;
+    K = matrix_structure -> degreeList;
+
+    for (i = 0; i <= unmoved_index; i++) {
+        k = unmoved[i];
+        s[k] *= (-1);
+
+        k_i = K[g -> nodes[k]];
+        sum_Ai = calac_sum_Ai(matrix_structure, g, g_arr, s, k);
+        sum_ki = calac_sum_Ki(matrix_structure, g, s, k);
+        score[k] = 4 * s[k] * (sum_Ai - sum_ki) + ((double)4 * (k_i * k_i) / M);
+
+        s[k] *= (-1);
+    }
+
+}
+
+
+double improving_division_of_the_network(matrixStructure *matrix_structure, group *g, int *g_arr, double *s, double Q_0) {
+    int i, j, n, j_index, i_index, unmoved_index, *indices, *unmoved;
     double delta_Q, *score, *improve, *d;
 
     n = g -> size;
@@ -88,51 +108,50 @@ double improving_division_of_the_network(matrixStructure *matrix_structure, grou
     indices = (int*) malloc(n * sizeof(int));
     unmoved = (int*) malloc(n * sizeof(int));
     d = (double*) malloc(n * sizeof(double));
-    if (score == NULL || improve == NULL || indices == NULL || unmoved == NULL || d == NULL)
-        ERROR_HANDLER(MALLOC_FAILED)
+    if (score == NULL || improve == NULL || indices == NULL || unmoved == NULL) {
+        printf("%s", MALLOC_FAILED);
+        exit(EXIT_FAILURE);
+    }
 
-    /* copy vector s to vector d */
-    memcpy(d, s, n * sizeof(double));
+    memcpy(d, s, n * sizeof(int));
 
-    unmoved = allocate_unmoved(g, unmoved);
-    last_available_index = n - 1; /* last available index in unmoved array */
     do {
-        for (i = 0; i < n; i++) {
-            last_available_index = n - 1;
-            for (k = 0; k <= last_available_index; k++) {
-                /* iterating over all unmoved vertices */
-                d[k] = d[k] * (-1);
-                score[k] = calc_score_i(matrix_structure, g, k, d);
-                d[k] = d[k] * (-1);
-            }
+        unmoved_index = n - 1;
+        init_unmoved(n, unmoved);
 
-            /* moving vertex j' with a maximal score */
-            j_index = find_max_index(score, n);
+
+        for (i = 0; i < n; i++) {
+            update_score(matrix_structure, g, g_arr, d, score, unmoved, unmoved_index);
+
+            j_index = find_max_index(score, unmoved_index);
             d[j_index] *= (-1);
+
             indices[i] = j_index;
 
-            if (i == 0)
+            if (i == 0) {
                 improve[i] = score[j_index];
-            else
-                improve[i] = improve[i - 1] + score[j_index];
-
-            remove_index_from_unmoved(unmoved, j_index, last_available_index);
-            last_available_index--;
+            } else {
+                improve[i] = improve[i-1] + score[j_index];
+            }
+            remove_index_from_unmoved(unmoved, j_index, unmoved_index);
+            unmoved_index--;
         }
 
         /* Find the maximum improvement of s and update s accordingly */
         i_index = find_max_index(improve, n);
-        for (i = n - 1; i > i_index; i--) {
+        for (i = n - 1; i > i_index + 1; i--) {
             j = indices[i];
-            d[j] = d[j] * (-1);
+            d[j] *= (-1);
         }
 
-        if (i_index == n - 1)
+        if (i_index == n - 1) {
             delta_Q = EPSILON();
-        else
+        }
+        else {
             delta_Q = improve[i_index];
+        }
 
-    } while (IS_POSITIVE(delta_Q));
+    } while (delta_Q > EPSILON());
 
     if (delta_Q > Q_0) {
         memcpy(s, d, n * sizeof(double));
