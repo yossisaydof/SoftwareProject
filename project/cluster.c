@@ -21,10 +21,7 @@ matrixStructure* generate_matrix_structure(FILE *matrix_file) {
     if ((int) fread(&n, sizeof(int), 1, matrix_file) != 1)
         ERROR_HANDLER(FILE_READING)
 
-    if (n == 0) {
-        printf("%s", DIVIDE_BY_ZERO); /* TODO - change error */
-        exit(EXIT_FAILURE);
-    }
+    if (n == 0) ERROR_HANDLER(DIVIDE_BY_ZERO)
 
     K = (int*) malloc(n * sizeof(int));
     if (K == NULL) ERROR_HANDLER(MALLOC_FAILED)
@@ -84,23 +81,23 @@ void write_output_file(FILE *output_file, modularityGroups *modularity_groups) {
     if (fwrite(&n, sizeof(int), 1, output_file) != 1)
         ERROR_HANDLER(FILE_WRITING)
 
-    printf("Number of groups: %d\n", n); /*TODO - delete*/
+    /*printf("Number of groups: %d\n", n); TODO - delete*/
     for (i = 0; i < n; i++) {
         group_size = head -> size;
         /* write number of nodes in the first group */
         if ((int) fwrite(&group_size, sizeof(int), 1, output_file) != 1)
             ERROR_HANDLER(FILE_WRITING)
 
-        printf("size %d:\t", group_size); /*TODO - delete*/
+        /*printf("size %d:\t", group_size); TODO - delete*/
         /* followed by the indices of the nodes in the group, in increasing order */
         /* TODO: sort nodes before writing to file */
         for (j = 0; j < head -> size; j++) {
             if ((int) fwrite(&(head -> nodes[j]), sizeof(int), 1, output_file) != 1)
                 ERROR_HANDLER(FILE_WRITING)
 
-            printf("%d  ", head -> nodes[j]); /* TODO - delete*/
+            /*printf("%d  ", head -> nodes[j]);  TODO - delete*/
         }
-        printf("\n"); /* TODO - delete*/
+        /*printf("\n");  TODO - delete*/
         head = head -> next;
     }
 }
