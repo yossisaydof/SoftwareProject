@@ -116,7 +116,7 @@ void mult_Kg_f_vector(matrixStructure *matrix, group *g, const double* vector, d
     }
 }
 
-double mult_Ag_i_f(matrixStructure *matrix, group *g, int *g_arr, double* vector, int i) {
+double mult_Ag_i_f(matrixStructure *matrix, group *g, const int *g_arr, const double* vector, int i) {
     int i_index, j, j_index, row_start, row_end, *nodes, *colind;
     spmat *A;
     double sum;
@@ -155,7 +155,7 @@ void mult_f_g_v(matrixStructure *matrix, group *g, int *g_arr, double* vector, d
     mult_Kg_f_vector(matrix, g, vector, f_g);
 }
 
-void add_norm(matrixStructure *matrix, double* vector, double* next_vector, int n) {
+void add_norm(matrixStructure *matrix, const double* vector, double* next_vector, int n) {
     int i;
 
     for (i = 0; i < n; i++) {

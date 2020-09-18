@@ -1,6 +1,6 @@
 #include "modularityGroups.h"
 
-void insert_modularity_groups(modularityGroups *modularity_groups , int* nodes, int n) {
+void insert_modularity_groups(modularityGroups *modularity_groups , const int* nodes, int n) {
     group *new_group;
     int i;
 

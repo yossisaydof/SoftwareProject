@@ -12,7 +12,7 @@ void init_unmoved(int n, int *unmoved) {
     }
 }
 
-int find_max_index(double *score, int n) {
+int find_max_index(const double *score, int n) {
     int i, max_index;
     double max, tmp_max;
 
@@ -36,7 +36,7 @@ void remove_index_from_unmoved(int *unmoved, int max_index, int last_available_i
     unmoved[last_available_index] = -1;
 }
 
-double calac_sum_Ai(matrixStructure *matrix_structure, group *g, int *g_arr, double *s, int i) {
+double calac_sum_Ai(matrixStructure *matrix_structure, group *g, const int *g_arr, const double *s, int i) {
     int i_index, j, j_index, row_start, row_end, *nodes, *colind;
     spmat *A;
     double sum = 0;
@@ -57,7 +57,7 @@ double calac_sum_Ai(matrixStructure *matrix_structure, group *g, int *g_arr, dou
     return sum;
 }
 
-double calac_sum_Ki(matrixStructure *matrix_structure, group *g, double *s, int i){
+double calac_sum_Ki(matrixStructure *matrix_structure, group *g, const double *s, int i){
     int i_index, j, j_index, M, k_i, k_j, *K, *nodes;
     double sum = 0;
     M = matrix_structure -> M;
@@ -75,7 +75,7 @@ double calac_sum_Ki(matrixStructure *matrix_structure, group *g, double *s, int 
     return sum;
 }
 
-void update_score(matrixStructure *matrix_structure, group *g, int *g_arr, double *s, double *score, int *unmoved, int unmoved_index) {
+void update_score(matrixStructure *matrix_structure, group *g, int *g_arr, double *s, double *score, const int *unmoved, int unmoved_index) {
     int k, i, k_i, M, *K;
     double sum_Ai, sum_ki;
 
@@ -108,10 +108,8 @@ double improving_division_of_the_network(matrixStructure *matrix_structure, grou
     indices = (int*) malloc(n * sizeof(int));
     unmoved = (int*) malloc(n * sizeof(int));
     d = (double*) malloc(n * sizeof(double));
-    if (score == NULL || improve == NULL || indices == NULL || unmoved == NULL) {
-        printf("%s", MALLOC_FAILED);
-        exit(EXIT_FAILURE);
-    }
+    if (score == NULL || improve == NULL || indices == NULL || unmoved == NULL)
+        ERROR_HANDLER(MALLOC_FAILED)
 
     memcpy(d, s, n * sizeof(int));
 
