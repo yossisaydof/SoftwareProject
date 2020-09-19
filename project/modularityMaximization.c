@@ -115,4 +115,5 @@ void improving_division_of_the_network(matrixStructure *matrix_structure, group 
     free(indices);
     free(unmoved);
     free(d);
+    free(mult_vector);
 }
