@@ -26,8 +26,7 @@
 #define IS_POSITIVE(X) ((X) > EPSILON())
 #define IS_NON_POSITIVE(X) ((X) <= EPSILON())
 
-//void improving_division_of_the_network(matrixStructure *matrix_structure, group *g, int *g_arr, double *s);
-void improving_division_of_the_network2(matrixStructure *matrix_structure, group *g, int *g_arr, double *s, double Q_0);
+void improving_division_of_the_network(matrixStructure *matrix_structure, group *g, int *g_arr, double *s, double Q_0);
 
 
 #endif
