@@ -94,7 +94,7 @@ void update_score(matrixStructure *matrix_structure, group *g, int *g_arr, doubl
 
 void improving_division_of_the_network(matrixStructure *matrix_structure, group *g, int *g_arr, double *s) {
     int i, j, n, j_index, i_index, *indices, *unmoved;
-    double delta_Q, *score, *improve;
+    double delta_Q, *score, *improve, *d;
 
     n = g -> size;
 
@@ -102,19 +102,21 @@ void improving_division_of_the_network(matrixStructure *matrix_structure, group 
     improve = (double*) malloc(n * sizeof(double));
     indices = (int*) malloc(n * sizeof(int));
     unmoved = (int*) malloc(n * sizeof(int));
-    s = (double*) malloc(n * sizeof(double));
-    if (score == NULL || improve == NULL || indices == NULL || unmoved == NULL)
-        ERROR_HANDLER(MALLOC_FAILED)
+    d = (double*) malloc(n * sizeof(double));
+    if (score == NULL || improve == NULL || indices == NULL || unmoved == NULL || d == NULL)
+        ERROR_HANDLER(MALLOC_FAILED);
 
+    memcpy(d, s, n * sizeof(double));
 
     do {
+        memcpy(s, d, n * sizeof(double));
         init_unmoved(n, unmoved);
 
         for (i = 0; i < n; i++) {
-            update_score(matrix_structure, g, g_arr, s, score, unmoved);
+            update_score(matrix_structure, g, g_arr, d, score, unmoved);
 
             j_index = find_max_index(score, n);
-            s[j_index] *= (-1);
+            d[j_index] *= (-1);
             indices[i] = j_index;
 
             if (i == 0) {
@@ -129,7 +131,7 @@ void improving_division_of_the_network(matrixStructure *matrix_structure, group 
         i_index = find_max_index(improve, n);
         for (i = n - 1; i > i_index; i--) {
             j = indices[i];
-            s[j] *= (-1);
+            d[j] *= (-1);
         }
 
         if (i_index == n - 1) {
@@ -145,4 +147,5 @@ void improving_division_of_the_network(matrixStructure *matrix_structure, group 
     free(improve);
     free(indices);
     free(unmoved);
+    free(d);
 }
