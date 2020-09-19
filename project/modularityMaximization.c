@@ -92,26 +92,25 @@ double calac_sum_Ki(matrixStructure *matrix_structure, group *g, const double *s
 //    }
 //}
 
-
+double calc_sum(int n, double *s, double *mult_vector) {
+    int i;
+    double sum = 0;
+    for (i = 0; i < n; i++) {
+        sum += (mult_vector[i] * s[i]);
+    }
+}
 void update_score2(matrixStructure *matrix_structure, group *g, int *g_arr, double *s, double *score, const int *unmoved,
                    double *mult_vector, double Q_0) {
-    int k, i, k_i, M, *K;
-    double sum_Ai, sum_ki;
-
-    M = matrix_structure -> M;
-    K = matrix_structure -> degreeList;
+    int i;
 
     for (i = 0; i < g -> size; i++) {
         if (unmoved[i] != -1){
-            k = unmoved[i];
-            s[k] *= (-1);
+            s[i] *= (-1);
 
-            k_i = K[g -> nodes[k]];
-            sum_Ai = calac_sum_Ai(matrix_structure, g, g_arr, s, k);
-            sum_ki = calac_sum_Ki(matrix_structure, g, s, k);
-            score[k] = 4 * s[k] * (sum_Ai - sum_ki) + ((double)4 * (k_i * k_i) / M);
+            mult_Bg_vector(matrix_structure, g, g_arr, s, mult_vector, 0);
+            score[i] = calc_sum(g -> size, s, mult_vector);
 
-            s[k] *= (-1);
+            s[i] *= (-1);
         }
     }
 }
