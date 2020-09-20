@@ -23,6 +23,6 @@
 #include "matrixStructure.h"
 #include "modularityGroups.h"
 
-double power_iteration(matrixStructure *matrix_structure, group *g, double *eigen_vector, int *g_arr);
+double power_iteration(matrixStructure *matrix_structure, group *g, double *eigen_vector, int *g_arr, double *f_g);
 
 #endif

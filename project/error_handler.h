@@ -16,8 +16,9 @@
 #define FILE_OPENING "Error: opening file failed\n"
 #define FILE_SEEK "Error: failed to seek file\n"
 #define MALLOC_FAILED "Error: malloc failed\n"
-#define ZERO_NODES "Error: the number of nodes in the graph can't be zero\n"
-#define ZERO_EDGES "Error: the number of edges in the graph can't be zero\n"
+#define ZERO_NODES "Error: number of nodes in the graph can't be zero\n"
+#define ZERO_EDGES "Error: number of edges in the graph can't be zero\n"
+#define INFINITE_LOOP "Error: you have reached to an infinite loop\n"
 
 
 #define ERROR_HANDLER(error) {printf("%s", error); exit(EXIT_FAILURE);}

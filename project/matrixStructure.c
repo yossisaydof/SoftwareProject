@@ -28,8 +28,6 @@ matrixStructure* allocate_matrix_structure(int *K, spmat *spmat_matrix, int M, i
     return matrix_structure;
 }
 
-
-
 double calc_k_v_mult(matrixStructure *matrix, group *g, const double *vector) {
     /*
      * Calculates k_i * vector[i]
@@ -112,28 +110,7 @@ void mult_Ag_v(matrixStructure *matrix, group *g, const int *g_arr, const double
     }
 }
 
-
-void mult_Kg_f_vector(matrixStructure *matrix, group *g, const double* vector, double* result) {
-    /*
-     * Calculates: (sum over j in g of K[g]_ij) * vector[i]
-     *      K[g]_ij = ((k_i * k_j) / M)   (according to indices in g)
-     * Notice that each sum of row i is of the form: ((k_i/M) * (k_0 + ... + k_n))
-     * So we calculate (k_0 + ... + k_n) only once and use it in every row.
-     */
-    int i, i_index, sum, *nodes, *K, M;
-
-    sum = sum_k_g(matrix, g);
-    nodes = g -> nodes;
-    K = matrix -> degreeList;
-    M = matrix -> M;
-
-    for (i = 0; i < g -> size; i++) {
-        i_index = nodes[i];
-        result[i] += (double)(sum * vector[i] * K[i_index]) / M;
-    }
-}
-
-double mult_Ag_i_f(matrixStructure *matrix, group *g, const int *g_arr, int i) {
+double calc_Ag_i_f(matrixStructure *matrix, group *g, const int *g_arr, int i) {
     /*
      * Calculates sum of row i in A[g] (according to indices in g).
      */
@@ -158,28 +135,40 @@ double mult_Ag_i_f(matrixStructure *matrix, group *g, const int *g_arr, int i) {
     return sum;
 }
 
-void mult_Ag_f(matrixStructure *matrix, group *g, int *g_arr, const double* vector, double *result) {
+
+void calc_vector_F(matrixStructure *matrix, group *g, int *g_arr, double *f_vector) {
     /*
-     * Calculates: (sum over j in g of A[g]_ij) * vector[i]
+     * Updates f_vector to be:
+     *      f_vector[i] = sum over j in g of B[g]_ij
+     * We calculate f_vector once for each group g
      */
-    int i;
-    double tmp;
+
+    int i, i_index, k_i, sum_k, M, *K;
+
+    sum_k = sum_k_g(matrix, g);
+    K = matrix -> degreeList;
+    M = matrix -> M;
 
     for (i = 0; i < g -> size; i++) {
-        tmp = mult_Ag_i_f(matrix, g, g_arr, i);
-        result[i] -= (tmp * vector[i]);
+        i_index = g -> nodes[i];
+        k_i = K[i_index];
+        f_vector[i] = (double) ((calc_Ag_i_f(matrix, g, g_arr, i) - ((double) sum_k * k_i / M)));
     }
 }
 
-void mult_f_g_v(matrixStructure *matrix, group *g, int *g_arr, double* vector, double* f_g) {
+void mult_f_g_v(group *g, const double* vector, const double* f_g, double *next_vector) {
     /*
      * Calculates f_g and update f_g vector according to it.
      * Reminder: f_g is a diagonal matrix, so we hold its values in a vector.
      */
-    mult_Ag_f(matrix, g, g_arr, vector, f_g);
-    mult_Kg_f_vector(matrix, g, vector, f_g);
+    int i;
+
+    for (i = 0; i < g -> size; ++i) {
+        next_vector[i] -= (f_g[i] * vector[i]);
+    }
 
 }
+
 
 void add_norm(matrixStructure *matrix, const double* vector, double* next_vector, int n) {
     /*
@@ -192,7 +181,9 @@ void add_norm(matrixStructure *matrix, const double* vector, double* next_vector
     }
 }
 
-void mult_Bg_vector(matrixStructure *matrix, group *g, int *g_arr, double* vector, double* next_vector, int norm_flag) {
+
+void mult_Bg_vector(matrixStructure *matrix, group *g, int *g_arr, double* vector, double* next_vector,
+                    double *f_g, int norm_flag) {
     /*
      * Calculates B_hat[g] * vector
      */
@@ -201,7 +192,7 @@ void mult_Bg_vector(matrixStructure *matrix, group *g, int *g_arr, double* vecto
     mult_kg_vector(matrix, g, vector, next_vector);
 
     if (g -> size != total_n) {
-        mult_f_g_v(matrix, g, g_arr, vector, next_vector);
+        mult_f_g_v(g, vector, f_g, next_vector);
     }
 
     if (norm_flag == 1) {

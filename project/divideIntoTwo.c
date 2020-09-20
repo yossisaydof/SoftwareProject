@@ -4,7 +4,7 @@
  /Algorithm 2 - Divide a group into two
 */
 
-double compute_delta_Q(matrixStructure *matrix_structure, group *g, int *g_arr, double *s) {
+double compute_delta_Q(matrixStructure *matrix_structure, group *g, int *g_arr, double *s, double *f_g) {
     /*
      * Computes deltaQ = s^t * B_hat[g] * s
      *      We first calculate (B_hat[g] * s) and store the result in mult_vector.
@@ -16,7 +16,7 @@ double compute_delta_Q(matrixStructure *matrix_structure, group *g, int *g_arr, 
     mult_vector = (double*) malloc(g -> size * sizeof(double));
 
     /* computes B_hat[g] * s and store the result in mult_vector */
-    mult_Bg_vector(matrix_structure, g, g_arr, s, mult_vector, 0);
+    mult_Bg_vector(matrix_structure, g, g_arr, s, mult_vector, f_g, 0);
 
     /* computes s^t * mult_vector */
     for (i = 0; i < g -> size; ++i) {
@@ -76,7 +76,7 @@ void divide_into_two(matrixStructure *matrix_structure, group *g, group *g1, gro
      * Implementation of algorithm 2 - divide g to 2 groups: g1, g2 if possible.
      */
     int n, i, cnt_positive, cnt_negative;
-    double eigen_value, deltaQ, *eigen_vector, *s;
+    double eigen_value, deltaQ, *eigen_vector, *s, *f_g;
 
     n = g -> size;
 
@@ -84,13 +84,21 @@ void divide_into_two(matrixStructure *matrix_structure, group *g, group *g1, gro
     eigen_vector = (double*) malloc(sizeof(double) * n);
     if (eigen_vector == NULL) ERROR_HANDLER(MALLOC_FAILED)
 
-    eigen_value = power_iteration(matrix_structure, g, eigen_vector, g_arr);
+    f_g = (double*) malloc(sizeof(double) * n);
+    if (f_g == NULL) ERROR_HANDLER(MALLOC_FAILED)
+
+    /* Updates f_g */
+    calc_vector_F(matrix_structure, g, g_arr, f_g);
+
+    /* perform power iteration */
+    eigen_value = power_iteration(matrix_structure, g, eigen_vector, g_arr, f_g);
 
     if (IS_NON_POSITIVE(eigen_value)) {
         /* eigen value is non zero so the group g is indivisible */
         reset_group(g1);
         reset_group(g2);
         free(eigen_vector);
+        free(f_g);
         return;
     }
 
@@ -111,7 +119,7 @@ void divide_into_two(matrixStructure *matrix_structure, group *g, group *g1, gro
     }
 
     /* compute deltaQ */
-    deltaQ = compute_delta_Q(matrix_structure, g, g_arr, s);
+    deltaQ = compute_delta_Q(matrix_structure, g, g_arr, s, f_g);
     if (IS_POSITIVE(eigen_value)) {
         /* Algorithm 4 - Modularity maximization */
         algorithm4(matrix_structure, g, g_arr, s, &cnt_positive, &cnt_negative);
@@ -129,4 +137,5 @@ void divide_into_two(matrixStructure *matrix_structure, group *g, group *g1, gro
 
     free(s);
     free(eigen_vector);
+    free(f_g);
 }

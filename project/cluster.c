@@ -4,6 +4,10 @@
 #include "divideIntoGroups.h"
 #include "matrixShifting.h"
 
+/*
+ * Shai liran
+ * Yossi Saydof
+ */
 
 void initialize_array_of_zeros(int *array, int n) {
     int i;
@@ -93,12 +97,10 @@ void write_output_file(FILE *output_file, modularityGroups *modularity_groups) {
             ERROR_HANDLER(FILE_WRITING)
 
         /* followed by the indices of the nodes in the group, in increasing order */
-
         for (j = 0; j < head -> size; j++) {
             if ((int) fwrite(&(head -> nodes[j]), sizeof(int), 1, output_file) != 1)
                 ERROR_HANDLER(FILE_WRITING)
         }
-
         head = head -> next;
     }
 }
@@ -109,12 +111,8 @@ int main(int argc, char* argv[]) {
     char *input_filename, *output_filename;
     matrixStructure *matrix_structure;
     modularityGroups *modularity_groups;
-    clock_t begin, end; /* TODO - delete*/
-    double time_spent; /* TODO - delete*/
 
     (void) argc;
-
-    begin = clock(); /* TODO - delete*/
 
     srand(time(NULL));
 
@@ -140,10 +138,6 @@ int main(int argc, char* argv[]) {
     matrix_structure -> free(matrix_structure);
     fclose(input_matrix_file);
     fclose(output_file);
-
-    end = clock(); /* TODO - delete*/
-    time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
-    printf("Total time: %f\n", time_spent); /* TODO - delete */
 
     exit(EXIT_SUCCESS);
 }

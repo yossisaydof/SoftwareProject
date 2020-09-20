@@ -1,6 +1,7 @@
 #include "powerIteration.h"
 
 double EPSILON = 0.00001;
+double CHECK_INFTI = 150000;
 
 void create_random_vector(int n, double *rand_vector){
     /* Fill randVector with random values */
@@ -24,11 +25,11 @@ double calc_vector_magnitude(const double *vector, int n) {
 }
 
 
-void calc_next_vector(matrixStructure *matrix_structure, group *g, int *g_arr, double* curr_vector, int n, double *next_vector) {
+void calc_next_vector(matrixStructure *matrix_structure, group *g, int *g_arr, double* curr_vector, int n, double *next_vector, double *f_g) {
     double denominator;
     int i;
     /* calculates numerator (i.e matrix_structure * curr_vector) */
-    mult_Bg_vector(matrix_structure, g, g_arr, curr_vector, next_vector, 1);
+    mult_Bg_vector(matrix_structure, g, g_arr, curr_vector, next_vector, f_g, 1);
 
     /* calculates denominator (i.e ||(matrix_structure * curr_vector)||) */
     denominator = calc_vector_magnitude(next_vector, n);
@@ -53,7 +54,7 @@ int check_diff(double *curr_vector, double *next_vector, int n) {
     return 0;
 }
 
-double clac_eigenvalue(matrixStructure *matrix_structure, group *g, int *g_arr, double *eigen_vector) {
+double clac_eigenvalue(matrixStructure *matrix_structure, group *g, int *g_arr, double *eigen_vector, double *f_g) {
     /*
      * Calculates eigen value.
      * bk is our approximation of the dominant eigenvector, an approximation of the corresponding
@@ -66,7 +67,7 @@ double clac_eigenvalue(matrixStructure *matrix_structure, group *g, int *g_arr, 
     if (mult_vector == NULL) ERROR_HANDLER(MALLOC_FAILED)
 
     /* calculates B_hat[g] * eigen_vector */
-    mult_Bg_vector(matrix_structure, g, g_arr, eigen_vector, mult_vector, 1);
+    mult_Bg_vector(matrix_structure, g, g_arr, eigen_vector, mult_vector, f_g, 1);
 
     for (i = 0; i < g -> size; i++) {
         numerator += (mult_vector[i] * eigen_vector[i]);
@@ -79,7 +80,7 @@ double clac_eigenvalue(matrixStructure *matrix_structure, group *g, int *g_arr, 
     return (numerator / denominator);
 }
 
-double power_iteration(matrixStructure *matrix_structure, group *g, double *eigen_vector, int *g_arr) {
+double power_iteration(matrixStructure *matrix_structure, group *g, double *eigen_vector, int *g_arr, double *f_g) {
     /*
      * Approximates the dominant eigenpair
      * Stores the corresponding eigenvector in eigen_vector
@@ -95,18 +96,20 @@ double power_iteration(matrixStructure *matrix_structure, group *g, double *eige
 
     create_random_vector(n, curr_vector);
 
-    while (1) { /* TODO: make sure this is not an infinite loop! */
-        calc_next_vector(matrix_structure, g, g_arr, curr_vector, n, eigen_vector);
+    while (1) {
+        calc_next_vector(matrix_structure, g, g_arr, curr_vector, n, eigen_vector, f_g);
         cnt_diff++;
         if (check_diff(curr_vector, eigen_vector, n) == 0) {
             /* the vector produced in the final iteration is the desired eigenvector */
             break;
         }
+        if (cnt_diff > (CHECK_INFTI * matrix_structure -> n))
+            ERROR_HANDLER(INFINITE_LOOP)
 
         memcpy(curr_vector, eigen_vector, n * sizeof(double));
     }
 
-    eigen_value = clac_eigenvalue(matrix_structure, g, g_arr, eigen_vector);
+    eigen_value = clac_eigenvalue(matrix_structure, g, g_arr, eigen_vector, f_g);
     free(curr_vector);
 
     return (eigen_value - (matrix_structure -> norm_1));

@@ -12,6 +12,7 @@
  * allocate_matrix_structure    - Allocate matrix structure and updates all of its parameters except for norm_1.
  * free_matrix_structure        - Free matrix structure.
  * mult_Bg_vector               - Calculates a multiplication of B_hat[g] by a vector.
+ * calc_vector_F                - Calculates vector f[g] (We only use the diagonal from the matrix F[g]).
  *
  * There are few move functions that helps calculate mult_Bg_vector (all are explained in the module).
  */
@@ -38,6 +39,7 @@ typedef struct _matrixStructure {
 } matrixStructure;
 
 matrixStructure* allocate_matrix_structure(int *K, spmat *spmat_matrix, int M, int n);
-void mult_Bg_vector(matrixStructure *matrix, group *g, int *g_arr, double* vector, double* next_vector, int norm_flag);
+void mult_Bg_vector(matrixStructure *matrix, group *g, int *g_arr, double* vector, double* next_vector, double *f_g, int norm_flag);
+void calc_vector_F(matrixStructure *matrix, group *g, int *g_arr, double *f_vector);
 
 #endif
