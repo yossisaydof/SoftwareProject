@@ -1,6 +1,9 @@
 #include "modularityGroups.h"
 
 void insert_modularity_groups(modularityGroups *modularity_groups , int *nodes, int n) {
+    /*
+     * Insert a group (with size n and that contain nodes from *nodes) to the modularity group.
+     */
     group *new_group;
     int i;
 
@@ -13,7 +16,7 @@ void insert_modularity_groups(modularityGroups *modularity_groups , int *nodes, 
     }
 
     new_group -> size = n;
-    new_group -> next = NULL;
+    new_group -> next = (group*) NULL;
 
     if (modularity_groups -> number_of_groups == 0) {
         modularity_groups -> head = new_group;
@@ -26,6 +29,9 @@ void insert_modularity_groups(modularityGroups *modularity_groups , int *nodes, 
 }
 
 group* remove_modularity_groups(modularityGroups *modularity_groups) {
+    /*
+     * Remove a group from the given modularity group
+     */
     group *tmp;
 
     tmp = modularity_groups -> head;
@@ -36,6 +42,9 @@ group* remove_modularity_groups(modularityGroups *modularity_groups) {
 }
 
 void free_modularity_groups(modularityGroups *modularity_groups) {
+    /*
+     * Free modularity group
+     */
     int i;
     group *tmp, *current;
 
@@ -50,14 +59,17 @@ void free_modularity_groups(modularityGroups *modularity_groups) {
     free(modularity_groups);
 }
 
-modularityGroups* allocate_modularity_group(){
+modularityGroups* allocate_modularity_group() {
+    /*
+     * Allocating modularity group
+     */
     modularityGroups *modularity_groups;
 
     modularity_groups = (modularityGroups*) malloc(sizeof(modularityGroups));
     if (modularity_groups == NULL) ERROR_HANDLER(MALLOC_FAILED)
 
     modularity_groups -> number_of_groups = 0;
-    modularity_groups -> head = NULL;
+    modularity_groups -> head = (group*) NULL;
 
     modularity_groups -> insert = insert_modularity_groups;
     modularity_groups -> remove = remove_modularity_groups;

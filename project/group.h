@@ -6,6 +6,7 @@
  * next group in the modularityGroup.
  *
  * free_group   - free group g.
+ * reset_group  - reset group g.
  */
 
 #ifndef GROUP_H

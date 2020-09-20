@@ -19,23 +19,6 @@ void add_row_array(struct _spmat *A, const int *row, int i) {
     rowptr[i + 1] = index;
 }
 
-void mult_array(const struct _spmat *A, const double *v, double *result) {
-    int i, j, *values, *colind, *rowptr;
-    double sum;
-
-    rowptr = (int*) A -> rowptr;
-    values = (int*) A -> values;
-    colind = (int*) A -> colind;
-
-    for (i = 0; i < A -> n; i++) {
-        sum = 0;
-        for (j = rowptr[i]; j < rowptr[i + 1]; j++) {
-            sum += (double) (values[j] * v[colind[j]]);
-        }
-        result[i] = sum;
-    }
-}
-
 void free_array(struct _spmat *A) {
     free(A -> rowptr);
     free(A -> colind);
@@ -60,7 +43,6 @@ spmat* spmat_allocate_array(int n, int nnz) {
     sparse_matrix -> n = n;
     sparse_matrix -> add_row = add_row_array;
     sparse_matrix -> free = free_array;
-    sparse_matrix -> mult = mult_array;
 
     sparse_matrix -> values = values;
     sparse_matrix -> colind = colind;

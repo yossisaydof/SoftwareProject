@@ -12,8 +12,10 @@ void initialize_array_of_zeros(int *array, int n) {
     }
 }
 
-
 matrixStructure* generate_matrix_structure(FILE *matrix_file) {
+    /*
+     * Reading the input file and store it in matrix structure.
+     */
     int n, i, j, M = 0, node_degree, node_id, *K, *matrix_row;
     matrixStructure *matrix_structure;
     spmat *spmat_matrix;
@@ -21,7 +23,7 @@ matrixStructure* generate_matrix_structure(FILE *matrix_file) {
     if ((int) fread(&n, sizeof(int), 1, matrix_file) != 1)
         ERROR_HANDLER(FILE_READING)
 
-    if (n == 0) ERROR_HANDLER(DIVIDE_BY_ZERO)
+    if (n == 0) ERROR_HANDLER(ZERO_NODES)
 
     K = (int*) malloc(n * sizeof(int));
     if (K == NULL) ERROR_HANDLER(MALLOC_FAILED)
@@ -35,7 +37,7 @@ matrixStructure* generate_matrix_structure(FILE *matrix_file) {
         if (fseek(matrix_file, (long)(node_degree * sizeof(int)), SEEK_CUR) != 0)
             ERROR_HANDLER(FILE_SEEK);
     }
-    if (M == 0) ERROR_HANDLER(DIVIDE_BY_ZERO) /* M cant be zero cause we divide by M */
+    if (M == 0) ERROR_HANDLER(ZERO_EDGES) /* M can not be zero because we divide by M */
 
     spmat_matrix = spmat_allocate_array(n, M);
 
@@ -71,6 +73,9 @@ matrixStructure* generate_matrix_structure(FILE *matrix_file) {
 
 
 void write_output_file(FILE *output_file, modularityGroups *modularity_groups) {
+    /*
+     * Iteration over the group O and write all the groups it contains to the output file
+     */
     int i, j, n, group_size;
     group *head;
 
@@ -81,23 +86,19 @@ void write_output_file(FILE *output_file, modularityGroups *modularity_groups) {
     if (fwrite(&n, sizeof(int), 1, output_file) != 1)
         ERROR_HANDLER(FILE_WRITING)
 
-    /*printf("Number of groups: %d\n", n); TODO - delete*/
     for (i = 0; i < n; i++) {
         group_size = head -> size;
         /* write number of nodes in the first group */
         if ((int) fwrite(&group_size, sizeof(int), 1, output_file) != 1)
             ERROR_HANDLER(FILE_WRITING)
 
-        /*printf("size %d:\t", group_size); TODO - delete*/
         /* followed by the indices of the nodes in the group, in increasing order */
-        /* TODO: sort nodes before writing to file */
+
         for (j = 0; j < head -> size; j++) {
             if ((int) fwrite(&(head -> nodes[j]), sizeof(int), 1, output_file) != 1)
                 ERROR_HANDLER(FILE_WRITING)
-
-            /*printf("%d  ", head -> nodes[j]);  TODO - delete*/
         }
-        /*printf("\n");  TODO - delete*/
+
         head = head -> next;
     }
 }
@@ -142,7 +143,7 @@ int main(int argc, char* argv[]) {
 
     end = clock(); /* TODO - delete*/
     time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
-    printf("Total time: %f\n", time_spent);
+    printf("Total time: %f\n", time_spent); /* TODO - delete */
 
     exit(EXIT_SUCCESS);
 }

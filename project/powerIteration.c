@@ -2,12 +2,12 @@
 
 double EPSILON = 0.00001;
 
-void create_random_vector(int n, double *randVector){
+void create_random_vector(int n, double *rand_vector){
     /* Fill randVector with random values */
     int i;
 
     for (i = 0; i < n; i++) {
-        randVector[i] = (double) rand();
+        rand_vector[i] = (double) rand();
     }
 }
 
@@ -32,7 +32,7 @@ void calc_next_vector(matrixStructure *matrix_structure, group *g, int *g_arr, d
 
     /* calculates denominator (i.e ||(matrix_structure * curr_vector)||) */
     denominator = calc_vector_magnitude(next_vector, n);
-    if (denominator == 0) ERROR_HANDLER(MALLOC_FAILED)
+    if (denominator == 0) ERROR_HANDLER(DIVIDE_BY_ZERO)
 
     /* update next_vector */
     for (i = 0; i < n; i++) {
@@ -72,7 +72,7 @@ double clac_eigenvalue(matrixStructure *matrix_structure, group *g, int *g_arr, 
         numerator += (mult_vector[i] * eigen_vector[i]);
         denominator += (eigen_vector[i] * eigen_vector[i]);
     }
-    if (denominator == 0) exit(EXIT_FAILURE);
+    if (denominator == 0) ERROR_HANDLER(DIVIDE_BY_ZERO)
 
     free(mult_vector);
 

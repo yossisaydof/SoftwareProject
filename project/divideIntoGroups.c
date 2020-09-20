@@ -5,6 +5,9 @@
  */
 
 modularityGroups* create_P(int n) {
+    /*
+     * Creating a modularity group P that contains one group g with all n nodes from our input graph.
+     */
     int i, *nodes;
     modularityGroups *P;
 
@@ -22,6 +25,11 @@ modularityGroups* create_P(int n) {
 }
 
 void update_g_arr(int *g_arr, group *g) {
+    /*
+     * g_arr is an array of size n which contains non zero values in the indices corresponding to g.
+     * g_arr[i] equals to the index of i in the group g plus 1.
+     * This will help us calculate A[g]_ij in our implementation.
+     */
     int i, i_index, *nodes;
 
     nodes = g -> nodes;
@@ -86,8 +94,8 @@ void divide_into_groups(matrixStructure *matrix_structure, modularityGroups *O) 
         }
         free(g1 -> nodes);
         free(g2 -> nodes);
-        g1->size = 0;
-        g2->size = 0;
+        g1 -> size = 0;
+        g2 -> size = 0;
         free_group(g);
     }
 

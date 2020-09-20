@@ -4,9 +4,10 @@
  *
  * Implementation of algorithm 2 - Divide a group of nodes into two to maximise the modularity.
  *
- * compute_delta_Q          - Computes deltaQ.
- * divide_g                 - Divide a group g according to s.
- * divide_into_two          - Implementation of algorithm 2.
+ * compute_delta_Q      - Computes deltaQ.
+ * divide_g             - Divide a group g according to s.
+ * algorithm4           - Invoke improving_division_of_the_network, which is an implementation of algorithm 4.
+ * divide_into_two      - Implementation of algorithm 2.
  *
  */
 

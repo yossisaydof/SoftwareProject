@@ -36,11 +36,10 @@ double sum_of_row(matrixStructure *matrix_structure, int i) {
     return sum1 + sum2;
 }
 
-
 double norm_l1(matrixStructure *matrix_structure) {
     /*
      * Calculates norm l1 of the matrix
-     * ||matrix||_1 = max_j (sum_i (|matrix_ij))
+     * ||matrix||_1 = max_j (sum_i (|matrix_ij|))
      * Notice that our matrix represents undirected graph, therefore sum of row i = sum of column i
      * */
     int i;

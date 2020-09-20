@@ -7,6 +7,8 @@
 double compute_delta_Q(matrixStructure *matrix_structure, group *g, int *g_arr, double *s) {
     /*
      * Computes deltaQ = s^t * B_hat[g] * s
+     *      We first calculate (B_hat[g] * s) and store the result in mult_vector.
+     *      Then we calculate s^t * mult_vector.
      */
     int i;
     double delta_Q = 0, *mult_vector;
@@ -25,11 +27,20 @@ double compute_delta_Q(matrixStructure *matrix_structure, group *g, int *g_arr, 
     return delta_Q;
 }
 
-void divide_g(group *g, group *g1, group *g2, const double *s) {
+void divide_g(int cnt_positive, int cnt_negative, group *g, group *g1, group *g2, const double *s) {
     /*
-     * Divide group g according to s to 2 groups: g1, g2
+     * Divide group g according to s to 2 groups: g1, g2.
      */
     int i, g1_index = 0, g2_index = 0;
+
+    g1 -> size = cnt_positive;
+    g1 -> nodes = (int*) malloc(sizeof(int) * cnt_positive);
+    if (g1 -> nodes == NULL) ERROR_HANDLER(MALLOC_FAILED)
+
+    g2 -> size = cnt_negative;
+    g2 -> nodes = (int*) malloc(sizeof(int) * cnt_negative);
+    if (g2 -> nodes == NULL) ERROR_HANDLER(MALLOC_FAILED)
+
 
     for (i = 0; i < g -> size; i++) {
         if (s[i] == 1) {
@@ -40,21 +51,36 @@ void divide_g(group *g, group *g1, group *g2, const double *s) {
             g2_index++;
         }
     }
-    g1 -> next = NULL;
-    g2 -> next = NULL;
+    g1 -> next = (group*) NULL;
+    g2 -> next = (group*) NULL;
 }
 
+void algorithm4(matrixStructure *matrix_structure, group *g, int *g_arr, double *s, int *cnt_positive, int *cnt_negative) {
+    int i;
+
+    improving_division_of_the_network(matrix_structure, g, g_arr, s);
+    *cnt_negative = 0;
+    *cnt_positive = 0;
+    for (i = 0; i < g -> size; i++) {
+        if (s[i] < EPSILON()) {
+            *cnt_negative = *cnt_negative + 1;
+        }
+        else {
+            *cnt_positive = *cnt_positive + 1;
+        }
+    }
+}
 
 void divide_into_two(matrixStructure *matrix_structure, group *g, group *g1, group *g2, int *g_arr) {
     /*
-     * Implementation of algorithm 2 - divide g to 2 groups: g1, g2 if possible
+     * Implementation of algorithm 2 - divide g to 2 groups: g1, g2 if possible.
      */
     int n, i, cnt_positive, cnt_negative;
     double eigen_value, deltaQ, *eigen_vector, *s;
 
     n = g -> size;
 
-    /* compute leading eigenpair of the modularity matrix B_hat_g */
+    /* Compute leading eigen-pair of the modularity matrix B_hat_g */
     eigen_vector = (double*) malloc(sizeof(double) * n);
     if (eigen_vector == NULL) ERROR_HANDLER(MALLOC_FAILED)
 
@@ -86,21 +112,14 @@ void divide_into_two(matrixStructure *matrix_structure, group *g, group *g1, gro
 
     /* compute deltaQ */
     deltaQ = compute_delta_Q(matrix_structure, g, g_arr, s);
-    if (eigen_value > EPSILON()) {
-        improving_division_of_the_network(matrix_structure, g, g_arr, s, deltaQ);
+    if (IS_POSITIVE(eigen_value)) {
+        /* Algorithm 4 - Modularity maximization */
+        algorithm4(matrix_structure, g, g_arr, s, &cnt_positive, &cnt_negative);
     }
 
     if (IS_POSITIVE(deltaQ)) {
         /* delta_Q > EPSILON so group g is divisible */
-        g1 -> size = cnt_positive;
-        g1 -> nodes = (int*) malloc(sizeof(int) * cnt_positive);
-        if (g1 -> nodes == NULL) ERROR_HANDLER(MALLOC_FAILED)
-
-        g2 -> size = cnt_negative;
-        g2 -> nodes = (int*) malloc(sizeof(int) * cnt_negative);
-        if (g2 -> nodes == NULL) ERROR_HANDLER(MALLOC_FAILED)
-
-        divide_g(g, g1, g2, s); /* divide g into two groups according to s */
+        divide_g(cnt_positive, cnt_negative, g, g1, g2, s); /* divide g into two groups according to s */
     }
     else {
         /* if deltaQ <= EPSILON the group g is indivisible */

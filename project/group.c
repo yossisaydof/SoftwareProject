@@ -9,7 +9,7 @@ void free_group(group *g) {
 }
 
 void reset_group(group *g) {
-    g -> nodes = NULL;
-    g -> next = NULL;
+    g -> nodes = (int*) NULL;
+    g -> next = (group*) NULL;
     g -> size = 0;
 }

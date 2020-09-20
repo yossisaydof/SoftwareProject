@@ -5,7 +5,11 @@
  * This module is used to store the input graph.
  *
  * We used a compressed sparse row implementation, which represents a matrix M by three (one-dimensional) arrays,
- * that respectively contain nonzero values, the extents of rows, and column indices..
+ * that respectively contain nonzero values, the extents of rows, and column indices.
+ *
+ * add_row_array            - Add a new row to the sparse matrix.
+ * free_array               - Frees the sparse matrix.
+ * spmat_allocate_array     - Allocating a new sparse matrix.
  * */
 
 #ifndef SPMATARRAY_H
@@ -27,9 +31,6 @@ typedef struct _spmat {
 
     /* Frees all resources used by A */
     void	(*free)(struct _spmat *A);
-
-    /* Multiplies matrix A by vector v, into result (result is pre-allocated) */
-    void	(*mult)(const struct _spmat *A, const double *v, double *result);
 
 } spmat;
 

@@ -12,8 +12,8 @@
  * allocate_matrix_structure    - Allocate matrix structure and updates all of its parameters except for norm_1.
  * free_matrix_structure        - Free matrix structure.
  * mult_Bg_vector               - Calculates a multiplication of B_hat[g] by a vector.
- * mult_Bg_vector_i             - Calculates place i in the result vector of the previous function.
  *
+ * There are few move functions that helps calculate mult_Bg_vector (all are explained in the module).
  */
 
 #ifndef MATRIXSTRUCTURE_H
