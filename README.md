@@ -3,7 +3,7 @@
 ## General description
 Implementation of algorithm for cluster detection within networks. The method is useful in various fields to characterize functional clusters of individual nodes within a system. (see reference below)
 
-[Fig. 1](Fig1.PNG)
+![Fig. 1](Fig1.PNG)
 
 ## Input :inbox_tray:
 The algorithm recieves a file representing the graph.
