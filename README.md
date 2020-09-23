@@ -8,7 +8,7 @@ Implementation of algorithm for cluster detection within networks. The method is
 </p>
 
 > **_Reference:_**
-Newman, Mark EJ. "Modularity and community structure in networks." Proceedings of the national academy of sciences 103, no. 23 (2006): 8577-8582. [[Link]](https://www.pnas.org/content/pnas/103/23/8577.full.pdf)
+Newman, Mark EJ. "Modularity and community structure in networks." Proceedings of the national academy of sciences 103, no. 23 (2006): 8577-8582. [[Link]](https://www.pnas.org/content/103/23/8577.short)
 
 <br />
 
