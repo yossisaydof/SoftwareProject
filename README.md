@@ -4,7 +4,7 @@
 Implementation of algorithm for cluster detection within networks. The method is useful in various fields to characterize functional clusters of individual nodes within a system. (see reference below)
 
 <p align="center">
-  <img src="Fig1.PNG">
+  <img src="Fig1.PNG" width="50%" height="50%">
 </p>
 
 > **_Reference:_**
